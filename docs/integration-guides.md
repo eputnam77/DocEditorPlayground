@@ -11,6 +11,9 @@ These quick notes show how to add or remove plugins or extensions when you use t
    const editor = new Editor({ extensions: [StarterKit, ...custom] });
    ```
 3. Remove a plugin by leaving it out of the extensions array.
+4. To use a local extension during development, link or import it directly:
+   - `npm link ../my-extension` and include it in `extensions`.
+   - Or import from a relative file path: `import MyExt from '../ext/MyExt'`.
 
 ## Toast UI
 
