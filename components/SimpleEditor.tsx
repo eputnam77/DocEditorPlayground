@@ -40,9 +40,13 @@ export default function SimpleEditor({
 
   return (
     <div>
-      <div style={{ marginBottom: "0.5rem" }}>
+      <div className="mb-2 flex gap-2">
         {enabledPlugins.includes("bold") && (
-          <button onClick={toggleBold} data-testid="btn-bold">
+          <button
+            onClick={toggleBold}
+            data-testid="btn-bold"
+            className="rounded border px-3 py-1"
+          >
             Bold
           </button>
         )}
@@ -50,7 +54,7 @@ export default function SimpleEditor({
           <button
             onClick={toggleItalic}
             data-testid="btn-italic"
-            style={{ marginLeft: "0.5rem" }}
+            className="rounded border px-3 py-1"
           >
             Italic
           </button>
@@ -63,6 +67,7 @@ export default function SimpleEditor({
           fontWeight: bold ? "bold" : "normal",
           fontStyle: italic ? "italic" : "normal",
         }}
+        className="w-full h-[70vh] p-4 border rounded"
         data-testid="simple-editor"
       />
     </div>
