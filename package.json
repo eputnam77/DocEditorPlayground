@@ -32,7 +32,8 @@
     "eslint": "latest",
     "@typescript-eslint/eslint-plugin": "latest",
     "@typescript-eslint/parser": "latest",
-    "prettier": "latest"
+    "prettier": "latest",
+    "@tailwindcss/postcss": "latest"
   },
   "engines": {
     "node": ">=20.0.0"
