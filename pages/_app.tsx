@@ -1,5 +1,6 @@
 import type { AppProps } from "next/app";
 import "../styles/globals.css";
+import "@toast-ui/editor/dist/toastui-editor.css";
 
 /**
  * Root application component that imports global styles.

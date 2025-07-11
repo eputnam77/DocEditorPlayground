@@ -1,2 +1,7 @@
 /* eslint-disable */
-export default {};
+export default function StarterKit(options = {}) {
+  return { name: "starterKit", options };
+}
+StarterKit.configure = function (opts = {}) {
+  return StarterKit(opts);
+};
