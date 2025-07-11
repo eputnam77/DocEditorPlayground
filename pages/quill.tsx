@@ -1,4 +1,5 @@
 import { useState } from "react";
+import dynamic from "next/dynamic";
 import { validateDocument } from "../utils/validation";
 import USWDSDocEditorLayout from "../components/USWDSDocEditorLayout";
 import EditorToolbar from "../components/EditorToolbar";
@@ -7,7 +8,7 @@ import TemplateLoader from "../components/TemplateLoader";
 import EditorIntegrationInfo from "../components/EditorIntegrationInfo";
 import QuillEditor from "../components/QuillEditor"; // Use your Quill editor component
 
-export default function QuillPage() {
+function QuillPage() {
   const [content, setContent] = useState("");
   const [valid, setValid] = useState(true);
 
@@ -74,3 +75,5 @@ export default function QuillPage() {
     </USWDSDocEditorLayout>
   );
 }
+
+export default dynamic(() => Promise.resolve(QuillPage), { ssr: false });
