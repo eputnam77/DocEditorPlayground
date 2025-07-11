@@ -46,7 +46,8 @@
     "@typescript-eslint/eslint-plugin": "latest",
     "@typescript-eslint/parser": "latest",
     "prettier": "latest",
-    "@tailwindcss/postcss": "latest"
+    "@tailwindcss/postcss": "latest",
+    "autoprefixer": "latest"
   },
   "engines": {
     "node": ">=20.0.0"
