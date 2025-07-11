@@ -1,6 +1,6 @@
 # Document Editor Playground
 
-This project demonstrates multiple rich text editors side by side using **Next.js** and **TypeScript**. Tailwind CSS styles the UI. To keep the demo lightweight, each editor page uses a small built‑in component instead of the real packages.
+This project demonstrates multiple rich text editors side by side using **Next.js** and **TypeScript**. Tailwind CSS styles the UI. Each editor page integrates the official package for that editor.
 
 ## Features
 

@@ -6,7 +6,7 @@ import StarterKit from "@tiptap/starter-kit";
 interface TipTapEditorProps {
   value: string;
   onChange: (val: string) => void;
-  extensions?: Extension[];  // For custom plugins/extensions
+  extensions?: Extension[]; // For custom plugins/extensions
   editable?: boolean;
 }
 
@@ -36,7 +36,10 @@ export default function TipTapEditor({
   }, [value, editor]);
 
   return (
-    <div className="border rounded bg-white dark:bg-zinc-900 min-h-[200px]">
+    <div
+      className="border rounded bg-white dark:bg-zinc-900 min-h-[200px]"
+      data-testid="simple-editor"
+    >
       <EditorContent editor={editor} />
     </div>
   );

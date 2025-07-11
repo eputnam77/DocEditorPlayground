@@ -51,8 +51,12 @@ export default function QuillEditor({ value, onChange }: QuillEditorProps) {
   }, [value]);
 
   return (
-    <div>
-      <div ref={editorRef} style={{ minHeight: 200 }} className="rounded border" />
+    <div data-testid="simple-editor">
+      <div
+        ref={editorRef}
+        style={{ minHeight: 200 }}
+        className="rounded border"
+      />
     </div>
   );
 }
