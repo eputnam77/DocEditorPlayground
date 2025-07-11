@@ -97,4 +97,4 @@ This file tracks planned tasks for implementing the **Document Editor Playground
 
 ---
 
-**Next agent:** ready-for:implementer
+**Next agent:** ready-for:scenario-gen
