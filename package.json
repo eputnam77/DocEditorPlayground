@@ -13,7 +13,8 @@
     "format": "prettier --write .",
     "test": "vitest run",
     "test:watch": "vitest",
-    "test:coverage": "vitest run --coverage"
+    "test:coverage": "vitest run --coverage",
+    "test:e2e": "playwright test"
   },
   "dependencies": {
     "next": "12.3.4",
@@ -47,7 +48,8 @@
     "@typescript-eslint/parser": "latest",
     "prettier": "latest",
     "@tailwindcss/postcss": "latest",
-    "autoprefixer": "latest"
+    "autoprefixer": "latest",
+    "@playwright/test": "latest"
   },
   "engines": {
     "node": ">=20.0.0"
