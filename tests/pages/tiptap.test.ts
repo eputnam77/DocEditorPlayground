@@ -1,7 +1,10 @@
+import { render, screen } from '@testing-library/react';
 import { describe, it, expect } from 'vitest';
+import TiptapPage from '../../pages/tiptap';
 
 describe('TiptapPage', () => {
-  it('should render Tiptap editor with expected features', () => {
-    expect(true).toBe(false);
+  it('renders plugin manager', () => {
+    render(<TiptapPage />);
+    expect(screen.getByTestId('plugin-bold')).toBeInTheDocument();
   });
 });

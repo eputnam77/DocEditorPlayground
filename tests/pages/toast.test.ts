@@ -1,7 +1,10 @@
+import { render, screen } from '@testing-library/react';
 import { describe, it, expect } from 'vitest';
+import ToastPage from '../../pages/toast';
 
 describe('ToastPage', () => {
-  it('should render Toast editor with expected features', () => {
-    expect(true).toBe(false);
+  it('renders plugin manager', () => {
+    render(<ToastPage />);
+    expect(screen.getByTestId('plugin-chart')).toBeInTheDocument();
   });
 });

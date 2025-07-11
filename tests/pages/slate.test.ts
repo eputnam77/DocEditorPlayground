@@ -1,7 +1,10 @@
+import { render, screen } from '@testing-library/react';
 import { describe, it, expect } from 'vitest';
+import SlatePage from '../../pages/slate';
 
 describe('SlatePage', () => {
-  it('should render Slate editor with expected features', () => {
-    expect(true).toBe(false);
+  it('renders plugin manager', () => {
+    render(<SlatePage />);
+    expect(screen.getByTestId('plugin-history')).toBeInTheDocument();
   });
 });
