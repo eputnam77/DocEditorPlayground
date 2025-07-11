@@ -1,16 +1,25 @@
-import fc from 'fast-check';
-import { validateDocument } from '../../utils/validation';
-import { describe, it } from 'vitest';
+import fc from "fast-check";
+import { validateDocument, validateTemplate } from "../../utils/validation";
+import { describe, it } from "vitest";
 
-// Property: validateDocument should return a boolean for any input and not throw
+// Property: validators should return boolean for any input without throwing
 
-describe('validateDocument (property)', () => {
-  it('returns a boolean for arbitrary documents', () => {
+describe("validation utils (property)", () => {
+  it("validateDocument returns boolean", () => {
     fc.assert(
       fc.property(fc.anything(), (doc) => {
         const result = validateDocument(doc);
-        return typeof result === 'boolean';
-      })
+        return typeof result === "boolean";
+      }),
+    );
+  });
+
+  it("validateTemplate returns boolean", () => {
+    fc.assert(
+      fc.property(fc.anything(), (tpl) => {
+        const result = validateTemplate(tpl);
+        return typeof result === "boolean";
+      }),
     );
   });
 });

@@ -1,16 +1,22 @@
-import PluginManager from '../components/PluginManager';
-import TemplateLoader from '../components/TemplateLoader';
-import EditorIntegrationInfo from '../components/EditorIntegrationInfo';
-import NavBar from '../components/NavBar';
+import { useState } from "react";
+import PluginManager from "../components/PluginManager";
+import TemplateLoader from "../components/TemplateLoader";
+import EditorIntegrationInfo from "../components/EditorIntegrationInfo";
+import NavBar from "../components/NavBar";
+import SimpleEditor from "../components/SimpleEditor";
 
 export default function SlatePage() {
+  const [content, setContent] = useState("");
+
   return (
     <div>
       <NavBar />
       <h1>Slate Editor</h1>
-      <textarea data-testid="editor" />
-      <PluginManager plugins={['history', 'links']} />
-      <TemplateLoader onLoad={console.log} />
+      <SimpleEditor initialValue={content} onChange={setContent} />
+      <PluginManager plugins={["history", "links"]} />
+      <TemplateLoader
+        onLoad={(tpl) => setContent(JSON.stringify(tpl, null, 2))}
+      />
       <EditorIntegrationInfo editorName="slate" />
     </div>
   );
