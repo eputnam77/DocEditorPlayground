@@ -27,7 +27,7 @@ export default function SimpleEditor({
     setItalic((b) => !b);
   }
 
-  function handleChange(e: React.ChangeEvent<HTMLTextAreaElement>) {
+  function handleChange(e: any) {
     const newValue = e.target.value;
     setValue(newValue);
     onChange?.(newValue);
