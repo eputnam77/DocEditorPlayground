@@ -1,20 +1,21 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect } from "react";
 
 /**
  * Button to toggle the `dark` class on the document root.
  */
 export default function DarkModeToggle() {
   // Check for user’s dark mode preference on mount
-  const [enabled, setEnabled] = useState(() =>
+  const initial =
     typeof window !== "undefined"
       ? document.documentElement.classList.contains("dark")
-      : false
-  );
+      : false;
+  const [enabled, setEnabled] = useState<boolean>(initial);
 
   function toggle() {
-    setEnabled(prev => {
-      document.documentElement.classList.toggle('dark', !prev);
-      return !prev;
+    setEnabled((prev) => {
+      const next = !prev;
+      document.documentElement.classList.toggle("dark", next);
+      return next;
     });
   }
 
@@ -32,11 +33,17 @@ export default function DarkModeToggle() {
     >
       {enabled ? (
         <>
-          <span role="img" aria-label="Light mode">☀️</span> Light Mode
+          <span role="img" aria-label="Light mode">
+            ☀️
+          </span>{" "}
+          Light Mode
         </>
       ) : (
         <>
-          <span role="img" aria-label="Dark mode">🌙</span> Dark Mode
+          <span role="img" aria-label="Dark mode">
+            🌙
+          </span>{" "}
+          Dark Mode
         </>
       )}
     </button>

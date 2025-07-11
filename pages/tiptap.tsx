@@ -13,8 +13,17 @@ export interface TiptapPageProps {
 
 export default function TiptapPage({ extensions = [] }: TiptapPageProps) {
   const [content, setContent] = useState("");
+  // Track which optional extensions are enabled. Keys correspond to
+  // PluginManager entries and map to StarterKit configuration options.
+  const [plugins, setPlugins] = useState({ bold: true, italic: true });
   const editor = useEditor({
-    extensions: [StarterKit, ...extensions],
+    extensions: [
+      StarterKit.configure({
+        bold: plugins.bold,
+        italic: plugins.italic,
+      }),
+      ...extensions,
+    ],
     content,
     onUpdate({ editor }) {
       setContent(editor.getHTML());
@@ -35,11 +44,20 @@ export default function TiptapPage({ extensions = [] }: TiptapPageProps) {
         </div>
         <div className="flex flex-col md:flex-row gap-6">
           <div className="flex-1">
-            <h2 className="text-lg font-semibold mb-2 text-zinc-700 dark:text-zinc-200">Plugins</h2>
-            <PluginManager plugins={["bold", "italic"]} />
+            <h2 className="text-lg font-semibold mb-2 text-zinc-700 dark:text-zinc-200">
+              Plugins
+            </h2>
+            <PluginManager
+              plugins={["bold", "italic"]}
+              onToggle={(name, enabled) =>
+                setPlugins((p) => ({ ...p, [name]: enabled }))
+              }
+            />
           </div>
           <div className="flex-1">
-            <h2 className="text-lg font-semibold mb-2 text-zinc-700 dark:text-zinc-200">Templates</h2>
+            <h2 className="text-lg font-semibold mb-2 text-zinc-700 dark:text-zinc-200">
+              Templates
+            </h2>
             <TemplateLoader
               onLoad={(tpl) => setContent(JSON.stringify(tpl, null, 2))}
             />

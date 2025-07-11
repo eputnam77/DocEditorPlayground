@@ -5,16 +5,21 @@ export interface SimpleEditorProps {
   initialValue?: string;
   /** Callback fired when the text changes */
   onChange?: (value: string) => void;
+  /** Names of enabled plugins controlling which toolbar buttons show. */
+  enabledPlugins?: string[];
 }
 
 /**
  * Very small text editor using a textarea and simple toolbar.
  * Formatting toggles update textarea styling but do not modify the text.
+ * `enabledPlugins` controls which formatting buttons appear, allowing
+ * external components to enable/disable features without complex logic.
  * This avoids heavy dependencies while providing minimal editor behaviour.
  */
 export default function SimpleEditor({
   initialValue = "",
   onChange,
+  enabledPlugins = ["bold", "italic"],
 }: SimpleEditorProps) {
   const [value, setValue] = useState(initialValue);
   const [bold, setBold] = useState(false);
@@ -36,16 +41,20 @@ export default function SimpleEditor({
   return (
     <div>
       <div style={{ marginBottom: "0.5rem" }}>
-        <button onClick={toggleBold} data-testid="btn-bold">
-          Bold
-        </button>
-        <button
-          onClick={toggleItalic}
-          data-testid="btn-italic"
-          style={{ marginLeft: "0.5rem" }}
-        >
-          Italic
-        </button>
+        {enabledPlugins.includes("bold") && (
+          <button onClick={toggleBold} data-testid="btn-bold">
+            Bold
+          </button>
+        )}
+        {enabledPlugins.includes("italic") && (
+          <button
+            onClick={toggleItalic}
+            data-testid="btn-italic"
+            style={{ marginLeft: "0.5rem" }}
+          >
+            Italic
+          </button>
+        )}
       </div>
       <textarea
         value={value}
