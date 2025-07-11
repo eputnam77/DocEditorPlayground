@@ -1,4 +1,5 @@
 import { useState } from "react";
+import { validateDocument } from "../utils/validation";
 import { EditorContent, useEditor } from "@tiptap/react";
 import StarterKit from "@tiptap/starter-kit";
 import PluginManager from "../components/PluginManager";
@@ -13,6 +14,7 @@ export interface TiptapPageProps {
 
 export default function TiptapPage({ extensions = [] }: TiptapPageProps) {
   const [content, setContent] = useState("");
+  const [valid, setValid] = useState(true);
   // Track which optional extensions are enabled. Keys correspond to
   // PluginManager entries and map to StarterKit configuration options.
   const [plugins, setPlugins] = useState({ bold: true, italic: true });
@@ -39,8 +41,19 @@ export default function TiptapPage({ extensions = [] }: TiptapPageProps) {
         <h1 className="text-3xl md:text-4xl font-extrabold text-transparent bg-clip-text bg-gradient-to-r from-pink-500 via-indigo-500 to-fuchsia-500 drop-shadow">
           TipTap Editor
         </h1>
+        <p className="text-zinc-600 dark:text-zinc-300">
+          Rich-text editor built on ProseMirror with an intuitive API.
+        </p>
         <div className="mb-4 rounded-lg border border-zinc-200 dark:border-zinc-600 bg-zinc-50 dark:bg-zinc-900 p-4 min-h-[200px]">
-          <EditorContent editor={editor} data-testid="tiptap-editor" />
+          <EditorContent
+            editor={editor}
+            data-testid="tiptap-editor"
+            className="min-h-[60vh]"
+            onBlur={() => setValid(validateDocument({ content }))}
+          />
+          <div className="mt-2 text-sm">
+            {valid ? "Document valid" : "Document invalid"}
+          </div>
         </div>
         <div className="flex flex-col md:flex-row gap-6">
           <div className="flex-1">

@@ -1,4 +1,5 @@
 import { useState } from "react";
+import { validateDocument } from "../utils/validation";
 import PluginManager from "../components/PluginManager";
 import TemplateLoader from "../components/TemplateLoader";
 import EditorIntegrationInfo from "../components/EditorIntegrationInfo";
@@ -7,6 +8,7 @@ import SimpleEditor from "../components/SimpleEditor";
 
 export default function CodexPage() {
   const [content, setContent] = useState("");
+  const [valid, setValid] = useState(true);
 
   return (
     <main className="min-h-screen bg-gradient-to-br from-blue-50 via-slate-100 to-fuchsia-50 dark:from-zinc-900 dark:via-zinc-800 dark:to-zinc-700 flex flex-col items-center py-8">
@@ -17,16 +19,32 @@ export default function CodexPage() {
         <h1 className="text-3xl md:text-4xl font-extrabold text-transparent bg-clip-text bg-gradient-to-r from-fuchsia-500 via-blue-500 to-violet-600 drop-shadow">
           Editor.js (CodeX)
         </h1>
+        <p className="text-zinc-600 dark:text-zinc-300">
+          A lightweight block-style editor with basic formatting options.
+        </p>
         <div className="mb-4">
-          <SimpleEditor initialValue={content} onChange={setContent} />
+          <SimpleEditor
+            initialValue={content}
+            onChange={(val) => {
+              setContent(val);
+              setValid(validateDocument({ content: val }));
+            }}
+          />
+          <div className="mt-2 text-sm">
+            {valid ? "Document valid" : "Document invalid"}
+          </div>
         </div>
         <div className="flex flex-col md:flex-row gap-6">
           <div className="flex-1">
-            <h2 className="text-lg font-semibold mb-2 text-zinc-700 dark:text-zinc-200">Plugins</h2>
+            <h2 className="text-lg font-semibold mb-2 text-zinc-700 dark:text-zinc-200">
+              Plugins
+            </h2>
             <PluginManager plugins={["header", "list"]} />
           </div>
           <div className="flex-1">
-            <h2 className="text-lg font-semibold mb-2 text-zinc-700 dark:text-zinc-200">Templates</h2>
+            <h2 className="text-lg font-semibold mb-2 text-zinc-700 dark:text-zinc-200">
+              Templates
+            </h2>
             <TemplateLoader
               onLoad={(tpl) => setContent(JSON.stringify(tpl, null, 2))}
             />
