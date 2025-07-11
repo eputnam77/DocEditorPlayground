@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { EditorContent, Extension, useEditor } from "@tiptap/react";
+import { EditorContent, useEditor } from "@tiptap/react";
 import StarterKit from "@tiptap/starter-kit";
 import PluginManager from "../components/PluginManager";
 import TemplateLoader from "../components/TemplateLoader";
@@ -8,7 +8,7 @@ import NavBar from "../components/NavBar";
 
 export interface TiptapPageProps {
   /** Additional TipTap extensions to load */
-  extensions?: Extension[];
+  extensions?: any[];
 }
 
 export default function TiptapPage({ extensions = [] }: TiptapPageProps) {
