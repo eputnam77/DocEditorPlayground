@@ -1,4 +1,5 @@
 import { useState } from "react";
+import dynamic from "next/dynamic";
 import { validateDocument } from "../utils/validation";
 import USWDSDocEditorLayout from "../components/USWDSDocEditorLayout";
 import EditorToolbar from "../components/EditorToolbar";
@@ -8,7 +9,7 @@ import EditorIntegrationInfo from "../components/EditorIntegrationInfo";
 import { EditorContent, useEditor } from "@tiptap/react";
 import StarterKit from "@tiptap/starter-kit";
 
-export default function TiptapPage() {
+function TiptapPage() {
   const [content, setContent] = useState("");
   const [valid, setValid] = useState(true);
   const [plugins, setPlugins] = useState({
@@ -126,3 +127,5 @@ export default function TiptapPage() {
     </USWDSDocEditorLayout>
   );
 }
+
+export default dynamic(() => Promise.resolve(TiptapPage), { ssr: false });

@@ -1,4 +1,5 @@
 import { useState } from "react";
+import dynamic from "next/dynamic";
 import { validateDocument } from "../utils/validation";
 import USWDSDocEditorLayout from "../components/USWDSDocEditorLayout";
 import EditorToolbar from "../components/EditorToolbar";
@@ -7,7 +8,7 @@ import TemplateLoader from "../components/TemplateLoader";
 import EditorIntegrationInfo from "../components/EditorIntegrationInfo";
 import SlateEditor from "../components/SlateEditor"; // Your Slate editor component
 
-export default function SlatePage() {
+function SlatePage() {
   const [content, setContent] = useState("");
   const [valid, setValid] = useState(true);
 
@@ -76,3 +77,5 @@ export default function SlatePage() {
     </USWDSDocEditorLayout>
   );
 }
+
+export default dynamic(() => Promise.resolve(SlatePage), { ssr: false });
