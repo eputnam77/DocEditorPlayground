@@ -17,14 +17,23 @@ type TemplateName = keyof typeof templates;
  * Provides a dropdown to select and load example templates. Displays
  * validation result after loading.
  */
+/**
+ * Dropdown menu for loading example templates. Validation is performed after
+ * loading and the result displayed to the user. Errors in the provided
+ * `onLoad` handler are caught to prevent UI crashes.
+ */
 export default function TemplateLoader({ onLoad }: TemplateLoaderProps) {
   const [selected, setSelected] = useState<TemplateName>("example");
   const [message, setMessage] = useState("");
 
   function handleLoad() {
     const tpl = templates[selected];
-    onLoad(tpl);
-    setMessage(validateTemplate(tpl) ? "Template valid" : "Template invalid");
+    try {
+      onLoad(tpl);
+      setMessage(validateTemplate(tpl) ? "Template valid" : "Template invalid");
+    } catch {
+      setMessage("Failed to load template");
+    }
   }
 
   return (

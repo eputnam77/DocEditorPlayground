@@ -12,4 +12,10 @@ describe("SimpleEditor", () => {
     fireEvent.click(screen.getByTestId("btn-italic"));
     expect(editor).toHaveStyle("font-style: italic");
   });
+
+  it("hides buttons when plugins disabled", () => {
+    render(<SimpleEditor enabledPlugins={[]} />);
+    expect(screen.queryByTestId("btn-bold")).toBeNull();
+    expect(screen.queryByTestId("btn-italic")).toBeNull();
+  });
 });
