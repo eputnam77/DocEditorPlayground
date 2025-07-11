@@ -1,4 +1,4 @@
-import React, { useMemo, useCallback, useEffect } from "react";
+import { useMemo, useCallback, useEffect, useState } from "react";
 import { createEditor, Descendant } from "slate";
 import { Slate, Editable, withReact } from "slate-react";
 
@@ -32,8 +32,7 @@ export default function SlateEditor({
 
   // Keep internal value in sync with external changes
   const initialValue = useMemo(() => safeParseValue(value), []);
-  const [localValue, setLocalValue] =
-    React.useState<Descendant[]>(initialValue);
+  const [localValue, setLocalValue] = useState<Descendant[]>(initialValue);
 
   useEffect(() => {
     // If the external value changes, update local

@@ -1,18 +1,20 @@
 // components/USWDSDocEditorLayout.tsx
 
-import React from "react";
+import type { ReactNode } from "react";
+
+interface LayoutProps {
+  editorName: string;
+  toolbar?: ReactNode;
+  menu?: ReactNode;
+  children: ReactNode;
+}
 
 export default function USWDSDocEditorLayout({
   editorName,
   toolbar,
   menu,
   children,
-}: {
-  editorName: string;
-  toolbar?: React.ReactNode;
-  menu?: React.ReactNode;
-  children: React.ReactNode;
-}) {
+}: LayoutProps) {
   return (
     <div className="min-h-screen bg-gray-50 flex flex-col">
       {/* Header */}

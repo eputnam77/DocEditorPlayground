@@ -17,9 +17,15 @@ export default function LexicalPage() {
       toolbar={<EditorToolbar />}
       menu={
         <nav className="flex gap-2">
-          <button className="px-3 py-2 text-sm font-medium text-blue-700 bg-blue-50 border border-blue-300 rounded hover:bg-blue-100">New</button>
-          <button className="px-3 py-2 text-sm font-medium text-gray-700 bg-gray-100 border border-gray-300 rounded hover:bg-gray-200">Open</button>
-          <button className="px-3 py-2 text-sm font-medium text-gray-700 bg-gray-100 border border-gray-300 rounded hover:bg-gray-200">Save</button>
+          <button className="px-3 py-2 text-sm font-medium text-blue-700 bg-blue-50 border border-blue-300 rounded hover:bg-blue-100">
+            New
+          </button>
+          <button className="px-3 py-2 text-sm font-medium text-gray-700 bg-gray-100 border border-gray-300 rounded hover:bg-gray-200">
+            Open
+          </button>
+          <button className="px-3 py-2 text-sm font-medium text-gray-700 bg-gray-100 border border-gray-300 rounded hover:bg-gray-200">
+            Save
+          </button>
         </nav>
       }
     >
@@ -43,12 +49,22 @@ export default function LexicalPage() {
       <div className="flex flex-col md:flex-row gap-6">
         <div className="flex-1">
           <h2 className="text-lg font-semibold mb-2 text-gray-800">Plugins</h2>
-          <PluginManager plugins={[
-            "history", "markdown", "table", "list", "codeHighlight", "collaboration", "comment"
-          ]} />
+          <PluginManager
+            plugins={[
+              "history",
+              "markdown",
+              "table",
+              "list",
+              "codeHighlight",
+              "collaboration",
+              "comment",
+            ]}
+          />
         </div>
         <div className="flex-1">
-          <h2 className="text-lg font-semibold mb-2 text-gray-800">Templates</h2>
+          <h2 className="text-lg font-semibold mb-2 text-gray-800">
+            Templates
+          </h2>
           <TemplateLoader
             onLoad={(tpl) => setContent(JSON.stringify(tpl, null, 2))}
           />

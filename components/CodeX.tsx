@@ -1,4 +1,4 @@
-import React, { useEffect, useRef } from "react";
+import { useEffect, useRef } from "react";
 import EditorJS from "@editorjs/editorjs";
 import Header from "@editorjs/header";
 import List from "@editorjs/list";
@@ -23,7 +23,7 @@ const DEFAULT_DATA = {
   version: "2.29.1",
 };
 
-const CodeX: React.FC<CodeXProps> = ({ value, onChange, readOnly = false }) => {
+function CodeX({ value, onChange, readOnly = false }: CodeXProps): JSX.Element {
   const ejInstance = useRef<EditorJS | null>(null);
   const holder = useRef<HTMLDivElement | null>(null);
 
@@ -78,6 +78,6 @@ const CodeX: React.FC<CodeXProps> = ({ value, onChange, readOnly = false }) => {
       <div ref={holder} />
     </div>
   );
-};
+}
 
 export default CodeX;

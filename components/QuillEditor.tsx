@@ -9,13 +9,13 @@ interface QuillEditorProps {
 }
 
 export default function QuillEditor({ value, onChange }: QuillEditorProps) {
-  const editorRef = useRef<HTMLDivElement>(null);
+  const editorRef = useRef<HTMLDivElement | null>(null);
   const quillRef = useRef<Quill | null>(null);
 
   // Set up the Quill editor once on mount
   useEffect(() => {
     if (editorRef.current && !quillRef.current) {
-      quillRef.current = new Quill(editorRef.current, {
+      quillRef.current = new (Quill as any)(editorRef.current, {
         theme: "snow",
         modules: {
           toolbar: [
@@ -33,10 +33,10 @@ export default function QuillEditor({ value, onChange }: QuillEditorProps) {
       });
 
       // Set initial value
-      quillRef.current.root.innerHTML = value || "";
+      quillRef.current!.root.innerHTML = value || "";
 
       // Handle text change
-      quillRef.current.on("text-change", () => {
+      quillRef.current!.on("text-change", () => {
         const html = quillRef.current!.root.innerHTML;
         onChange(html);
       });

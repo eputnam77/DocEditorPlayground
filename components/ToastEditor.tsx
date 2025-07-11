@@ -1,4 +1,4 @@
-import React, { useRef, useEffect } from "react";
+import { useRef, useEffect } from "react";
 import { Editor } from "@toast-ui/react-editor";
 import "@toast-ui/editor/dist/toastui-editor.css";
 
@@ -11,15 +11,15 @@ interface ToastEditorProps {
   readOnly?: boolean;
 }
 
-const ToastEditor: React.FC<ToastEditorProps> = ({
+function ToastEditor({
   value,
   onChange,
   height = "300px",
   previewStyle = "vertical",
   initialEditType = "wysiwyg",
   readOnly = false,
-}) => {
-  const editorRef = useRef<Editor>(null);
+}: ToastEditorProps): JSX.Element {
+  const editorRef = useRef<Editor | null>(null);
 
   // Handle controlled input: update editor when `value` prop changes
   useEffect(() => {
@@ -67,6 +67,6 @@ const ToastEditor: React.FC<ToastEditorProps> = ({
       />
     </div>
   );
-};
+}
 
 export default ToastEditor;
