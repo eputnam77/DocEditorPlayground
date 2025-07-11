@@ -51,7 +51,10 @@ const CodeX: React.FC<CodeXProps> = ({ value, onChange, readOnly = false }) => {
     });
 
     return () => {
-      if (ejInstance.current && typeof ejInstance.current.destroy === "function") {
+      if (
+        ejInstance.current &&
+        typeof ejInstance.current.destroy === "function"
+      ) {
         ejInstance.current.destroy();
         ejInstance.current = null;
       }
@@ -68,7 +71,10 @@ const CodeX: React.FC<CodeXProps> = ({ value, onChange, readOnly = false }) => {
   }, [value]);
 
   return (
-    <div className="border rounded bg-white dark:bg-zinc-900 min-h-[200px] p-2">
+    <div
+      className="border rounded bg-white dark:bg-zinc-900 min-h-[200px] p-2"
+      data-testid="simple-editor"
+    >
       <div ref={holder} />
     </div>
   );

@@ -21,7 +21,20 @@
     "react-dom": "latest",
     "tailwindcss": "latest",
     "@tiptap/react": "latest",
-    "@tiptap/starter-kit": "latest"
+    "@tiptap/starter-kit": "latest",
+    "@toast-ui/react-editor": "latest",
+    "@toast-ui/editor": "latest",
+    "@editorjs/editorjs": "latest",
+    "@editorjs/header": "latest",
+    "@editorjs/list": "latest",
+    "@editorjs/paragraph": "latest",
+    "quill": "latest",
+    "slate": "latest",
+    "slate-react": "latest",
+    "lexical": "latest",
+    "@lexical/react": "latest",
+    "@ckeditor/ckeditor5-react": "latest",
+    "@ckeditor/ckeditor5-build-classic": "latest"
   },
   "devDependencies": {
     "typescript": "latest",

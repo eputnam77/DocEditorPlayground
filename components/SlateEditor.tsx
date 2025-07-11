@@ -32,7 +32,8 @@ export default function SlateEditor({
 
   // Keep internal value in sync with external changes
   const initialValue = useMemo(() => safeParseValue(value), []);
-  const [localValue, setLocalValue] = React.useState<Descendant[]>(initialValue);
+  const [localValue, setLocalValue] =
+    React.useState<Descendant[]>(initialValue);
 
   useEffect(() => {
     // If the external value changes, update local
@@ -44,13 +45,19 @@ export default function SlateEditor({
   }, [value]);
 
   // On change, update local and bubble up to parent
-  const handleChange = useCallback((val: Descendant[]) => {
-    setLocalValue(val);
-    onChange(JSON.stringify(val));
-  }, [onChange]);
+  const handleChange = useCallback(
+    (val: Descendant[]) => {
+      setLocalValue(val);
+      onChange(JSON.stringify(val));
+    },
+    [onChange],
+  );
 
   return (
-    <div className="border rounded bg-white dark:bg-zinc-900 min-h-[200px] p-2">
+    <div
+      className="border rounded bg-white dark:bg-zinc-900 min-h-[200px] p-2"
+      data-testid="simple-editor"
+    >
       <Slate editor={editor} value={localValue} onChange={handleChange}>
         <Editable
           readOnly={!editable}

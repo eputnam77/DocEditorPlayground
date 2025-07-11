@@ -29,7 +29,10 @@ export default function CkEditor({
   }, [value]);
 
   return (
-    <div className="border rounded bg-white dark:bg-zinc-900 min-h-[200px] p-2">
+    <div
+      className="border rounded bg-white dark:bg-zinc-900 min-h-[200px] p-2"
+      data-testid="simple-editor"
+    >
       <CKEditor
         editor={ClassicEditor}
         data={value}

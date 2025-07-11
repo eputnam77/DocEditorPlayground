@@ -16,7 +16,11 @@ interface LexicalEditorProps {
   editable?: boolean;
 }
 
-function EditorOnChangePlugin({ onChange }: { onChange: (value: string) => void }) {
+function EditorOnChangePlugin({
+  onChange,
+}: {
+  onChange: (value: string) => void;
+}) {
   const [editor] = useLexicalComposerContext();
   useEffect(() => {
     return editor.registerUpdateListener(({ editorState }) => {
@@ -68,14 +72,17 @@ export default function LexicalEditor({
 
   return (
     <LexicalComposer initialConfig={initialConfig}>
-      <div className="border rounded bg-white dark:bg-zinc-900 min-h-[200px] p-2">
+      <div
+        className="border rounded bg-white dark:bg-zinc-900 min-h-[200px] p-2"
+        data-testid="simple-editor"
+      >
         <PlainTextPlugin
           contentEditable={
-            <ContentEditable
-              className="outline-none min-h-[160px] p-2 bg-transparent"
-            />
+            <ContentEditable className="outline-none min-h-[160px] p-2 bg-transparent" />
           }
-          placeholder={<div className="text-gray-400">Start writing your document…</div>}
+          placeholder={
+            <div className="text-gray-400">Start writing your document…</div>
+          }
         />
         <HistoryPlugin />
         <EditorOnChangePlugin onChange={onChange} />

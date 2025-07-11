@@ -14,7 +14,25 @@
     "resolveJsonModule": true,
     "isolatedModules": true,
     "jsx": "preserve",
-    "incremental": true
+    "incremental": true,
+    "baseUrl": ".",
+    "paths": {
+      "@toast-ui/react-editor": ["stubs/toast-ui-react-editor"],
+      "@toast-ui/editor/dist/toastui-editor.css": ["stubs/toastui-editor.css"],
+      "@editorjs/editorjs": ["stubs/editorjs"],
+      "@editorjs/header": ["stubs/editorjs-header"],
+      "@editorjs/list": ["stubs/editorjs-list"],
+      "@editorjs/paragraph": ["stubs/editorjs-paragraph"],
+      "@ckeditor/ckeditor5-react": ["stubs/ckeditor5-react"],
+      "@ckeditor/ckeditor5-build-classic": ["stubs/ckeditor5-build-classic"],
+      "quill": ["stubs/quill"],
+      "slate": ["stubs/slate"],
+      "slate-react": ["stubs/slate-react"],
+      "lexical": ["stubs/lexical"],
+      "@lexical/react/LexicalComposer": ["stubs/lexical-react"],
+      "@tiptap/react": ["stubs/tiptap-react"],
+      "@tiptap/starter-kit": ["stubs/tiptap-starter-kit"]
+    }
   },
   "include": ["next-env.d.ts", "**/*.ts", "**/*.tsx"],
   "exclude": ["node_modules"]
