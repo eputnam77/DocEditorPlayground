@@ -17,6 +17,10 @@ This project demonstrates multiple rich text editors side by side using **Next.j
    ```bash
    npm install
    ```
+   If you see a peer dependency conflict error, run:
+   ```bash
+   npm install --legacy-peer-deps
+   ```
 2. Start the development server:
    ```bash
    npm run dev
