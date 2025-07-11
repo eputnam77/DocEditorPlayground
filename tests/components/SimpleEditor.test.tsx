@@ -12,4 +12,11 @@ describe("SimpleEditor", () => {
     fireEvent.click(screen.getByTestId("btn-italic"));
     expect(editor).toHaveStyle("font-style: italic");
   });
+
+  it("adds comments to the list", () => {
+    render(<SimpleEditor />);
+    window.prompt = () => "My comment";
+    fireEvent.click(screen.getByTestId("btn-comment"));
+    expect(screen.getByTestId("comment-list")).toHaveTextContent("My comment");
+  });
 });

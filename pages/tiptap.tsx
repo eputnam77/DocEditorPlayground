@@ -30,16 +30,23 @@ export default function TiptapPage({ extensions = [] }: TiptapPageProps) {
         <h1 className="text-3xl md:text-4xl font-extrabold text-transparent bg-clip-text bg-gradient-to-r from-pink-500 via-indigo-500 to-fuchsia-500 drop-shadow">
           TipTap Editor
         </h1>
-        <div className="mb-4 rounded-lg border border-zinc-200 dark:border-zinc-600 bg-zinc-50 dark:bg-zinc-900 p-4 min-h-[200px]">
+        <p className="text-sm text-zinc-600 dark:text-zinc-300">
+          Headless framework offering flexible rich text editing.
+        </p>
+        <div className="mb-4 rounded-lg border border-zinc-200 dark:border-zinc-600 bg-zinc-50 dark:bg-zinc-900 p-4 min-h-[500px]">
           <EditorContent editor={editor} data-testid="tiptap-editor" />
         </div>
         <div className="flex flex-col md:flex-row gap-6">
           <div className="flex-1">
-            <h2 className="text-lg font-semibold mb-2 text-zinc-700 dark:text-zinc-200">Plugins</h2>
+            <h2 className="text-lg font-semibold mb-2 text-zinc-700 dark:text-zinc-200">
+              Plugins
+            </h2>
             <PluginManager plugins={["bold", "italic"]} />
           </div>
           <div className="flex-1">
-            <h2 className="text-lg font-semibold mb-2 text-zinc-700 dark:text-zinc-200">Templates</h2>
+            <h2 className="text-lg font-semibold mb-2 text-zinc-700 dark:text-zinc-200">
+              Templates
+            </h2>
             <TemplateLoader
               onLoad={(tpl) => setContent(JSON.stringify(tpl, null, 2))}
             />

@@ -1,5 +1,5 @@
-import DarkModeToggle from '../components/DarkModeToggle';
-import NavBar from '../components/NavBar';
+import DarkModeToggle from "../components/DarkModeToggle";
+import NavBar from "../components/NavBar";
 
 export default function HomePage() {
   return (
@@ -7,12 +7,13 @@ export default function HomePage() {
       <div className="absolute top-6 right-8">
         <DarkModeToggle />
       </div>
-      <section className="bg-white/80 dark:bg-zinc-800/95 shadow-2xl rounded-2xl px-10 py-12 max-w-xl w-full flex flex-col items-center border border-zinc-100 dark:border-zinc-700">
+      <section className="bg-white/90 dark:bg-zinc-800/95 shadow-2xl rounded-3xl px-12 py-16 max-w-2xl w-full flex flex-col items-center border border-zinc-100 dark:border-zinc-700">
         <h1 className="text-4xl md:text-5xl font-extrabold mb-4 text-transparent bg-clip-text bg-gradient-to-r from-blue-500 via-violet-500 to-emerald-500 drop-shadow-lg">
           Document Editor Playground
         </h1>
         <p className="text-lg md:text-xl mb-8 text-zinc-700 dark:text-zinc-200 text-center">
-          Preview and compare modern document editors with plugins, extensions, and beautiful UI.
+          Preview and compare modern document editors with plugins, templates
+          and word-processor style features.
         </p>
         <NavBar />
         <div className="mt-10 text-xs text-zinc-400 dark:text-zinc-500 text-center">

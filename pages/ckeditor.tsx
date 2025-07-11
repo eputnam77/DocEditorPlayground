@@ -17,16 +17,23 @@ export default function CkeditorPage() {
         <h1 className="text-3xl md:text-4xl font-extrabold text-transparent bg-clip-text bg-gradient-to-r from-blue-500 via-violet-500 to-emerald-500 drop-shadow">
           CKEditor 5
         </h1>
-        <div className="mb-4">
+        <p className="text-sm text-zinc-600 dark:text-zinc-300">
+          Powerful editor with plugin-based architecture.
+        </p>
+        <div className="mb-4 min-h-[500px]">
           <SimpleEditor initialValue={content} onChange={setContent} />
         </div>
         <div className="flex flex-col md:flex-row gap-6">
           <div className="flex-1">
-            <h2 className="text-lg font-semibold mb-2 text-zinc-700 dark:text-zinc-200">Plugins</h2>
+            <h2 className="text-lg font-semibold mb-2 text-zinc-700 dark:text-zinc-200">
+              Plugins
+            </h2>
             <PluginManager plugins={["alignment", "image"]} />
           </div>
           <div className="flex-1">
-            <h2 className="text-lg font-semibold mb-2 text-zinc-700 dark:text-zinc-200">Templates</h2>
+            <h2 className="text-lg font-semibold mb-2 text-zinc-700 dark:text-zinc-200">
+              Templates
+            </h2>
             <TemplateLoader
               onLoad={(tpl) => setContent(JSON.stringify(tpl, null, 2))}
             />
