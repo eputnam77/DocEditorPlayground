@@ -1,5 +1,5 @@
-import DarkModeToggle from '../components/DarkModeToggle';
-import NavBar from '../components/NavBar';
+import DarkModeToggle from "../components/DarkModeToggle";
+import NavBar from "../components/NavBar";
 
 export default function HomePage() {
   return (
@@ -12,7 +12,8 @@ export default function HomePage() {
           Document Editor Playground
         </h1>
         <p className="text-lg md:text-xl mb-8 text-zinc-700 dark:text-zinc-200 text-center">
-          Preview and compare modern document editors with plugins, extensions, and beautiful UI.
+          Preview and compare modern document editors with plugins, extensions,
+          and beautiful UI.
         </p>
         <NavBar />
         <div className="mt-10 text-xs text-zinc-400 dark:text-zinc-500 text-center">

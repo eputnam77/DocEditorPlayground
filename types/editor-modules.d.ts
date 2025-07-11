@@ -1,10 +1,18 @@
 declare module "@toast-ui/react-editor" {
   import React from "react";
-  export const Editor: React.FC<any>;
+  export class Editor {
+    getInstance(): any;
+  }
+  export const ToastEditor: React.FC<any>;
 }
 declare module "@toast-ui/editor/dist/toastui-editor.css";
 declare module "@editorjs/editorjs" {
-  export default class EditorJS {}
+  export default class EditorJS {
+    constructor(options?: any);
+    save(): Promise<any>;
+    render(data: any): void;
+    destroy(): void;
+  }
 }
 declare module "@editorjs/header" {
   export default class Header {}
@@ -17,12 +25,13 @@ declare module "@editorjs/paragraph" {
 }
 declare module "quill" {
   export default class Quill {
+    constructor(el: HTMLElement, options?: any);
     root: { innerHTML: string };
     on(event: string, cb: () => void): void;
   }
 }
 declare module "slate" {
-  export const Descendant: any;
+  export type Descendant = any;
   export function createEditor(): any;
 }
 declare module "slate-react" {
@@ -52,7 +61,7 @@ declare module "@ckeditor/ckeditor5-build-classic" {
 declare module "@tiptap/react" {
   export function EditorContent(props: any): any;
   export function useEditor(props: any): any;
-  export const Extension: any;
+  export type Extension = any;
 }
 declare module "@tiptap/starter-kit" {
   const StarterKit: any;

@@ -21,7 +21,7 @@ export default function TiptapPage() {
     blockquote: true,
     codeBlock: true,
     comment: false, // Example for future extension
-    trackChanges: false // Example for future extension
+    trackChanges: false, // Example for future extension
   });
 
   const editor = useEditor({
@@ -50,9 +50,15 @@ export default function TiptapPage() {
       toolbar={<EditorToolbar />}
       menu={
         <nav className="flex gap-2">
-          <button className="px-3 py-2 text-sm font-medium text-blue-700 bg-blue-50 border border-blue-300 rounded hover:bg-blue-100">New</button>
-          <button className="px-3 py-2 text-sm font-medium text-gray-700 bg-gray-100 border border-gray-300 rounded hover:bg-gray-200">Open</button>
-          <button className="px-3 py-2 text-sm font-medium text-gray-700 bg-gray-100 border border-gray-300 rounded hover:bg-gray-200">Save</button>
+          <button className="px-3 py-2 text-sm font-medium text-blue-700 bg-blue-50 border border-blue-300 rounded hover:bg-blue-100">
+            New
+          </button>
+          <button className="px-3 py-2 text-sm font-medium text-gray-700 bg-gray-100 border border-gray-300 rounded hover:bg-gray-200">
+            Open
+          </button>
+          <button className="px-3 py-2 text-sm font-medium text-gray-700 bg-gray-100 border border-gray-300 rounded hover:bg-gray-200">
+            Save
+          </button>
         </nav>
       }
     >
@@ -76,8 +82,14 @@ export default function TiptapPage() {
           <h2 className="text-lg font-semibold mb-2 text-gray-800">Plugins</h2>
           <PluginManager
             plugins={[
-              "bold", "italic", "underline", "heading",
-              "bulletList", "orderedList", "blockquote", "codeBlock"
+              "bold",
+              "italic",
+              "underline",
+              "heading",
+              "bulletList",
+              "orderedList",
+              "blockquote",
+              "codeBlock",
               // Add more as needed
             ]}
             onToggle={(name, enabled) =>
@@ -86,7 +98,9 @@ export default function TiptapPage() {
           />
         </div>
         <div className="flex-1">
-          <h2 className="text-lg font-semibold mb-2 text-gray-800">Templates</h2>
+          <h2 className="text-lg font-semibold mb-2 text-gray-800">
+            Templates
+          </h2>
           <TemplateLoader
             onLoad={(tpl) => setContent(JSON.stringify(tpl, null, 2))}
           />

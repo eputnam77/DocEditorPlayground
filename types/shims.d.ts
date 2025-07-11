@@ -2,6 +2,10 @@ declare namespace JSX {
   interface IntrinsicElements {
     [elemName: string]: any;
   }
+  type Element = any;
+  interface ElementChildrenAttribute {
+    children: {};
+  }
 }
 
 declare module "react" {
