@@ -24,18 +24,32 @@ export default function TiptapPage() {
     trackChanges: false, // Example for future extension
   });
 
+  const starterKit =
+    typeof (StarterKit as any).configure === "function"
+      ? StarterKit.configure({
+          bold: plugins.bold,
+          italic: plugins.italic,
+          underline: plugins.underline,
+          heading: plugins.heading,
+          bulletList: plugins.bulletList,
+          orderedList: plugins.orderedList,
+          blockquote: plugins.blockquote,
+          codeBlock: plugins.codeBlock,
+        })
+      : (StarterKit as any)({
+          bold: plugins.bold,
+          italic: plugins.italic,
+          underline: plugins.underline,
+          heading: plugins.heading,
+          bulletList: plugins.bulletList,
+          orderedList: plugins.orderedList,
+          blockquote: plugins.blockquote,
+          codeBlock: plugins.codeBlock,
+        });
+
   const editor = useEditor({
     extensions: [
-      StarterKit.configure({
-        bold: plugins.bold,
-        italic: plugins.italic,
-        underline: plugins.underline,
-        heading: plugins.heading,
-        bulletList: plugins.bulletList,
-        orderedList: plugins.orderedList,
-        blockquote: plugins.blockquote,
-        codeBlock: plugins.codeBlock,
-      }),
+      starterKit,
       // Add any other TipTap extensions you want to toggle here
     ],
     content,
