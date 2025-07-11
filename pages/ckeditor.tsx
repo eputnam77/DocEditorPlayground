@@ -1,5 +1,3 @@
-// pages/ckeditor.tsx
-
 import { useState } from "react";
 import { validateDocument } from "../utils/validation";
 import USWDSDocEditorLayout from "../components/USWDSDocEditorLayout";
@@ -7,8 +5,7 @@ import EditorToolbar from "../components/EditorToolbar";
 import PluginManager from "../components/PluginManager";
 import TemplateLoader from "../components/TemplateLoader";
 import EditorIntegrationInfo from "../components/EditorIntegrationInfo";
-// Swap SimpleEditor for your real CKEditor component if you have one
-import SimpleEditor from "../components/SimpleEditor";
+import CkEditor from "../components/CkEditor";
 
 export default function CkeditorPage() {
   const [content, setContent] = useState("");
@@ -27,9 +24,9 @@ export default function CkeditorPage() {
       }
     >
       <div className="mb-4">
-        <SimpleEditor
-          initialValue={content}
-          onChange={(val) => {
+        <CkEditor
+          value={content}
+          onChange={(val: string) => {
             setContent(val);
             setValid(validateDocument({ content: val }));
           }}
@@ -42,12 +39,14 @@ export default function CkeditorPage() {
           )}
         </div>
       </div>
-      {/* Move Plugins/Extensions/Templates to dropdowns in EditorToolbar if you want.
-          Or keep as below, or move into modals/dialogs later. */}
+      {/* Optional extras below */}
       <div className="flex flex-col md:flex-row gap-6">
         <div className="flex-1">
           <h2 className="text-lg font-semibold mb-2 text-gray-800">Plugins</h2>
-          <PluginManager plugins={["alignment", "image", "trackChanges", "comment", "heading", "numberedList", "bulletedList", "indent", "paragraphNumbering"]} />
+          <PluginManager plugins={[
+            "alignment", "image", "trackChanges", "comment", "heading",
+            "numberedList", "bulletedList", "indent", "paragraphNumbering"
+          ]} />
         </div>
         <div className="flex-1">
           <h2 className="text-lg font-semibold mb-2 text-gray-800">Templates</h2>
