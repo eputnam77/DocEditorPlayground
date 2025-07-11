@@ -6,6 +6,6 @@ describe("TiptapPage", () => {
   it("renders plugin manager and editor", () => {
     render(<TiptapPage />);
     expect(screen.getByTestId("plugin-bold")).toBeInTheDocument();
-    expect(screen.getByTestId("simple-editor")).toBeInTheDocument();
+    expect(screen.getByTestId("tiptap-editor")).toBeInTheDocument();
   });
 });

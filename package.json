@@ -19,7 +19,9 @@
     "next": "latest",
     "react": "latest",
     "react-dom": "latest",
-    "tailwindcss": "latest"
+    "tailwindcss": "latest",
+    "@tiptap/react": "latest",
+    "@tiptap/starter-kit": "latest"
   },
   "devDependencies": {
     "typescript": "latest",
