@@ -1,19 +1,19 @@
-import Link from 'next/link';
+import Link from "next/link";
 
 const editors = [
-  { name: "TipTap", path: "/editors/tiptap" },
-  { name: "Toast Editor", path: "/editors/toast" },
-  { name: "CodeX", path: "/editors/codex" },
-  { name: "Quill", path: "/editors/quill" },
-  { name: "Slate", path: "/editors/slate" },
-  { name: "Lexical", path: "/editors/lexical" },
-  { name: "CKEditor 5", path: "/editors/ckeditor" },
+  { name: "TipTap", path: "/tiptap" },
+  { name: "Toast Editor", path: "/toast" },
+  { name: "CodeX", path: "/codex" },
+  { name: "Quill", path: "/quill" },
+  { name: "Slate", path: "/slate" },
+  { name: "Lexical", path: "/lexical" },
+  { name: "CKEditor 5", path: "/ckeditor" },
 ];
 
 export default function NavBar() {
   return (
     <nav className="w-full flex flex-wrap gap-4 justify-center">
-      {editors.map(editor => (
+      {editors.map((editor) => (
         <Link
           key={editor.name}
           href={editor.path}
