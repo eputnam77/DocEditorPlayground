@@ -1,9 +1,10 @@
+import { render, screen } from '@testing-library/react';
 import { describe, it, expect } from 'vitest';
-
-// Placeholder test for home page
+import HomePage from '../../pages';
 
 describe('HomePage', () => {
-  it('should describe project and link to editor pages', () => {
-    expect(true).toBe(false);
+  it('links to editor pages', () => {
+    render(<HomePage />);
+    expect(screen.getByText('tiptap')).toBeInTheDocument();
   });
 });

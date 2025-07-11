@@ -1,7 +1,10 @@
+import { render, screen } from '@testing-library/react';
 import { describe, it, expect } from 'vitest';
+import CkeditorPage from '../../pages/ckeditor';
 
 describe('CkeditorPage', () => {
-  it('should render Ckeditor editor with expected features', () => {
-    expect(true).toBe(false);
+  it('renders plugin manager', () => {
+    render(<CkeditorPage />);
+    expect(screen.getByTestId('plugin-alignment')).toBeInTheDocument();
   });
 });
