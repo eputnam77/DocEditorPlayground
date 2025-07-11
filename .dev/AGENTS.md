@@ -6,94 +6,273 @@
 
 ## 0 · Global Settings
 
-| Key                      | Value                                                                 |
-| ------------------------ | --------------------------------------------------------------------- |
-| Default shell            | `bash` (Linux)                                                        |
-| Python version           | **3.12**                                                              |
-| Virtual‑env manager      | **uv** (falls back to `python -m venv`)                               |
-| Package manager          | **poetry** (`poetry install`)                                         |
-| Test runner              | **pytest**                                                            |
-| E2E framework            | **Playwright + pytest‑playwright**                                    |
-| Property‑based tests     | **Hypothesis**                                                        |
-| Mutation testing         | **mutmut** (`mutmut run --use-coverage`)                              |
-| Coverage thresholds      | **75 %** on feature branches → **90 %** on `main` (**branch + line**) |
-| Mutation score           | **≥60 %** on feature branches → **≥80 %** on `main`                   |
-| Code formatter           | **black**                                                             |
-| Linter                   | **ruff** (includes import‑sorting)                                    |
-| Static‑type checker      | **mypy --strict**                                                     |
-| Security scanners        | **bandit -r src**, **pip‑audit -r requirements.txt**                  |
-| Docs generator           | **MkDocs Material** (`mkdocs build`)                                  |
-| Commit message style     | **Conventional Commits**                                              |
-| CI provider              | **GitHub Actions** *(experimental – see §5)*                          |
+| Key                      | Value                                                                  |
+| ------------------------ | ---------------------------------------------------------------------- |
+| Default shell            | `bash` (Linux)                                                         |
+| Node.js version          | **20 LTS**                                                             |
+| Package manager          | **npm** (local) · **pnpm** (CI)                                        |
+| Bundler / transpiler     | **tsup** (esbuild wrapper)                                             |
+| Test runner              | **Vitest**                                                             |
+| **E2E framework**        | **Playwright + @playwright/test**                                      |
+| **Property‑based tests** | **fast‑check** (via Vitest)                                            |
+| **Mutation testing**     | **Stryker Mutator** (`stryker run`)                                    |
+| Coverage thresholds      | **75 %** on feature branches → **90 %** on `main` (branch + statement) |
+| Mutation score           | **≥60 %** on feature → **≥80 %** on `main`                             |
+| Code formatter           | **Prettier**                                                           |
+| Linter                   | **ESLint + @typescript‑eslint**                                        |
+| Static‑type checker      | **TypeScript** (`tsc --noEmit`)                                        |
+| Security scanners        | **npm audit --prod**, **Snyk CLI**                                     |
+| Docs generator           | **TypeDoc** (`typedoc --out docs src`)                                 |
+| Commit message style     | **Conventional Commits**                                               |
+| CI provider              | **GitHub Actions** *(experimental – see §6)*                           |
 
-> **Data flow**   Every agent works from the latest commit on its branch and communicates only via GitHub Issues/PRs.
-
+> **Data flow**   Each agent works from the latest commit on its branch and communicates only via GitHub Issues / PRs.
+> 
 ---
 
 ## 1 · Agents & Execution Order
 
-| #  | Agent ID       | Purpose (summary)                                                                          | Auto‑trigger condition                    |
-| -- | -------------- | ------------------------------------------------------------------------------------------ | ----------------------------------------- |
-| 0  | `planner`      | Parse **PRD.md** → create **TASKS.md** (epics → issues with acceptance criteria & labels). | manual                                    |
-| 1  | `architect`    | Design folder layout, write ADRs, initialise `pyproject.toml`, and CI skeleton.            | `planner` PR merged                       |
-| 2  | `scaffolder`   | Generate skeleton code *and tests* for each open issue.                                    | `architect` PR merged                     |
-| 3  | `scenario‑gen` | Convert acceptance criteria to Gherkin *.feature* files & Hypothesis strategies.           | new **ready** issue                       |
-| 4  | `builder`      | Implement code for issues marked **ready**; keep unit/integration tests ≥75 % coverage.    | after `scenario‑gen`                      |
-| 5  | `verifier`     | Cross‑reference **PRD.md** → **TASKS.md** → implemented code; emit completeness report.    | after `builder`                           |
-| 6  | `linter`       | Run `ruff --fix` & `black`; open PR if diff.                                               | after `verifier` green                    |
-| 7  | `tester`       | Execute **dev gate** (unit + property tests, type‑check, coverage ≥75 %).                  | after `linter` green                      |
-| 8  | `e2e‑tester`   | Run Playwright E2E suite (headless) against disposable container.                          | after `tester` green                      |
-| 9  | `mutation`     | Run `mutmut`; fails if mutation score < threshold.                                         | after `e2e‑tester` green                  |
-| 10 | `fixer`        | Patch any failing files, re‑run gates until all green.                                     | on test / lint / mutation failure         |
-| 11 | `security`     | Run Bandit & pip‑audit; open CVE issues.                                                   | nightly · before merge→`main`             |
-| 12 | `docwriter`    | Update `README.md`, API refs, examples, changelog.                                         | branch green & cov ≥90 % & mutation ≥80 % |
-| 13 | `reviewer`     | Human‑style review; request approvals.                                                     | after `docwriter`                         |
-| 14 | `releasebot`   | Bump semver, tag, build & push Docker image, draft release notes.                          | PR merged→`main` |
+| #  | Agent ID       | Purpose                                                                                     | Auto‑trigger             |
+| -- | -------------- | ------------------------------------------------------------------------------------------- | ------------------------ |
+| 0  | `planner`      | Parse **project‑management/PRD.md** → build **TASKS.md** (issues with acceptance criteria). | manual                   |
+| 1  | `architect`    | Repo layout, write ADRs, init `package.json`, stub CI.                                      | `planner` PR merged      |
+| 2  | `scaffolder`   | Generate skeleton code *and tests*.                                                         | `architect` PR merged    |
+| 3  | `scenario‑gen` | Convert acceptance criteria → Gherkin *.feature* files & fast‑check arbitraries.            | new ready issue          |
+| 4  | `builder`      | Implement code; keep unit/integration coverage ≥75 %.                                       | after `scenario‑gen`     |
+| 5  | `verifier`     | Trace PRD → TASKS → code; emit completeness report.                                         | after `builder`          |
+| 6  | `linter`       | `eslint --fix` + `prettier --write`.                                                        | after `verifier` green   |
+| 7  | `tester`       | Run *dev gate* (unit, property, type‑check, coverage).                                      | after `linter` green     |
+| 8  | `e2e‑tester`   | Playwright E2E suite (headless).                                                            | after `tester` green     |
+| 9  | `mutation`     | Stryker; fails if mutation score < threshold.                                               | after `e2e‑tester` green |
+| 10 | `fixer`        | Patch failing files; loop until green.                                                      | on any gate fail         |
+| 11 | `security`     | `npm audit --prod` + Snyk; open CVE issues.                                                 | nightly · pre‑merge      |
+| 12 | `docwriter`    | Update docs/changelog once all gates green & score ≥ thresholds.                            | after `security` green   |
+| 13 | `reviewer`     | Human code review.                                                                          | after `docwriter`        |
+| 14 | `releasebot`   | Bump semver, publish package + Docker, draft release notes.                                 | PR merged→`main`         |
 
-### Agent Handoff Conventions
+### Handoff conventions
 
-* **Feature branches** enforce the *dev gate* (≥75 % coverage, ≥60 % mutation).
-* The **main** branch enforces the *release gate* (≥90 % coverage, ≥80 % mutation, security pass, docs build).
-* Each agent finishing successfully applies the label `ready‑for:<next‑agent>`; a GitHub Action (when enabled) reads this label and triggers the next agent via the Codex API.
+* **Feature branches** enforce *dev gate* (≥75 % cov, ≥60 % mut).
+* **main** enforces *release gate* (≥90 % cov, ≥80 % mut, security, docs).
+* Agents tag PRs with `ready-for:<next-agent>`; a router Action (disabled by default) reads the tag and triggers the next agent.
 
 ---
 
 ## 2 · Quality Gates
 
-### Dev Gate (feature branches)
+### Dev Gate (feature)
 
 ```bash
-ruff check src tests
-black --check src tests
-mypy --strict src
-autopep8? # (if enabled)
-bandit -r src -lll --skip B101          # allow asserts during early dev
-pytest -q --cov=src --cov-branch --cov-fail-under=80
-pytest -q -m property                   # Hypothesis tests
-playwright install --with-deps --dry-run  # ensure browsers cached
-pytest -q -m e2e
-mutmut run -s src --use-coverage -q --fail-under 60
+eslint "src/**/*.ts" "tests/**/*.ts"
+prettier --check .
+tsc --noEmit
+npm audit --prod --audit-level=high || true  # warn only on feature
+vitest run --coverage --coverage.reporter=text --coverage.branches --coverage.statements --coverage.failUnder=75
+vitest run -m property                        # fast‑check suites
+playwright install --with-deps --dry-run      # ensure binaries cached
+playwright test --reporter=line --headless
+stryker run --coverageAnalysis=perTest --threshold-break 60
 ```
 
 ### Release Gate (`main`)
 
 ```bash
-ruff check src tests
-black --check src tests
-mypy --strict src
-bandit -r src -lll
-pip-audit -r requirements.txt
-pytest -q --cov=src --cov-branch --cov-fail-under=90
-pytest -q -m e2e
-mutmut run -s src --use-coverage -q --fail-under 80
-mkdocs build --strict
+eslint .
+prettier --check .
+tsc --noEmit
+npm audit --prod
+snyk test --severity-threshold=high
+vitest run --coverage --coverage.reporter=html --coverage.failUnder=90
+playwright test --reporter=html --timeout 60000
+stryker run --threshold-break 80
+typedoc --out docs src --strict
 ```
 
-Any non‑zero exit hands control to **fixer**.
+Any non‑zero exit passes control to **fixer**.
 
 ---
 
-## 3 · Writing Style Guidelines
+## 3.5 · TypeScript Project Structure
+
+### Repository Structure
+
+```
+my-lib/
+├── project-management/          # Project management files (not in NPM package)
+│   ├── AGENTS.md               # Agent definitions and workflow
+│   ├── TASKS.md                # Generated by planner agent
+│   ├── PRD.md                  # Product Requirements Document
+│   ├── VERIFICATION_REPORT.md  # Generated by verifier agent
+│   ├── ADRs/                   # Architecture Decision Records
+│   │   ├── 001-project-structure.md
+│   │   ├── 002-technology-stack.md
+│   │   └── ...
+│   ├── Templates/              # Project templates
+│   │   ├── README.md
+│   │   ├── API_DOCS.md
+│   │   ├── CHANGELOG.md
+│   │   └── TEST_EXAMPLES.md
+│   └── Workflows/              # GitHub Actions and automation
+│       ├── agents.yml
+│       └── next-agent.sh
+├── src/                        # All .ts / .tsx source (included in NPM package)
+│   ├── index.ts                # Main entry point
+│   ├── types/                  # Type definitions and interfaces
+│   ├── utils/                  # Utility functions
+│   └── components/             # Reusable components (if applicable)
+├── tests/                      # Unit & integration specs
+│   ├── unit/                   # Unit tests
+│   ├── integration/            # Integration tests
+│   └── fixtures/               # Test data and mocks
+├── dist/                       # Auto-generated build artefacts (git-ignored)
+├── docs/                       # TypeDoc generated documentation
+├── examples/                   # Working sample apps / snippets
+├── .github/workflows/          # CI (lint + test + type-check + release)
+├── .eslintrc.json              # Lint rules
+├── .prettierrc                 # Formatter
+├── tsconfig.json               # Editor + type-checker config
+├── tsconfig.build.json         # Narrow build-time config (⟂ tsup/tsc)
+├── vitest.config.ts            # Test runner setup
+├── package.json
+├── README.md
+└── LICENSE
+```
+
+### Package.json Configuration
+
+To ensure project management files are excluded from the NPM package, add to `package.json`:
+
+```jsonc
+{
+  "files": [
+    "dist",
+    "src",
+    "README.md",
+    "LICENSE"
+  ],
+  "ignore": [
+    "project-management",
+    "tests",
+    "examples",
+    "docs",
+    ".github"
+  ]
+}
+```
+
+### Project Management Structure Benefits
+
+The `project-management/` folder provides several advantages:
+
+1. **Separation of Concerns**: Project management files stay separate from actual NPM package code
+2. **Reusability**: Templates and workflows can be referenced across multiple projects
+3. **Version Control**: Track changes to agent workflows independently from code changes
+4. **Documentation**: Keep project management approach well-documented and accessible
+5. **Template System**: Easy to copy and adapt for new projects
+6. **Clean Package**: NPM packages contain only the essential code and documentation
+
+### File Purposes
+
+- **AGENTS.md**: Defines the multi-agent workflow and agent specifications
+- **PRD.md**: Product Requirements Document that drives task generation
+- **TASKS.md**: Generated by planner agent with detailed task breakdown
+- **VERIFICATION_REPORT.md**: Generated by verifier agent with completeness analysis
+- **ADRs/**: Architecture Decision Records for technical decisions
+- **Templates/**: Reusable templates for documentation and code generation
+- **Workflows/**: GitHub Actions and automation scripts
+
+### Core Configuration Files
+
+#### TypeScript Configuration
+```jsonc
+// tsconfig.json  – IDE-friendly, no Emit
+{
+  "compilerOptions": {
+    "target": "ES2022",
+    "module": "ES2022",
+    "rootDir": "src",
+    "strict": true,
+    "skipLibCheck": true,
+    "moduleResolution": "bundler",
+    "incremental": true
+  },
+  "include": ["src/**/*.ts", "tests/**/*.ts"]
+}
+```
+
+```jsonc
+// tsconfig.build.json – used by tsup (extends the above)
+{
+  "extends": "./tsconfig.json",
+  "compilerOptions": { "noEmit": false, "outDir": "dist" },
+  "exclude": ["tests", "**/*.test.ts"]
+}
+```
+
+#### Test Configuration
+```ts
+// vitest.config.ts
+import { defineConfig } from 'vitest/config';
+
+export default defineConfig({
+  test: { 
+    globals: true, 
+    environment: 'node',
+    coverage: {
+      provider: 'v8',
+      reporter: ['text', 'json', 'html'],
+      exclude: [
+        'node_modules/',
+        'dist/',
+        'tests/',
+        '**/*.d.ts',
+        '**/*.test.ts',
+        '**/*.spec.ts'
+      ]
+    }
+  }
+});
+```
+
+#### Linting Configuration
+```jsonc
+// .eslintrc.json (flat config variant)
+{
+  "plugins": { "@typescript-eslint": "latest" },
+  "languageOptions": { "parser": "@typescript-eslint/parser" },
+  "rules": {
+    "no-unused-vars": "error",
+    "@typescript-eslint/explicit-function-return-type": "warn",
+    "@typescript-eslint/no-explicit-any": "warn",
+    "@typescript-eslint/prefer-const": "error",
+    "@typescript-eslint/no-unused-vars": "error"
+  }
+}
+```
+
+### Package.json Scripts
+```jsonc
+{
+  "scripts": {
+    "dev": "tsup src/index.ts --watch --dts",
+    "build": "tsup src/index.ts --dts --minify",
+    "typecheck": "tsc --noEmit",
+    "lint": "eslint .",
+    "lint:fix": "eslint . --fix",
+    "format": "prettier --write .",
+    "test": "vitest run",
+    "test:watch": "vitest",
+    "test:coverage": "vitest run --coverage",
+    "docs": "typedoc --out docs src",
+    "release": "semantic-release",
+    "prepare": "husky install"
+  }
+}
+```
+
+---
+
+## 4 · Writing Style Guidelines
 
 ### Documentation Standards
 
@@ -130,12 +309,13 @@ All documentation generated by the `docwriter` agent must follow these style gui
 
 The `docwriter` agent should reference these templates:
 - `templates/README.md` - Standard README structure
-- `templates/API_DOCS.md` - API documentation format
+- `templates/API_DOCS.md` - API documentation format (TypeDoc compatible)
 - `templates/CHANGELOG.md` - Release notes template
+- `templates/TEST_EXAMPLES.md` - TypeScript test examples and patterns
 
 ---
 
-## 4 · Branch & Commit Policy
+## 5 · Branch & Commit Policy
 
 * **Branches** `plan/<slug>` · `scaffold/<slug>` · `feat/<slug>` · `fix/<issue>` · `docs/<topic>` · `test/<scope>`
 * **Commits** follow Conventional Commits, e.g.
@@ -149,37 +329,27 @@ The `docwriter` agent should reference these templates:
 
 ---
 
-## 5 · Automation Workflow (GitHub Actions - Experimental)
+## 6 · Automation Workflow (GitHub Actions - Experimental)
 
 <!--
 ⚠️  EXPERIMENTAL_CI: false
-     The workflow below is intentionally **disabled**. Agents `planner`,
-     `architect`, and `scaffolder` MUST ignore it unless this flag is
-     set to `true` via a repository‑level secret or branch environment
-     variable.
-
-     When you are ready to try headless Codex in CI:
-       1. Rename `.github/workflows/agents.yml.disabled` → `agents.yml`.
-       2. Set the secret `EXPERIMENTAL_CI=true`.
-       3. Verify that `codex run --quiet` or an upcoming non‑interactive
-          flag works in GitHub runners (see Codex issue #1080).
+     The workflow below is kept for future use. Agents MUST ignore it
+     unless this flag is switched to true (repo secret or env var).
 -->
 
-> **Status**   Codex CLI currently crashes inside GitHub Actions because
-> its Ink TTY renderer requires an interactive terminal. Until Codex
-> ships a true CI mode you can either:
->
-> * Use a self‑hosted runner with a pseudo‑TTY (`docker run -it …`).
-> * Keep the YAML renamed as `agents.yml.disabled` so GitHub ignores it.
+> **Why disabled?**   Codex CLI currently crashes in GitHub Actions due to Ink’s interactive TTY requirement (issue #1080). Enable when a non‑interactive flag ships or use a self‑hosted runner with pseudo‑TTY.
 
 ```yaml
 # .github/workflows/agents.yml.disabled
-# (Rename to .yml when EXPERIMENTAL_CI=true)
-
 name: Codex‑router
 on:
   push:
     branches: ["**"]
+
+env:
+  NODE_VERSION: "20"
+  PNPM_VERSION: "9"
+  EXPERIMENTAL_CI: ${{ secrets.EXPERIMENTAL_CI }}
 
 jobs:
   codex-router:
@@ -187,167 +357,57 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
-      - name: Detect last agent & status
-        run: |
-          ./scripts/next-agent.sh  # sets $NEXT_AGENT env var
+      - uses: pnpm/action-setup@v3
+        with: { version: "${{ env.PNPM_VERSION }}" }
+      - name: Detect next agent
+        run: ./scripts/next-agent.sh  # sets $NEXT_AGENT
       - name: Trigger agent via Codex API
         if: env.NEXT_AGENT != ''
         run: codex run --quiet --agent "$NEXT_AGENT"
 ```
 
-> **Router additions**  `next-agent.sh` now recognises the new gates:
->
-> ```bash
-> elif [[ "$LAST_AGENT" == "tester" && "$STATUS" == "success" ]]; then
->   echo "NEXT_AGENT=e2e-tester" >>"$GITHUB_ENV"
-> elif [[ "$LAST_AGENT" == "e2e-tester" && "$STATUS" == "success" ]]; then
->   echo "NEXT_AGENT=mutation" >>"$GITHUB_ENV"
-> ```
-
 ---
 
-## 6 · Environment Setup
+## 7 · Environment Setup
 
-* **Python 3.12** via `pyenv` or container.
+* **Node.js 18.18+** via `nvm` or container.
 * Local dev startup:
 
   ```bash
-  uv venv
-  uv pip install -r requirements-dev.txt
-  pre-commit install
+  nvm install --lts
+  npm install
+  npm run build
+  npx husky install
   ```
 * Codespaces/VS Code: devcontainer runs pre-commit on open.
+* Playwright browsers are cached in `~/.cache/ms-playwright` to speed up local runs; CI layers cache that directory too.
 
 ---
 
-## 7 · Failure‑Recovery Matrix
+## 8 · Failure‑Recovery Matrix
 
-| Problem                         | Responsible Agent | Remedy                                |
-| ------------------------------- | ----------------- | ------------------------------------- |
-| Lint error                      | linter            | Auto‑fix & push                       |
-| Type error                      | tester → fixer    | Patch types/code                      |
-| Unit / integration test failure | fixer             | Minimal diff fix, ensure green        |
-| **E2E failure**                 | fixer             | Patch UI / service, re‑run Playwright |
-| **Mutation score drop**         | fixer             | Add tests or refine existing ones     |
-| Coverage drop                   | builder / tester  | Add tests or mark exceptions          |
-| High CVE                        | security          | Bump dependency or patch code         |
-| Docs build failure              | docwriter         | Regenerate & push fix                 |
-
----
-
-## 8 · References
-
-* [Ruff documentation](https://docs.astral.sh/ruff/)
-* [Black documentation](https://black.readthedocs.io/)
-* [Pytest documentation](https://docs.pytest.org/)
-* [Bandit documentation](https://bandit.readthedocs.io/)
-* [pip-audit](https://pypi.org/project/pip-audit/)
+| Problem                 | Responsible Agent | Remedy                               |
+| ----------------------- | ----------------- | ------------------------------------ |
+| Lint error              | linter            | Auto‑fix & push                      |
+| Type error              | tester → fixer    | Patch types / code                   |
+| Unit / property failure | fixer             | Tweak logic or tests                 |
+| **E2E failure**         | fixer             | Patch UI / service; rerun Playwright |
+| **Mutation drop**       | fixer             | Add or improve tests                 |
+| Coverage drop           | builder / tester  | Add tests / mark exceptions          |
+| High CVE                | security          | Upgrade dependency or patch          |
+| Docs fail               | docwriter         | Regenerate & push                    |
 
 ---
 
-## 9 · Project Structure & File Organization
+## 9 · References
 
-### Recommended Repository Structure
-
-To keep development workflow files (AGENTS.md, TASKS.md, PRD.md) out of the distributed package, use this structure:
-
-```
-your-project/
-├── src/                           # Source code (gets distributed)
-│   └── your_package/
-│       ├── __init__.py
-│       └── main.py
-├── tests/                         # Test files
-├── docs/                          # Documentation
-├── scripts/                       # Development scripts
-├── .github/                       # GitHub workflows
-│   └── workflows/
-│       └── agents.yml
-├── .dev/                          # Development-only files (NOT distributed)
-│   ├── AGENTS.md                  # Multi-agent workflow guide
-│   ├── TASKS.md                   # Task breakdown
-│   ├── PRD.md                     # Product requirements
-│   ├── ADRs/                      # Architecture decision records
-│   │   └── 0001-initial-architecture.md
-│   └── templates/                 # Development templates
-│       ├── README.md
-│       ├── API_DOCS.md
-│       └── CHANGELOG.md
-├── pyproject.toml                 # Package configuration
-├── setup.py                       # Legacy setup
-├── requirements.txt               # Runtime dependencies
-├── requirements-dev.txt           # Development dependencies
-├── .gitignore
-├── .pre-commit-config.yaml
-└── README.md                      # User-facing documentation
-```
-
-### Package Configuration
-
-Add this to your `pyproject.toml` to exclude development files from distribution:
-
-```toml
-[build-system]
-requires = ["setuptools>=61.0", "wheel"]
-build-backend = "setuptools.build_meta"
-
-[project]
-name = "your-package"
-version = "1.0.0"
-# ... other project metadata
-
-[tool.setuptools.packages.find]
-where = ["src"]
-exclude = ["tests*", ".dev*"]
-
-[tool.setuptools.package-data]
-"*" = ["*.txt", "*.md", "*.yaml", "*.yml"]
-```
-
-### Git Configuration
-
-Add to your `.gitignore`:
-
-```gitignore
-# Build artifacts
-dist/
-build/
-*.egg-info/
-
-# Environment
-.env
-.venv/
-venv/
-
-# IDE
-.vscode/
-.idea/
-*.swp
-*.swo
-
-# OS
-.DS_Store
-Thumbs.db
-```
-
-### Alternative Structures
-
-If you prefer different organization:
-
-1. **`docs/dev/`** - Development documentation
-2. **`scripts/`** - Development scripts and workflows  
-3. **`.github/`** - GitHub-specific workflows and templates
-
-### File Placement Guidelines
-
-| File Type | Location | Reason |
-|-----------|----------|---------|
-| AGENTS.md | `.dev/` | Development workflow, not user-facing |
-| TASKS.md | `.dev/` | Internal task tracking |
-| PRD.md | `.dev/` | Product requirements for development |
-| README.md | Root | User-facing documentation |
-| API docs | `docs/` | User-facing API reference |
-| Templates | `.dev/templates/` | Development templates |
+* [Playwright](https://playwright.dev/)
+* [fast-check](https://github.com/dubzzz/fast-check)
+* [Stryker‑mutator](https://stryker-mutator.io/)
+* [Vitest](https://vitest.dev/)
+* [TypeScript](https://www.typescriptlang.org/)
+* [tsup](https://github.com/egoist/tsup)
+* [TypeDoc](https://typedoc.org/)
 
 ---
 
