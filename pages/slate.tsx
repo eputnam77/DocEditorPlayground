@@ -26,7 +26,6 @@ import {
   ChevronUp,
   Clock,
 } from "lucide-react";
-import "../styles/slate.css";
 
 /* ---------- Plugin toggle setup ---------- */
 const PLUGINS = {

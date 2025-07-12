@@ -37,7 +37,6 @@ import {
   ChevronUp,
   Clock,
 } from "lucide-react";
-import "../styles/tiptap.css";
 
 /* -------- Initial content (blank) -------- */
 const initialContent = ""; // replace with your preferred starter HTML

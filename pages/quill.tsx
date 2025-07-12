@@ -17,7 +17,6 @@ import {
   ChevronUp,
   Clock,
 } from "lucide-react";
-import "../styles/quill.css"; // optional overrides
 
 /* ---------- Quill module registry (toggleable) ---------- */
 const MODULES: Record<string, any> = {
