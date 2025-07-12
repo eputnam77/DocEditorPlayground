@@ -32,9 +32,30 @@
       "@tiptap/react": ["stubs/tiptap-react"],
       "@tiptap/starter-kit": ["stubs/tiptap-starter-kit"],
       "next/dynamic": ["stubs/next-dynamic"],
-      "@playwright/test": ["stubs/playwright-test"]
+      "@playwright/test": ["stubs/playwright-test"],
+      "@ckeditor/*": ["stubs/empty"],
+      "@editorjs/*": ["stubs/empty"],
+      "@tiptap/*": ["stubs/empty"],
+      "@lexical/*": ["stubs/empty"],
+      "framer-motion": ["stubs/empty"],
+      "next/router": ["stubs/empty"],
+      "lucide-react": ["stubs/empty"],
+      "react-quill": ["stubs/empty"],
+      "slate-history": ["stubs/empty"],
+      "react-editor-js": ["stubs/empty"],
+      "editorjs-underline": ["stubs/empty"],
+      "@toast-ui/editor-plugin-*": ["stubs/empty"],
+      "prismjs": ["stubs/empty"]
     }
   },
-  "include": ["next-env.d.ts", "**/*.ts", "**/*.tsx"],
-  "exclude": ["node_modules"]
+  "include": [
+    "next-env.d.ts",
+    "types/**/*.d.ts",
+    "src/**/*.ts",
+    "src/**/*.tsx",
+    "tests/**/*.ts",
+    "tests/**/*.tsx",
+    "components/**/*.tsx"
+  ],
+  "exclude": ["node_modules", "pages/**", "tests"]
 }
