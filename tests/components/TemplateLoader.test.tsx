@@ -19,4 +19,10 @@ describe("TemplateLoader", () => {
     fireEvent.click(screen.getByTestId("template-load-btn"));
     expect(screen.getByTestId("template-msg").textContent).toContain("Failed");
   });
+
+  it("lists the newly added templates", () => {
+    render(<TemplateLoader onLoad={() => {}} />);
+    expect(screen.getByText("faaAdvisoryCircular")).toBeInTheDocument();
+    expect(screen.getByText("releaseNotes")).toBeInTheDocument();
+  });
 });
