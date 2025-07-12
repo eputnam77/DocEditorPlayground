@@ -1,57 +1,69 @@
 {
   "name": "doceditorplayground",
-  "version": "0.1.0",
+  "version": "0.2.1",
   "private": true,
-  "type": "module",
+
+  "engines": {
+    "node": ">=18.18"
+  },
+
   "scripts": {
     "dev": "next dev",
     "build": "next build",
     "start": "next start",
+    "lint": "next lint",
     "typecheck": "tsc --noEmit",
-    "lint": "eslint .",
-    "lint:fix": "eslint . --fix",
     "format": "prettier --write .",
     "test": "vitest run",
     "test:watch": "vitest",
     "test:coverage": "vitest run --coverage",
     "test:e2e": "playwright test"
   },
+
   "dependencies": {
-    "next": "12.3.4",
-    "react": "17.0.2",
-    "react-dom": "17.0.2",
-    "tailwindcss": "latest",
-    "@tiptap/react": "latest",
-    "@tiptap/starter-kit": "latest",
-    "@toast-ui/react-editor": "latest",
-    "@toast-ui/editor": "latest",
-    "@editorjs/editorjs": "latest",
-    "@editorjs/header": "latest",
-    "@editorjs/list": "latest",
-    "@editorjs/paragraph": "latest",
-    "quill": "latest",
-    "slate": "latest",
-    "slate-react": "latest",
-    "lexical": "latest",
-    "@lexical/react": "latest",
-    "@ckeditor/ckeditor5-react": "latest",
-    "@ckeditor/ckeditor5-build-classic": "latest"
+    "next": "^15.3.1",
+    "react": "^18.2.0",
+    "react-dom": "^18.2.0",
+
+    "tailwindcss": "^3.5.2",
+    "postcss": "^8.4.37",
+    "autoprefixer": "^10.4.20",
+
+    "@tiptap/react": "^2.2.0",
+    "@tiptap/starter-kit": "^2.2.0",
+
+    "@editorjs/editorjs": "^3.1.0",
+    "@editorjs/header": "^2.8.1",
+    "@editorjs/list": "^1.7.1",
+    "@editorjs/paragraph": "^2.11.3",
+
+    "quill": "^2.0.2",
+
+    "slate": "^0.98.0",
+    "slate-react": "^0.98.0",
+
+    "lexical": "^0.14.0",
+    "@lexical/react": "^0.14.0",
+
+    "@ckeditor/ckeditor5-react": "^6.1.0",
+    "@ckeditor/ckeditor5-build-classic": "^40.1.0"
   },
+
   "devDependencies": {
-    "typescript": "latest",
-    "@types/react": "latest",
-    "@types/node": "latest",
-    "vitest": "latest",
-    "@testing-library/react": "latest",
-    "eslint": "latest",
-    "@typescript-eslint/eslint-plugin": "latest",
-    "@typescript-eslint/parser": "latest",
-    "prettier": "latest",
-    "@tailwindcss/postcss": "latest",
-    "autoprefixer": "latest",
-    "@playwright/test": "latest"
-  },
-  "engines": {
-    "node": ">=20.0.0"
+    "typescript": "^5.5.0",
+    "@types/react": "^18.2.24",
+    "@types/node": "^22.4.0",
+
+    "eslint": "^8.59.0",
+    "eslint-config-next": "^15.3.1",
+    "@typescript-eslint/eslint-plugin": "^7.0.0",
+    "@typescript-eslint/parser": "^7.0.0",
+
+    "prettier": "^3.2.4",
+
+    "vitest": "^1.4.1",
+    "@testing-library/react": "^14.1.0",
+
+    "@playwright/test": "^1.46.0"
   }
 }
