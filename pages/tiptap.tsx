@@ -39,7 +39,10 @@ import {
 } from "lucide-react";
 import "@/styles/tiptap.css";
 
-// --- Extension Management ---
+/* -------- Initial content (blank) -------- */
+const initialContent = ""; // replace with your preferred starter HTML
+
+/* -------- Extension Management -------- */
 const AVAILABLE_EXTENSIONS = [
   { name: "StarterKit", extension: StarterKit.configure({ history: false }) },
   { name: "Underline", extension: Underline },
@@ -64,7 +67,7 @@ const AVAILABLE_EXTENSIONS = [
   { name: "TextStyle", extension: TextStyle },
 ];
 
-// --- Extensions Default ---
+/* -------- Extensions Default -------- */
 const DEFAULT_TOOLBAR_EXTENSIONS = [
   "StarterKit",
   "Underline",
@@ -86,7 +89,7 @@ const DEFAULT_TOOLBAR_EXTENSIONS = [
 ];
 
 function TiptapEditorPage() {
-  // --- Extensions (hidden in a menu) ---
+  /* -------- Extension toggle menu -------- */
   const [showExtensionMenu, setShowExtensionMenu] = useState(false);
   const [enabledExtensions, setEnabledExtensions] = useState<string[]>(() => {
     if (typeof window === "undefined") return DEFAULT_TOOLBAR_EXTENSIONS;
@@ -104,18 +107,15 @@ function TiptapEditorPage() {
 
   useEffect(() => {
     if (typeof window !== "undefined") {
-      localStorage.setItem(
-        "tiptapExtensions",
-        JSON.stringify(enabledExtensions),
-      );
+      localStorage.setItem("tiptapExtensions", JSON.stringify(enabledExtensions));
     }
   }, [enabledExtensions]);
 
-  // --- Editor ---
+  /* -------- Editor instance -------- */
   const editor = useEditor(
     {
       extensions,
-      content: FAA_AC_TEMPLATE,
+      content: initialContent,
       autofocus: true,
       editorProps: {
         attributes: {
@@ -133,11 +133,11 @@ function TiptapEditorPage() {
   const handleSave = () => {
     if (editor) {
       alert(editor.getHTML());
-      // Integrate with your backend as needed.
+      // Hook up to your backend / autosave here
     }
   };
 
-  // --- Toolbar Button (icon, command, active?) ---
+  /* -------- Toolbar button helper -------- */
   const toolbarButton = (
     icon: any,
     command: () => void,
@@ -154,19 +154,19 @@ function TiptapEditorPage() {
     </button>
   );
 
-  // --- Dummy Version History (replace with actual integration) ---
+  /* -------- Dummy version history -------- */
   const [showHistory, setShowHistory] = useState(false);
   const DUMMY_HISTORY = [
-    { id: 1, label: "Draft - Jul 9, 8:00am" },
-    { id: 2, label: "AutoSave - Jul 8, 3:30pm" },
-    { id: 3, label: "Submitted - Jul 7, 12:15pm" },
+    { id: 1, label: "Draft - Jul 9, 8:00 am" },
+    { id: 2, label: "AutoSave - Jul 8, 3:30 pm" },
+    { id: 3, label: "Submitted - Jul 7, 12:15 pm" },
   ];
 
-  if (!editor) return <div>Loading TipTap...</div>;
+  if (!editor) return <div>Loading TipTap…</div>;
 
   return (
     <div className="fixed inset-0 z-30 bg-white flex flex-col">
-      {/* Toolbar */}
+      {/* -------- Toolbar -------- */}
       <header className="flex items-center gap-2 bg-gray-100 px-6 py-3 border-b w-full">
         <h1 className="text-xl font-bold mr-6">TipTap Editor</h1>
 
@@ -177,10 +177,10 @@ function TiptapEditorPage() {
               editor.isActive("heading", { level: 1 })
                 ? "h1"
                 : editor.isActive("heading", { level: 2 })
-                  ? "h2"
-                  : editor.isActive("heading", { level: 3 })
-                    ? "h3"
-                    : "p"
+                ? "h2"
+                : editor.isActive("heading", { level: 3 })
+                ? "h3"
+                : "p"
             }
             onChange={(e) => {
               const val = e.target.value;
@@ -268,7 +268,7 @@ function TiptapEditorPage() {
         {/* Spacer */}
         <div className="flex-1"></div>
 
-        {/* Extensions menu (hidden, only advanced users) */}
+        {/* Extensions menu */}
         <div className="relative">
           <button
             onClick={() => setShowExtensionMenu(!showExtensionMenu)}
@@ -281,20 +281,17 @@ function TiptapEditorPage() {
             <div className="absolute right-0 mt-2 bg-white shadow-lg border rounded p-4 z-50 max-h-72 overflow-y-auto w-64">
               <div className="mb-2 font-semibold">Enabled Extensions</div>
               {AVAILABLE_EXTENSIONS.map((ext) => (
-                <label
-                  key={ext.name}
-                  className="flex items-center gap-2 text-sm my-1"
-                >
+                <label key={ext.name} className="flex items-center gap-2 text-sm my-1">
                   <input
                     type="checkbox"
                     checked={enabledExtensions.includes(ext.name)}
-                    onChange={() => {
+                    onChange={() =>
                       setEnabledExtensions((prev) =>
                         prev.includes(ext.name)
                           ? prev.filter((n) => n !== ext.name)
                           : [...prev, ext.name],
-                      );
-                    }}
+                      )
+                    }
                   />
                   {ext.name}
                 </label>
@@ -318,21 +315,14 @@ function TiptapEditorPage() {
           >
             <Clock className="w-4 h-4" />
             History
-            {showHistory ? (
-              <ChevronUp className="w-4 h-4" />
-            ) : (
-              <ChevronDown className="w-4 h-4" />
-            )}
+            {showHistory ? <ChevronUp className="w-4 h-4" /> : <ChevronDown className="w-4 h-4" />}
           </button>
           {showHistory && (
             <div className="absolute right-0 mt-2 bg-white shadow-lg border rounded p-2 z-50 w-56">
               <div className="mb-2 font-semibold">Version History</div>
               <ul>
                 {DUMMY_HISTORY.map((v) => (
-                  <li
-                    key={v.id}
-                    className="py-1 border-b last:border-none text-xs"
-                  >
+                  <li key={v.id} className="py-1 border-b last:border-none text-xs">
                     {v.label}
                   </li>
                 ))}
@@ -347,7 +337,8 @@ function TiptapEditorPage() {
           )}
         </div>
       </header>
-      {/* Editor */}
+
+      {/* -------- Editor -------- */}
       <main className="flex-1 overflow-auto">
         <EditorContent editor={editor} className="tiptap-content" />
       </main>
@@ -355,5 +346,5 @@ function TiptapEditorPage() {
   );
 }
 
-// Disable SSR for Next.js hydration issues
+/* Disable SSR for Next.js hydration issues */
 export default dynamic(() => Promise.resolve(TiptapEditorPage), { ssr: false });
