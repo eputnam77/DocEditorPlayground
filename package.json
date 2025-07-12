@@ -39,8 +39,8 @@
 
     "quill": "^2.0.2",
 
-    "slate": "^0.98.0",
-    "slate-react": "^0.98.0",
+    "slate": "^0.117.0",
+    "slate-react": "^0.117.0",
 
     "lexical": "^0.14.0",
     "@lexical/react": "^0.14.0",
