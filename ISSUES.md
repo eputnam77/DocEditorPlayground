@@ -1,9 +1,9 @@
 # Known Issues
 
 ## Type Checking
-- `npm run typecheck` fails: numerous errors about missing React and testing library types because dependencies are not installed.
+`npm run typecheck` fails with numerous `TS2307` and other errors for missing modules such as `next/router`, `framer-motion`, various editor packages (e.g., `@ckeditor/*`, `@editorjs/*`, `@tiptap/*`). See `/tmp/typecheck.log` for the full output.
 
 ## Test Suite
-- `npm run test` and `npm run test:coverage` fail because `vitest` executable is not found. Node modules are not installed due to network restrictions.
+`npm run test:coverage` executes a stubbed `vitest` binary which prints `vitest stub - tests skipped`, so no tests or coverage are actually run. See `/tmp/testcov.log`.
 
-Resolution requires installing dependencies or adjusting configuration. See logged output in `/tmp/typecheck.log`, `/tmp/test.log`, and `/tmp/testcov.log`.
+Dependencies need to be installed or the configuration adjusted before these commands can succeed.
