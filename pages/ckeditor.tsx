@@ -22,7 +22,7 @@ import HorizontalLine from "@ckeditor/ckeditor5-horizontal-line/src/horizontalli
 import Undo from "@ckeditor/ckeditor5-undo/src/undo";
 import Redo from "@ckeditor/ckeditor5-undo/src/redo";
 
-import "@/styles/ckeditor.css";
+import "../styles/ckeditor.css";
 
 /* --------- Initial content (blank) --------- */
 const initialData = ""; // set your own default HTML if desired
@@ -81,7 +81,9 @@ function CkeditorPage() {
     const toolbarItems: string[] = ["heading", "|"];
     enabledPlugins.forEach((name) => {
       const item = TOOLBAR_MAP[name];
-      Array.isArray(item) ? toolbarItems.push(...item) : toolbarItems.push(item);
+      Array.isArray(item)
+        ? toolbarItems.push(...item)
+        : toolbarItems.push(item);
     });
     toolbarItems.push("|", "undo", "redo");
 
@@ -140,7 +142,10 @@ function CkeditorPage() {
             <div className="absolute right-0 mt-2 bg-white shadow-lg border rounded p-4 z-50 max-h-72 overflow-y-auto w-64">
               <div className="mb-2 font-semibold">Enabled Plugins</div>
               {Object.keys(PLUGINS).map((name) => (
-                <label key={name} className="flex items-center gap-2 text-sm my-1">
+                <label
+                  key={name}
+                  className="flex items-center gap-2 text-sm my-1"
+                >
                   <input
                     type="checkbox"
                     checked={enabledPlugins.includes(name)}
@@ -179,7 +184,10 @@ function CkeditorPage() {
               <div className="mb-2 font-semibold">Version History</div>
               <ul>
                 {DUMMY_HISTORY.map((v) => (
-                  <li key={v.id} className="py-1 border-b last:border-none text-xs">
+                  <li
+                    key={v.id}
+                    className="py-1 border-b last:border-none text-xs"
+                  >
                     {v.label}
                   </li>
                 ))}
@@ -201,7 +209,9 @@ function CkeditorPage() {
           editor={EditorConstructor}
           data={initialData}
           onReady={(editor) => (window.__ckeditor = editor)}
-          onChange={(_, editor) => setTimeout(() => handleSave(editor.getData()), 0)}
+          onChange={(_, editor) =>
+            setTimeout(() => handleSave(editor.getData()), 0)
+          }
           config={EditorConstructor.defaultConfig}
         />
       </main>

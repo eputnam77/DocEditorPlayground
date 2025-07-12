@@ -17,7 +17,7 @@ import {
   ChevronUp,
   Clock,
 } from "lucide-react";
-import "@/styles/quill.css"; // optional overrides
+import "../styles/quill.css"; // optional overrides
 
 /* ---------- Quill module registry (toggleable) ---------- */
 const MODULES: Record<string, any> = {
@@ -38,7 +38,10 @@ const DUMMY_HISTORY = [
 function QuillEditorPage() {
   const [enabledModules, setEnabledModules] = useState<string[]>(() => {
     if (typeof window === "undefined") return DEFAULT_MODULES;
-    return JSON.parse(localStorage.getItem("quillModules") ?? "null") ?? DEFAULT_MODULES;
+    return (
+      JSON.parse(localStorage.getItem("quillModules") ?? "null") ??
+      DEFAULT_MODULES
+    );
   });
   const [showModuleMenu, setShowModuleMenu] = useState(false);
   const [showHistory, setShowHistory] = useState(false);
@@ -65,11 +68,7 @@ function QuillEditorPage() {
   };
 
   /* Toolbar button helper */
-  const button = (
-    icon: JSX.Element,
-    cmd: () => void,
-    title = "",
-  ) => (
+  const button = (icon: JSX.Element, cmd: () => void, title = "") => (
     <button
       type="button"
       onClick={cmd}
@@ -90,8 +89,16 @@ function QuillEditorPage() {
 
         {/* Formatting buttons */}
         <div className="flex items-center gap-1">
-          {button(<Bold className="w-4 h-4" />, () => editor?.format("bold", !editor?.getFormat().bold), "Bold")}
-          {button(<Italic className="w-4 h-4" />, () => editor?.format("italic", !editor?.getFormat().italic), "Italic")}
+          {button(
+            <Bold className="w-4 h-4" />,
+            () => editor?.format("bold", !editor?.getFormat().bold),
+            "Bold",
+          )}
+          {button(
+            <Italic className="w-4 h-4" />,
+            () => editor?.format("italic", !editor?.getFormat().italic),
+            "Italic",
+          )}
           {button(
             <UnderlineIcon className="w-4 h-4" />,
             () => editor?.format("underline", !editor?.getFormat().underline),
@@ -107,11 +114,31 @@ function QuillEditorPage() {
             () => editor?.format("code", !editor?.getFormat().code),
             "Inline Code",
           )}
-          {button(<Quote className="w-4 h-4" />, () => editor?.format("blockquote", !editor?.getFormat().blockquote), "Blockquote")}
-          {button(<List className="w-4 h-4" />, () => editor?.format("list", "bullet"), "Bullet List")}
-          {button(<ListOrdered className="w-4 h-4" />, () => editor?.format("list", "ordered"), "Numbered List")}
-          {button(<Undo2 className="w-4 h-4" />, () => editor?.history.undo(), "Undo")}
-          {button(<Redo2 className="w-4 h-4" />, () => editor?.history.redo(), "Redo")}
+          {button(
+            <Quote className="w-4 h-4" />,
+            () => editor?.format("blockquote", !editor?.getFormat().blockquote),
+            "Blockquote",
+          )}
+          {button(
+            <List className="w-4 h-4" />,
+            () => editor?.format("list", "bullet"),
+            "Bullet List",
+          )}
+          {button(
+            <ListOrdered className="w-4 h-4" />,
+            () => editor?.format("list", "ordered"),
+            "Numbered List",
+          )}
+          {button(
+            <Undo2 className="w-4 h-4" />,
+            () => editor?.history.undo(),
+            "Undo",
+          )}
+          {button(
+            <Redo2 className="w-4 h-4" />,
+            () => editor?.history.redo(),
+            "Redo",
+          )}
 
           <button
             onClick={handleSave}
@@ -137,13 +164,18 @@ function QuillEditorPage() {
             <div className="absolute right-0 mt-2 bg-white shadow-lg border rounded p-4 z-50 max-h-72 overflow-y-auto w-64">
               <div className="mb-2 font-semibold">Enabled Modules</div>
               {Object.keys(MODULES).map((name) => (
-                <label key={name} className="flex items-center gap-2 text-sm my-1">
+                <label
+                  key={name}
+                  className="flex items-center gap-2 text-sm my-1"
+                >
                   <input
                     type="checkbox"
                     checked={enabledModules.includes(name)}
                     onChange={() =>
                       setEnabledModules((prev) =>
-                        prev.includes(name) ? prev.filter((n) => n !== name) : [...prev, name],
+                        prev.includes(name)
+                          ? prev.filter((n) => n !== name)
+                          : [...prev, name],
                       )
                     }
                   />
@@ -169,14 +201,21 @@ function QuillEditorPage() {
           >
             <Clock className="w-4 h-4" />
             History
-            {showHistory ? <ChevronUp className="w-4 h-4" /> : <ChevronDown className="w-4 h-4" />}
+            {showHistory ? (
+              <ChevronUp className="w-4 h-4" />
+            ) : (
+              <ChevronDown className="w-4 h-4" />
+            )}
           </button>
           {showHistory && (
             <div className="absolute right-0 mt-2 bg-white shadow-lg border rounded p-2 z-50 w-56">
               <div className="mb-2 font-semibold">Version History</div>
               <ul>
                 {DUMMY_HISTORY.map((v) => (
-                  <li key={v.id} className="py-1 border-b last:border-none text-xs">
+                  <li
+                    key={v.id}
+                    className="py-1 border-b last:border-none text-xs"
+                  >
                     {v.label}
                   </li>
                 ))}
