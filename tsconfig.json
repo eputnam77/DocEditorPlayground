@@ -37,7 +37,7 @@
       "@editorjs/*": ["stubs/empty"],
       "@tiptap/*": ["stubs/empty"],
       "@lexical/*": ["stubs/empty"],
-      "framer-motion": ["stubs/empty"],
+      "framer-motion": ["stubs/framer-motion"],
       "next/router": ["stubs/empty"],
       "lucide-react": ["stubs/empty"],
       "react-quill": ["stubs/empty"],
