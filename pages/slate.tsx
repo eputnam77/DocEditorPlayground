@@ -26,7 +26,7 @@ import {
   ChevronUp,
   Clock,
 } from "lucide-react";
-import "@/styles/slate.css";
+import "../styles/slate.css";
 
 /* ---------- Plugin toggle setup ---------- */
 const PLUGINS = {
@@ -85,7 +85,8 @@ const toggleMark = (editor: Editor, format: string) => {
 const isBlockActive = (editor: Editor, type: string) => {
   const [match] = Array.from(
     Editor.nodes(editor, {
-      match: (n) => !Editor.isEditor(n) && SlateElement.isElement(n) && n.type === type,
+      match: (n) =>
+        !Editor.isEditor(n) && SlateElement.isElement(n) && n.type === type,
     }),
   );
   return !!match;
@@ -202,7 +203,10 @@ const FormatToolbar = () => {
 function SlateEditorPage() {
   const [pluginsEnabled, setPluginsEnabled] = useState<string[]>(() => {
     if (typeof window === "undefined") return DEFAULT_PLUGINS;
-    return JSON.parse(localStorage.getItem("slatePlugins") ?? "null") ?? DEFAULT_PLUGINS;
+    return (
+      JSON.parse(localStorage.getItem("slatePlugins") ?? "null") ??
+      DEFAULT_PLUGINS
+    );
   });
   const [showPluginMenu, setShowPluginMenu] = useState(false);
   const [showHistory, setShowHistory] = useState(false);
@@ -250,13 +254,18 @@ function SlateEditorPage() {
             <div className="absolute right-0 mt-2 bg-white shadow-lg border rounded p-4 z-50 max-h-72 overflow-y-auto w-64">
               <div className="mb-2 font-semibold">Enabled Plugins</div>
               {Object.keys(PLUGINS).map((name) => (
-                <label key={name} className="flex items-center gap-2 text-sm my-1">
+                <label
+                  key={name}
+                  className="flex items-center gap-2 text-sm my-1"
+                >
                   <input
                     type="checkbox"
                     checked={pluginsEnabled.includes(name)}
                     onChange={() =>
                       setPluginsEnabled((prev) =>
-                        prev.includes(name) ? prev.filter((n) => n !== name) : [...prev, name],
+                        prev.includes(name)
+                          ? prev.filter((n) => n !== name)
+                          : [...prev, name],
                       )
                     }
                   />
@@ -282,14 +291,21 @@ function SlateEditorPage() {
           >
             <Clock className="w-4 h-4" />
             History
-            {showHistory ? <ChevronUp className="w-4 h-4" /> : <ChevronDown className="w-4 h-4" />}
+            {showHistory ? (
+              <ChevronUp className="w-4 h-4" />
+            ) : (
+              <ChevronDown className="w-4 h-4" />
+            )}
           </button>
           {showHistory && (
             <div className="absolute right-0 mt-2 bg-white shadow-lg border rounded p-2 z-50 w-56">
               <div className="mb-2 font-semibold">Version History</div>
               <ul>
                 {DUMMY_HISTORY.map((v) => (
-                  <li key={v.id} className="py-1 border-b last:border-none text-xs">
+                  <li
+                    key={v.id}
+                    className="py-1 border-b last:border-none text-xs"
+                  >
                     {v.label}
                   </li>
                 ))}

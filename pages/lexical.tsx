@@ -11,10 +11,7 @@ import { ListPlugin } from "@lexical/react/LexicalListPlugin";
 import { CodeHighlightPlugin } from "@lexical/react/LexicalCodeHighlightPlugin";
 import { LinkPlugin } from "@lexical/react/LexicalLinkPlugin";
 import { OnChangePlugin } from "@lexical/react/LexicalOnChangePlugin";
-import {
-  HeadingNode,
-  $createHeadingNode,
-} from "@lexical/heading";
+import { HeadingNode, $createHeadingNode } from "@lexical/heading";
 import { ListItemNode, ListNode } from "@lexical/list";
 import { QuoteNode } from "@lexical/quote";
 import { CodeNode } from "@lexical/code";
@@ -35,7 +32,7 @@ import {
   ChevronUp,
   Clock,
 } from "lucide-react";
-import "@/styles/lexical.css";
+import "../styles/lexical.css";
 
 /* ---------- Plugin registry (toggleable) ---------- */
 const PLUGINS: Record<
@@ -98,10 +95,9 @@ function Toolbar() {
             underline: sel.hasFormat("underline"),
             strikethrough: sel.hasFormat("strikethrough"),
             code: sel.hasFormat("code"),
-            quote:
-              sel.anchor
-                ?.getNodes()
-                .some((n) => $isQuoteNode(n.getParent())),
+            quote: sel.anchor
+              ?.getNodes()
+              .some((n) => $isQuoteNode(n.getParent())),
           });
         }
       });
@@ -116,9 +112,7 @@ function Toolbar() {
   ) => (
     <button
       type="button"
-      className={`px-2 py-1 rounded ${
-        active ? "bg-indigo-100" : ""
-      }`}
+      className={`px-2 py-1 rounded ${active ? "bg-indigo-100" : ""}`}
       onClick={command}
       title={title}
     >
@@ -141,7 +135,12 @@ function Toolbar() {
 
   return (
     <>
-      {button(<Bold className="w-4 h-4" />, () => format("bold"), selectionFormat.bold, "Bold")}
+      {button(
+        <Bold className="w-4 h-4" />,
+        () => format("bold"),
+        selectionFormat.bold,
+        "Bold",
+      )}
       {button(
         <Italic className="w-4 h-4" />,
         () => format("italic"),
@@ -204,7 +203,10 @@ function Toolbar() {
 function LexicalEditorPage() {
   const [enabledPlugins, setEnabledPlugins] = useState<string[]>(() => {
     if (typeof window === "undefined") return DEFAULT_PLUGINS;
-    return JSON.parse(localStorage.getItem("lexicalPlugins") ?? "null") ?? DEFAULT_PLUGINS;
+    return (
+      JSON.parse(localStorage.getItem("lexicalPlugins") ?? "null") ??
+      DEFAULT_PLUGINS
+    );
   });
   const [showPluginMenu, setShowPluginMenu] = useState(false);
   const [showHistory, setShowHistory] = useState(false);
@@ -269,13 +271,18 @@ function LexicalEditorPage() {
             <div className="absolute right-0 mt-2 bg-white shadow-lg border rounded p-4 z-50 max-h-72 overflow-y-auto w-64">
               <div className="mb-2 font-semibold">Enabled Plugins</div>
               {Object.keys(PLUGINS).map((name) => (
-                <label key={name} className="flex items-center gap-2 text-sm my-1">
+                <label
+                  key={name}
+                  className="flex items-center gap-2 text-sm my-1"
+                >
                   <input
                     type="checkbox"
                     checked={enabledPlugins.includes(name)}
                     onChange={() =>
                       setEnabledPlugins((prev) =>
-                        prev.includes(name) ? prev.filter((n) => n !== name) : [...prev, name],
+                        prev.includes(name)
+                          ? prev.filter((n) => n !== name)
+                          : [...prev, name],
                       )
                     }
                   />
@@ -301,14 +308,21 @@ function LexicalEditorPage() {
           >
             <Clock className="w-4 h-4" />
             History
-            {showHistory ? <ChevronUp className="w-4 h-4" /> : <ChevronDown className="w-4 h-4" />}
+            {showHistory ? (
+              <ChevronUp className="w-4 h-4" />
+            ) : (
+              <ChevronDown className="w-4 h-4" />
+            )}
           </button>
           {showHistory && (
             <div className="absolute right-0 mt-2 bg-white shadow-lg border rounded p-2 z-50 w-56">
               <div className="mb-2 font-semibold">Version History</div>
               <ul>
                 {DUMMY_HISTORY.map((v) => (
-                  <li key={v.id} className="py-1 border-b last:border-none text-xs">
+                  <li
+                    key={v.id}
+                    className="py-1 border-b last:border-none text-xs"
+                  >
                     {v.label}
                   </li>
                 ))}
@@ -329,7 +343,9 @@ function LexicalEditorPage() {
         <LexicalComposer initialConfig={initialConfig}>
           <RichTextPlugin
             placeholder={<div className="text-gray-400">Start typing…</div>}
-            contentEditable={<ContentEditable className="outline-none lexical-content" />}
+            contentEditable={
+              <ContentEditable className="outline-none lexical-content" />
+            }
           />
           {/* Enable core plugins always */}
           {PluginComponents.map((Comp, idx) => (
@@ -351,4 +367,6 @@ function LexicalEditorPage() {
 }
 
 /* Disable SSR */
-export default dynamic(() => Promise.resolve(LexicalEditorPage), { ssr: false });
+export default dynamic(() => Promise.resolve(LexicalEditorPage), {
+  ssr: false,
+});

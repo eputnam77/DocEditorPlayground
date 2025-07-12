@@ -37,7 +37,7 @@ import {
   ChevronUp,
   Clock,
 } from "lucide-react";
-import "@/styles/tiptap.css";
+import "../styles/tiptap.css";
 
 /* -------- Initial content (blank) -------- */
 const initialContent = ""; // replace with your preferred starter HTML
@@ -107,7 +107,10 @@ function TiptapEditorPage() {
 
   useEffect(() => {
     if (typeof window !== "undefined") {
-      localStorage.setItem("tiptapExtensions", JSON.stringify(enabledExtensions));
+      localStorage.setItem(
+        "tiptapExtensions",
+        JSON.stringify(enabledExtensions),
+      );
     }
   }, [enabledExtensions]);
 
@@ -177,10 +180,10 @@ function TiptapEditorPage() {
               editor.isActive("heading", { level: 1 })
                 ? "h1"
                 : editor.isActive("heading", { level: 2 })
-                ? "h2"
-                : editor.isActive("heading", { level: 3 })
-                ? "h3"
-                : "p"
+                  ? "h2"
+                  : editor.isActive("heading", { level: 3 })
+                    ? "h3"
+                    : "p"
             }
             onChange={(e) => {
               const val = e.target.value;
@@ -281,7 +284,10 @@ function TiptapEditorPage() {
             <div className="absolute right-0 mt-2 bg-white shadow-lg border rounded p-4 z-50 max-h-72 overflow-y-auto w-64">
               <div className="mb-2 font-semibold">Enabled Extensions</div>
               {AVAILABLE_EXTENSIONS.map((ext) => (
-                <label key={ext.name} className="flex items-center gap-2 text-sm my-1">
+                <label
+                  key={ext.name}
+                  className="flex items-center gap-2 text-sm my-1"
+                >
                   <input
                     type="checkbox"
                     checked={enabledExtensions.includes(ext.name)}
@@ -315,14 +321,21 @@ function TiptapEditorPage() {
           >
             <Clock className="w-4 h-4" />
             History
-            {showHistory ? <ChevronUp className="w-4 h-4" /> : <ChevronDown className="w-4 h-4" />}
+            {showHistory ? (
+              <ChevronUp className="w-4 h-4" />
+            ) : (
+              <ChevronDown className="w-4 h-4" />
+            )}
           </button>
           {showHistory && (
             <div className="absolute right-0 mt-2 bg-white shadow-lg border rounded p-2 z-50 w-56">
               <div className="mb-2 font-semibold">Version History</div>
               <ul>
                 {DUMMY_HISTORY.map((v) => (
-                  <li key={v.id} className="py-1 border-b last:border-none text-xs">
+                  <li
+                    key={v.id}
+                    className="py-1 border-b last:border-none text-xs"
+                  >
                     {v.label}
                   </li>
                 ))}

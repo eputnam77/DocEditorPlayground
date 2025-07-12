@@ -22,7 +22,7 @@ import {
   ChevronUp,
   Clock,
 } from "lucide-react";
-import "@/styles/toast.css"; // optional overrides
+import "../styles/toast.css"; // optional overrides
 
 /* ---------- Plugin registry ---------- */
 const PLUGINS: Record<
@@ -48,7 +48,10 @@ function ToastUIEditorPage() {
 
   const [enabledPlugins, setEnabledPlugins] = useState<string[]>(() => {
     if (typeof window === "undefined") return DEFAULT_PLUGINS;
-    return JSON.parse(localStorage.getItem("toastPlugins") ?? "null") ?? DEFAULT_PLUGINS;
+    return (
+      JSON.parse(localStorage.getItem("toastPlugins") ?? "null") ??
+      DEFAULT_PLUGINS
+    );
   });
   const [showPluginMenu, setShowPluginMenu] = useState(false);
   const [showHistory, setShowHistory] = useState(false);
@@ -80,11 +83,7 @@ function ToastUIEditorPage() {
     editorRef.current?.getInstance().exec(cmd, payload);
 
   /* Simple inline buttons */
-  const button = (
-    icon: JSX.Element,
-    cmd: () => void,
-    title: string,
-  ) => (
+  const button = (icon: JSX.Element, cmd: () => void, title: string) => (
     <button
       type="button"
       onClick={cmd}
@@ -116,9 +115,21 @@ function ToastUIEditorPage() {
             "Strikethrough",
           )}
           {button(<Code className="w-4 h-4" />, exec("code"), "Inline Code")}
-          {button(<Quote className="w-4 h-4" />, exec("blockquote"), "Blockquote")}
-          {button(<List className="w-4 h-4" />, exec("bulletList"), "Bullet List")}
-          {button(<ListOrdered className="w-4 h-4" />, exec("orderedList"), "Numbered List")}
+          {button(
+            <Quote className="w-4 h-4" />,
+            exec("blockquote"),
+            "Blockquote",
+          )}
+          {button(
+            <List className="w-4 h-4" />,
+            exec("bulletList"),
+            "Bullet List",
+          )}
+          {button(
+            <ListOrdered className="w-4 h-4" />,
+            exec("orderedList"),
+            "Numbered List",
+          )}
           {button(<Undo2 className="w-4 h-4" />, exec("undo"), "Undo")}
           {button(<Redo2 className="w-4 h-4" />, exec("redo"), "Redo")}
 
@@ -146,13 +157,18 @@ function ToastUIEditorPage() {
             <div className="absolute right-0 mt-2 bg-white shadow-lg border rounded p-4 z-50 max-h-72 overflow-y-auto w-64">
               <div className="mb-2 font-semibold">Enabled Plugins</div>
               {Object.keys(PLUGINS).map((name) => (
-                <label key={name} className="flex items-center gap-2 text-sm my-1">
+                <label
+                  key={name}
+                  className="flex items-center gap-2 text-sm my-1"
+                >
                   <input
                     type="checkbox"
                     checked={enabledPlugins.includes(name)}
                     onChange={() =>
                       setEnabledPlugins((prev) =>
-                        prev.includes(name) ? prev.filter((n) => n !== name) : [...prev, name],
+                        prev.includes(name)
+                          ? prev.filter((n) => n !== name)
+                          : [...prev, name],
                       )
                     }
                   />
@@ -178,14 +194,21 @@ function ToastUIEditorPage() {
           >
             <Clock className="w-4 h-4" />
             History
-            {showHistory ? <ChevronUp className="w-4 h-4" /> : <ChevronDown className="w-4 h-4" />}
+            {showHistory ? (
+              <ChevronUp className="w-4 h-4" />
+            ) : (
+              <ChevronDown className="w-4 h-4" />
+            )}
           </button>
           {showHistory && (
             <div className="absolute right-0 mt-2 bg-white shadow-lg border rounded p-2 z-50 w-56">
               <div className="mb-2 font-semibold">Version History</div>
               <ul>
                 {DUMMY_HISTORY.map((v) => (
-                  <li key={v.id} className="py-1 border-b last:border-none text-xs">
+                  <li
+                    key={v.id}
+                    className="py-1 border-b last:border-none text-xs"
+                  >
                     {v.label}
                   </li>
                 ))}
@@ -218,4 +241,6 @@ function ToastUIEditorPage() {
 }
 
 /* Disable SSR to avoid hydration issues */
-export default dynamic(() => Promise.resolve(ToastUIEditorPage), { ssr: false });
+export default dynamic(() => Promise.resolve(ToastUIEditorPage), {
+  ssr: false,
+});
