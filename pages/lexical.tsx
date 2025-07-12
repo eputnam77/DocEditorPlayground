@@ -32,7 +32,6 @@ import {
   ChevronUp,
   Clock,
 } from "lucide-react";
-import "../styles/lexical.css";
 
 /* ---------- Plugin registry (toggleable) ---------- */
 const PLUGINS: Record<

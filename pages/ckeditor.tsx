@@ -22,8 +22,6 @@ import HorizontalLine from "@ckeditor/ckeditor5-horizontal-line/src/horizontalli
 import Undo from "@ckeditor/ckeditor5-undo/src/undo";
 import Redo from "@ckeditor/ckeditor5-undo/src/redo";
 
-import "../styles/ckeditor.css";
-
 /* --------- Initial content (blank) --------- */
 const initialData = ""; // set your own default HTML if desired
 

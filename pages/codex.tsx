@@ -12,7 +12,6 @@ import InlineCode from "@editorjs/inline-code";
 import Underline from "editorjs-underline";
 
 import { ChevronDown, ChevronUp, Clock } from "lucide-react";
-import "../styles/codex.css"; /* optional overrides */
 
 /* -------- Editor.js plugin registry -------- */
 const PLUGINS = {

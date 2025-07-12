@@ -22,7 +22,6 @@ import {
   ChevronUp,
   Clock,
 } from "lucide-react";
-import "../styles/toast.css"; // optional overrides
 
 /* ---------- Plugin registry ---------- */
 const PLUGINS: Record<
