@@ -11,14 +11,13 @@ This project demonstrates multiple rich text editors side by side using **Next.j
 
 ## Setup
 
-1. Install dependencies:
+1. Run the setup script (requires `nvm`):
    ```bash
-   npm install
+   bash scripts/setup.sh
    ```
-   If you see a peer dependency conflict error, run:
-   ```bash
-   npm install --legacy-peer-deps
-   ```
+   This installs the latest LTS version of Node, project dependencies,
+   builds the app and configures Git hooks.
+   If you run into peer dependency conflicts, you can run `npm install --legacy-peer-deps`.
 2. Start the development server:
    ```bash
    npm run dev
