@@ -1,5 +1,3 @@
-// frontend/pages/editors/tiptap.tsx
-
 import React, { useEffect, useMemo, useState } from "react";
 import dynamic from "next/dynamic";
 import { useEditor, EditorContent } from "@tiptap/react";
@@ -39,7 +37,6 @@ import {
   ChevronUp,
   Clock,
 } from "lucide-react";
-import FAA_AC_TEMPLATE from "@/data/tiptapTemplates/faa_ac_template";
 import "@/styles/tiptap.css";
 
 // --- Extension Management ---
