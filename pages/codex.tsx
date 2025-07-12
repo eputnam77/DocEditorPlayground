@@ -1,101 +1,182 @@
-import React, { useEffect, useRef } from "react";
+/* pages/editors/codex.tsx */
+import React, { useEffect, useMemo, useRef, useState } from "react";
 import dynamic from "next/dynamic";
-import { Button } from "@/components/ui/button";
-import FAA_AC_TEMPLATE from "@/data/codexTemplates/faa_ac_template";
+import { createReactEditorJS, ReactEditorJS } from "react-editor-js";
 
-// Import the CodeX-specific CSS for spacing, headings, etc.
-import "@/styles/codex.css";
+import Header from "@editorjs/header";
+import List from "@editorjs/list";
+import Checklist from "@editorjs/checklist";
+import Quote from "@editorjs/quote";
+import CodeTool from "@editorjs/code";
+import InlineCode from "@editorjs/inline-code";
+import Underline from "editorjs-underline";
 
-// Only import Editor.js tools on client
-let EditorJS: any = null;
-let Header: any = null;
-let List: any = null;
-let Quote: any = null;
-let Delimiter: any = null;
+import {
+  ChevronDown,
+  ChevronUp,
+  Clock,
+} from "lucide-react";
+import "@/styles/codex.css"; /* optional overrides */
 
-if (typeof window !== "undefined") {
-  const EJ = require("@editorjs/editorjs");
-  EditorJS = EJ.default ?? EJ;
+/* -------- Editor.js plugin registry -------- */
+const PLUGINS = {
+  Header: { class: Header, inlineToolbar: true, shortcut: "CMD+SHIFT+H" },
+  List: { class: List, inlineToolbar: true },
+  Checklist: { class: Checklist, inlineToolbar: true },
+  Quote: { class: Quote, inlineToolbar: true },
+  Code: { class: CodeTool },
+  InlineCode: { class: InlineCode },
+  Underline: { class: Underline },
+};
 
-  const H = require("@editorjs/header");
-  Header = H.default ?? H;
+const DEFAULT_PLUGINS = Object.keys(PLUGINS);
 
-  const L = require("@editorjs/list");
-  List = L.default ?? L;
+/* -------- Dummy version-history data -------- */
+const DUMMY_HISTORY = [
+  { id: 1, label: "Draft – Jul 9, 8:00 am" },
+  { id: 2, label: "Autosave – Jul 8, 3:30 pm" },
+  { id: 3, label: "Submitted – Jul 7, 12:15 pm" },
+];
 
-  const Q = require("@editorjs/quote");
-  Quote = Q.default ?? Q;
-
-  const D = require("@editorjs/delimiter");
-  Delimiter = D.default ?? D;
-}
-
+/* -------- React component -------- */
 function CodexEditorPage() {
-  const ejInstance = useRef<any>(null);
-  const holder = useRef<HTMLDivElement>(null);
+  const [enabledPlugins, setEnabledPlugins] = useState<string[]>(() => {
+    if (typeof window === "undefined") return DEFAULT_PLUGINS;
+    const stored = localStorage.getItem("codexPlugins");
+    return stored ? JSON.parse(stored) : DEFAULT_PLUGINS;
+  });
+  const [showPluginMenu, setShowPluginMenu] = useState(false);
+  const [showHistory, setShowHistory] = useState(false);
 
+  /* Persist selection */
   useEffect(() => {
-    if (!holder.current || ejInstance.current) return;
+    if (typeof window !== "undefined") {
+      localStorage.setItem("codexPlugins", JSON.stringify(enabledPlugins));
+    }
+  }, [enabledPlugins]);
 
-    ejInstance.current = new EditorJS({
-      holder: holder.current!,
-      autofocus: true,
-      placeholder: "Start writing...",
-      tools: {
-        header: Header,
-        list: List,
-        quote: Quote,
-        delimiter: Delimiter,
-      },
-      data: FAA_AC_TEMPLATE, // FAA Advisory Circular template
-      onReady: () => {
-        // You can do more on editor ready if needed
-      },
+  /* Build Editor.js tools config */
+  const tools = useMemo(() => {
+    const config: Record<string, any> = {};
+    enabledPlugins.forEach((name) => {
+      config[name] = PLUGINS[name];
     });
+    return config;
+  }, [enabledPlugins]);
 
-    return () => {
-      if (
-        ejInstance.current &&
-        typeof ejInstance.current.destroy === "function"
-      ) {
-        ejInstance.current.destroy();
-        ejInstance.current = null;
-      }
-    };
-  }, []);
+  /* Editor ref for saving */
+  const editorCore = useRef<ReactEditorJS>(null);
+  const ReactEditor = useMemo(() => createReactEditorJS(), []);
 
   const handleSave = async () => {
-    if (ejInstance.current) {
-      const output = await ejInstance.current.save();
-      alert("Output JSON: " + JSON.stringify(output, null, 2));
-      // You can POST this to your backend, etc.
-    }
+    if (!editorCore.current) return;
+    const output = await editorCore.current.save();
+    alert(JSON.stringify(output, null, 2)); // replace with backend call
   };
 
   return (
     <div className="fixed inset-0 z-30 bg-white flex flex-col">
-      <header className="flex items-center gap-2 bg-gray-100 px-6 py-3 border-b">
-        <h1 className="text-xl font-bold mr-6">CodeX Editor (Editor.js)</h1>
-        <span className="text-gray-500 text-sm">
-          Headings • Lists • Blockquote
-        </span>
-        <Button className="ml-auto" onClick={handleSave}>
+      {/* ---------- Header ---------- */}
+      <header className="flex items-center gap-2 bg-gray-100 px-6 py-3 border-b w-full">
+        <h1 className="text-xl font-bold mr-6">Editor.js</h1>
+
+        {/* Save button */}
+        <button
+          onClick={handleSave}
+          className="ml-2 px-4 py-2 bg-indigo-600 text-white rounded hover:bg-indigo-700"
+        >
           Save
-        </Button>
+        </button>
+
+        {/* Spacer */}
+        <div className="flex-1" />
+
+        {/* Plugin toggle menu */}
+        <div className="relative">
+          <button
+            onClick={() => setShowPluginMenu(!showPluginMenu)}
+            className="px-3 py-1 border rounded bg-gray-50 hover:bg-gray-200 flex items-center gap-1"
+            title="Manage Plugins"
+          >
+            Plugins <ChevronDown className="w-4 h-4" />
+          </button>
+          {showPluginMenu && (
+            <div className="absolute right-0 mt-2 bg-white shadow-lg border rounded p-4 z-50 max-h-72 overflow-y-auto w-64">
+              <div className="mb-2 font-semibold">Enabled Plugins</div>
+              {Object.keys(PLUGINS).map((name) => (
+                <label key={name} className="flex items-center gap-2 text-sm my-1">
+                  <input
+                    type="checkbox"
+                    checked={enabledPlugins.includes(name)}
+                    onChange={() =>
+                      setEnabledPlugins((prev) =>
+                        prev.includes(name)
+                          ? prev.filter((n) => n !== name)
+                          : [...prev, name],
+                      )
+                    }
+                  />
+                  {name}
+                </label>
+              ))}
+              <button
+                className="mt-2 text-xs px-2 py-1 rounded bg-gray-200"
+                onClick={() => setShowPluginMenu(false)}
+              >
+                Close
+              </button>
+            </div>
+          )}
+        </div>
+
+        {/* Version history */}
+        <div className="relative ml-4">
+          <button
+            onClick={() => setShowHistory(!showHistory)}
+            className="px-3 py-1 border rounded bg-gray-50 hover:bg-gray-200 flex items-center gap-1"
+            title="Version History"
+          >
+            <Clock className="w-4 h-4" />
+            History
+            {showHistory ? <ChevronUp className="w-4 h-4" /> : <ChevronDown className="w-4 h-4" />}
+          </button>
+          {showHistory && (
+            <div className="absolute right-0 mt-2 bg-white shadow-lg border rounded p-2 z-50 w-56">
+              <div className="mb-2 font-semibold">Version History</div>
+              <ul>
+                {DUMMY_HISTORY.map((v) => (
+                  <li key={v.id} className="py-1 border-b last:border-none text-xs">
+                    {v.label}
+                  </li>
+                ))}
+              </ul>
+              <button
+                className="mt-2 text-xs px-2 py-1 rounded bg-gray-200"
+                onClick={() => setShowHistory(false)}
+              >
+                Close
+              </button>
+            </div>
+          )}
+        </div>
       </header>
-      <main className="flex-1 overflow-auto p-0">
-        <div
-          ref={holder}
-          id="codex-editor"
-          className="codex-content w-full h-full min-h-[500px] px-8 py-6 bg-white"
-          style={{ outline: "none" }}
-        />
+
+      {/* ---------- Editor.js canvas ---------- */}
+      <main className="flex-1 overflow-auto px-4 py-6">
+        <ReactEditor
+          ref={editorCore}
+          holder="codex-holder"
+          tools={tools}
+          defaultValue={{ time: Date.now(), blocks: [] }}
+          autofocus
+          minHeight={300}
+        >
+          <div id="codex-holder" className="prose max-w-none" />
+        </ReactEditor>
       </main>
     </div>
   );
 }
 
-// Disable SSR to avoid editor initialization on the server
-export default dynamic(() => Promise.resolve(CodexEditorPage), {
-  ssr: false,
-});
+/* Disable SSR to avoid hydration issues */
+export default dynamic(() => Promise.resolve(CodexEditorPage), { ssr: false });
