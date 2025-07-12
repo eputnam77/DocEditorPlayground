@@ -42,11 +42,12 @@
     "slate": "^0.117.0",
     "slate-react": "^0.117.0",
 
-    "lexical": "^0.14.0",
-    "@lexical/react": "^0.14.0",
+    "lexical": "^0.15.0",
+    "@lexical/react": "^0.15.0",
 
     "@ckeditor/ckeditor5-react": "^6.1.0",
-    "@ckeditor/ckeditor5-build-classic": "^40.1.0"
+    "@ckeditor/ckeditor5-build-classic": "^43.1.2",
+    "@ckeditor/ckeditor5-clipboard": "^43.1.2"
   },
 
   "devDependencies": {
