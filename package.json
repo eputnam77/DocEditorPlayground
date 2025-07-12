@@ -29,7 +29,7 @@
     "@tiptap/react": "^2.2.0",
     "@tiptap/starter-kit": "^2.2.0",
 
-    "@editorjs/editorjs": "^3.1.0",
+    "@editorjs/editorjs": "^2.30.8",
     "@editorjs/header": "^2.8.1",
     "@editorjs/list": "^1.7.1",
     "@editorjs/paragraph": "^2.11.3",
