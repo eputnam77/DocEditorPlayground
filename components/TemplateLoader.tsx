@@ -2,6 +2,8 @@ import { useState } from "react";
 import example from "../templates/example.json";
 import helloWorld from "../templates/hello-world.json";
 import simpleArticle from "../templates/simple-article.json";
+import faaAdvisoryCircular from "../templates/faa-advisory-circular.json";
+import releaseNotes from "../templates/release-notes.json";
 import { validateTemplate } from "../utils/validation";
 
 export interface TemplateLoaderProps {
@@ -9,7 +11,13 @@ export interface TemplateLoaderProps {
   onLoad: (template: unknown) => void;
 }
 
-const templates = { example, helloWorld, simpleArticle } as const;
+const templates = {
+  example,
+  helloWorld,
+  simpleArticle,
+  faaAdvisoryCircular,
+  releaseNotes,
+} as const;
 
 type TemplateName = keyof typeof templates;
 

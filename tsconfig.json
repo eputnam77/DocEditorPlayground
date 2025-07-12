@@ -32,7 +32,8 @@
       "@lexical/react/LexicalComposer": ["stubs/lexical-react"],
       "@tiptap/react": ["stubs/tiptap-react"],
       "@tiptap/starter-kit": ["stubs/tiptap-starter-kit"],
-      "next/dynamic": ["stubs/next-dynamic"]
+      "next/dynamic": ["stubs/next-dynamic"],
+      "@playwright/test": ["stubs/playwright-test"]
     }
   },
   "include": ["next-env.d.ts", "**/*.ts", "**/*.tsx"],
