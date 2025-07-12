@@ -1,89 +1,101 @@
-import { useState } from "react";
+import React, { useEffect, useRef } from "react";
 import dynamic from "next/dynamic";
-import { validateDocument } from "../utils/validation";
-import USWDSDocEditorLayout from "../components/USWDSDocEditorLayout";
-import EditorToolbar from "../components/EditorToolbar";
-import PluginManager from "../components/PluginManager";
-import TemplateLoader from "../components/TemplateLoader";
-import EditorIntegrationInfo from "../components/EditorIntegrationInfo";
-import CodeX from "../components/CodeX";
+import { Button } from "@/components/ui/button";
+import FAA_AC_TEMPLATE from "@/data/codexTemplates/faa_ac_template";
 
-function CodexPage() {
-  const [content, setContent] = useState("");
-  const [valid, setValid] = useState(true);
+// Import the CodeX-specific CSS for spacing, headings, etc.
+import "@/styles/codex.css";
+
+// Only import Editor.js tools on client
+let EditorJS: any = null;
+let Header: any = null;
+let List: any = null;
+let Quote: any = null;
+let Delimiter: any = null;
+
+if (typeof window !== "undefined") {
+  const EJ = require("@editorjs/editorjs");
+  EditorJS = EJ.default ?? EJ;
+
+  const H = require("@editorjs/header");
+  Header = H.default ?? H;
+
+  const L = require("@editorjs/list");
+  List = L.default ?? L;
+
+  const Q = require("@editorjs/quote");
+  Quote = Q.default ?? Q;
+
+  const D = require("@editorjs/delimiter");
+  Delimiter = D.default ?? D;
+}
+
+function CodexEditorPage() {
+  const ejInstance = useRef<any>(null);
+  const holder = useRef<HTMLDivElement>(null);
+
+  useEffect(() => {
+    if (!holder.current || ejInstance.current) return;
+
+    ejInstance.current = new EditorJS({
+      holder: holder.current!,
+      autofocus: true,
+      placeholder: "Start writing...",
+      tools: {
+        header: Header,
+        list: List,
+        quote: Quote,
+        delimiter: Delimiter,
+      },
+      data: FAA_AC_TEMPLATE, // FAA Advisory Circular template
+      onReady: () => {
+        // You can do more on editor ready if needed
+      },
+    });
+
+    return () => {
+      if (
+        ejInstance.current &&
+        typeof ejInstance.current.destroy === "function"
+      ) {
+        ejInstance.current.destroy();
+        ejInstance.current = null;
+      }
+    };
+  }, []);
+
+  const handleSave = async () => {
+    if (ejInstance.current) {
+      const output = await ejInstance.current.save();
+      alert("Output JSON: " + JSON.stringify(output, null, 2));
+      // You can POST this to your backend, etc.
+    }
+  };
 
   return (
-    <USWDSDocEditorLayout
-      editorName="CodeX (Editor.js)"
-      toolbar={<EditorToolbar />}
-      menu={
-        <nav className="flex gap-2">
-          <button className="px-3 py-2 text-sm font-medium text-blue-700 bg-blue-50 border border-blue-300 rounded hover:bg-blue-100">
-            New
-          </button>
-          <button className="px-3 py-2 text-sm font-medium text-gray-700 bg-gray-100 border border-gray-300 rounded hover:bg-gray-200">
-            Open
-          </button>
-          <button className="px-3 py-2 text-sm font-medium text-gray-700 bg-gray-100 border border-gray-300 rounded hover:bg-gray-200">
-            Save
-          </button>
-        </nav>
-      }
-    >
-      <div className="mb-4">
-        <CodeX
-          value={content}
-          onChange={(val: string) => {
-            setContent(val);
-            setValid(validateDocument({ content: val }));
-          }}
+    <div className="fixed inset-0 z-30 bg-white flex flex-col">
+      <header className="flex items-center gap-2 bg-gray-100 px-6 py-3 border-b">
+        <h1 className="text-xl font-bold mr-6">CodeX Editor (Editor.js)</h1>
+        <span className="text-gray-500 text-sm">
+          Headings • Lists • Blockquote
+        </span>
+        <Button className="ml-auto" onClick={handleSave}>
+          Save
+        </Button>
+      </header>
+      <main className="flex-1 overflow-auto p-0">
+        <div
+          ref={holder}
+          id="codex-editor"
+          className="codex-content w-full h-full min-h-[500px] px-8 py-6 bg-white"
+          style={{ outline: "none" }}
         />
-        <div className="mt-2 text-sm">
-          {valid ? (
-            <span className="text-green-700">Document valid</span>
-          ) : (
-            <span className="text-red-700">Document invalid</span>
-          )}
-        </div>
-      </div>
-      {/* Optional extras below */}
-      <div className="flex flex-col md:flex-row gap-6">
-        <div className="flex-1">
-          <h2 className="text-lg font-semibold mb-2 text-gray-800">Plugins</h2>
-          <PluginManager
-            plugins={[
-              "header",
-              "list",
-              "paragraph",
-              "quote",
-              "checklist",
-              "table",
-              "delimiter",
-              "marker",
-              "code",
-              "link",
-              "inlineCode",
-              "image",
-              "raw",
-              "embed",
-              "attaches",
-            ]}
-          />
-        </div>
-        <div className="flex-1">
-          <h2 className="text-lg font-semibold mb-2 text-gray-800">
-            Templates
-          </h2>
-          <TemplateLoader
-            onLoad={(tpl) => setContent(JSON.stringify(tpl, null, 2))}
-          />
-        </div>
-      </div>
-      <div className="mt-6">
-        <EditorIntegrationInfo editorName="codex" />
-      </div>
-    </USWDSDocEditorLayout>
+      </main>
+    </div>
   );
 }
 
-export default dynamic(() => Promise.resolve(CodexPage), { ssr: false });
+// Disable SSR to avoid editor initialization on the server
+export default dynamic(() => Promise.resolve(CodexEditorPage), {
+  ssr: false,
+});
