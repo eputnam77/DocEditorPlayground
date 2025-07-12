@@ -64,3 +64,18 @@ declare module "@tiptap/starter-kit" {
   const StarterKit: any;
   export default StarterKit;
 }
+
+declare module "next/router";
+declare module "framer-motion";
+declare module "react-editor-js";
+declare module "@editorjs/*";
+declare module "editorjs-underline";
+declare module "lucide-react";
+declare module "@lexical/*";
+declare module "react-quill";
+declare module "slate-history";
+declare module "@tiptap/*";
+declare module "@toast-ui/editor-plugin-code-syntax-highlight";
+declare module "@toast-ui/editor-plugin-table-merged-cell";
+declare module "@toast-ui/editor-plugin-color-syntax";
+declare module "prismjs";
