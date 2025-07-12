@@ -2,12 +2,12 @@ import { test, expect } from "@playwright/test";
 
 const pages = [
   { path: "/", text: "Document Editor Playground" },
-  { path: "/tiptap", text: "TipTap" },
+  { path: "/tiptap", text: "TipTap Editor" },
   { path: "/toast", text: "Toast UI Editor" },
-  { path: "/codex", text: "CodeX (Editor.js)" },
-  { path: "/quill", text: "Quill" },
-  { path: "/slate", text: "Slate" },
-  { path: "/lexical", text: "Lexical" },
+  { path: "/codex", text: "Editor.js" },
+  { path: "/quill", text: "Quill Editor" },
+  { path: "/slate", text: "Slate Editor" },
+  { path: "/lexical", text: "Lexical Editor" },
   { path: "/ckeditor", text: "CKEditor 5" },
 ];
 

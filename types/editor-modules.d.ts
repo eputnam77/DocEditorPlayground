@@ -20,9 +20,6 @@ declare module "@editorjs/header" {
 declare module "@editorjs/list" {
   export default class List {}
 }
-declare module "@editorjs/paragraph" {
-  export default class Paragraph {}
-}
 declare module "quill" {
   export default class Quill {
     constructor(el: HTMLElement, options?: any);

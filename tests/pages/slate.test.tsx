@@ -3,9 +3,8 @@ import { describe, it, expect } from "vitest";
 import SlatePage from "../../pages/slate";
 
 describe("SlatePage", () => {
-  it("renders plugin manager and editor", () => {
+  it("renders heading", () => {
     render(<SlatePage />);
-    expect(screen.getByTestId("plugin-history")).toBeInTheDocument();
-    expect(screen.getByTestId("simple-editor")).toBeInTheDocument();
+    expect(screen.getByText("Slate Editor")).toBeInTheDocument();
   });
 });

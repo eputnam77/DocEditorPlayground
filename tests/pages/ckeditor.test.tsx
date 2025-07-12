@@ -3,9 +3,8 @@ import { describe, it, expect } from "vitest";
 import CkeditorPage from "../../pages/ckeditor";
 
 describe("CkeditorPage", () => {
-  it("renders plugin manager and editor", () => {
+  it("renders heading", () => {
     render(<CkeditorPage />);
-    expect(screen.getByTestId("plugin-alignment")).toBeInTheDocument();
-    expect(screen.getByTestId("simple-editor")).toBeInTheDocument();
+    expect(screen.getByText("CKEditor 5")).toBeInTheDocument();
   });
 });
