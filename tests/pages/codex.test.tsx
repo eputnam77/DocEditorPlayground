@@ -3,9 +3,8 @@ import { describe, it, expect } from "vitest";
 import CodexPage from "../../pages/codex";
 
 describe("CodexPage", () => {
-  it("renders plugin manager and editor", () => {
+  it("renders heading", () => {
     render(<CodexPage />);
-    expect(screen.getByTestId("plugin-header")).toBeInTheDocument();
-    expect(screen.getByTestId("simple-editor")).toBeInTheDocument();
+    expect(screen.getByText("Editor.js")).toBeInTheDocument();
   });
 });

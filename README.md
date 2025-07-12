@@ -5,9 +5,7 @@ This project demonstrates multiple rich text editors side by side using **Next.j
 ## Features
 
 - Dedicated pages for **TipTap**, **CodeX**, **Quill**, **Slate**, **Lexical** and **CKEditor 5**. Removed **Toast UI** as of July 2025 because that repo hasn't been updated since 2023.
-- Simple toolbar editor shared across pages
-- Plugin toggles via `PluginManager`
-- Loadable example templates with validation
+- Plugin toggles built into each page
 - Quick integration tips for each editor
 - Dark mode switch
 
@@ -40,7 +38,6 @@ See [Integration Guides](docs/integration-guides.md) for quick notes on how to m
 / (repo root)
 ├── pages/            # Next.js pages for each editor
 ├── components/       # Reusable React components
-├── templates/        # Example content templates
 ├── utils/            # Shared utilities and validation helpers
 ├── styles/           # Global Tailwind styles
 ├── public/           # Static assets

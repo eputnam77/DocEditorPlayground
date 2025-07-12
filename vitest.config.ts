@@ -8,7 +8,6 @@ export default defineConfig({
       "@editorjs/editorjs": "./stubs/editorjs.js",
       "@editorjs/header": "./stubs/editorjs-header.js",
       "@editorjs/list": "./stubs/editorjs-list.js",
-      "@editorjs/paragraph": "./stubs/editorjs-paragraph.js",
       "@ckeditor/ckeditor5-react": "./stubs/ckeditor5-react.js",
       "@ckeditor/ckeditor5-build-classic": "./stubs/ckeditor5-build-classic.js",
       quill: "./stubs/quill.js",
