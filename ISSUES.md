@@ -1,9 +1,19 @@
 # Known Issues
 
+## Formatting
+`npx prettier --check .` reports style issues in multiple files.
+Run `npx prettier --write` to fix them.
+
 ## Type Checking
-`npm run typecheck` fails with numerous `TS2307` and other errors for missing modules such as `next/router`, `framer-motion`, various editor packages (e.g., `@ckeditor/*`, `@editorjs/*`, `@tiptap/*`). See `/tmp/typecheck.log` for the full output.
+`npx tsc --noEmit` fails with numerous `TS2307` module-not-found errors
+for packages like `next/router`, `framer-motion`, `@ckeditor/*`,
+`react-editor-js`, `@tiptap/*` and others.
+See the console output above for details.
 
 ## Test Suite
-`npm run test:coverage` executes a stubbed `vitest` binary which prints `vitest stub - tests skipped`, so no tests or coverage are actually run. See `/tmp/testcov.log`.
+`npx vitest run --coverage` and `npx vitest run -m property` execute a
+stubbed `vitest` binary so tests and coverage are skipped. Playwright and
+Stryker commands are also stubbed.
 
-Dependencies need to be installed or the configuration adjusted before these commands can succeed.
+Dependencies need to be installed or configuration adjusted before these
+commands can succeed.
