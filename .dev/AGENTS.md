@@ -70,7 +70,7 @@ npm audit --prod --audit-level=high || true  # warn only on feature
 vitest run --coverage --coverage.reporter=text --coverage.branches --coverage.statements --coverage.failUnder=75
 vitest run -m property                        # fast‑check suites
 playwright install --with-deps --dry-run      # ensure binaries cached
-playwright test --reporter=line --headless
+playwright test --reporter=line
 stryker run --coverageAnalysis=perTest --threshold-break 60
 ```
 
