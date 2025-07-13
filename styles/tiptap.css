@@ -1,1 +1,106 @@
 /* Placeholder overrides for TipTap */
+.tiptap-content {
+  min-height: 200px;
+  border: 1px solid #d1d5db; /* Tailwind gray-300 */
+  border-radius: 0.5rem;
+  padding: 1rem;
+  background: #fff;
+  font-size: 1rem;
+  outline: none;
+  transition: border-color 0.2s;
+}
+.tiptap-content:focus-within {
+  border-color: #6366f1; /* Tailwind indigo-500 */
+}
+
+.tiptap-content h1 {
+  font-size: 2rem;
+  font-weight: 700;
+  margin: 1.2em 0 0.5em 0;
+}
+.tiptap-content h2 {
+  font-size: 1.5rem;
+  font-weight: 600;
+  margin: 1.1em 0 0.5em 0;
+}
+.tiptap-content h3 {
+  font-size: 1.25rem;
+  font-weight: 600;
+  margin: 1em 0 0.5em 0;
+}
+.tiptap-content h4 {
+  font-size: 1.1rem;
+  font-weight: 600;
+  margin: 0.9em 0 0.5em 0;
+}
+.tiptap-content h5 {
+  font-size: 1rem;
+  font-weight: 600;
+  margin: 0.8em 0 0.5em 0;
+}
+.tiptap-content h6 {
+  font-size: 0.95rem;
+  font-weight: 600;
+  margin: 0.7em 0 0.5em 0;
+}
+
+.tiptap-content blockquote {
+  border-left: 4px solid #a5b4fc; /* Tailwind indigo-300 */
+  background: #f3f4f6; /* Tailwind gray-100 */
+  color: #374151; /* Tailwind gray-700 */
+  margin: 1em 0;
+  padding: 0.5em 1em;
+  font-style: italic;
+}
+
+.tiptap-content code {
+  background: #f3f4f6;
+  color: #d97706; /* Tailwind amber-600 */
+  font-family: 'Fira Mono', 'Consolas', 'Monaco', monospace;
+  padding: 0.2em 0.4em;
+  border-radius: 0.3em;
+  font-size: 0.95em;
+}
+
+.tiptap-content pre {
+  background: #1e293b; /* Tailwind slate-800 */
+  color: #f1f5f9; /* Tailwind slate-100 */
+  padding: 1em;
+  border-radius: 0.5em;
+  overflow-x: auto;
+  font-family: 'Fira Mono', 'Consolas', 'Monaco', monospace;
+  font-size: 0.95em;
+  margin: 1em 0;
+}
+
+.tiptap-content ul,
+.tiptap-content ol {
+  margin: 1em 0 1em 2em;
+  padding-left: 1.5em;
+}
+.tiptap-content ul {
+  list-style-type: disc;
+}
+.tiptap-content ol {
+  list-style-type: decimal;
+}
+
+.tiptap-content li {
+  margin: 0.25em 0;
+}
+
+.tiptap-content strong {
+  font-weight: 700;
+}
+
+.tiptap-content em {
+  font-style: italic;
+}
+
+.tiptap-content u {
+  text-decoration: underline;
+}
+
+.tiptap-content s {
+  text-decoration: line-through;
+}

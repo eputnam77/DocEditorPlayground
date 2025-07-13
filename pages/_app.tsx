@@ -1,8 +1,8 @@
 import type { AppProps } from "next/app";
-import "../styles/globals.css";
-import "@toast-ui/editor/dist/toastui-editor.css";
+import React from "react";
 import "../styles/ckeditor.css";
 import "../styles/codex.css";
+import "../styles/globals.css";
 import "../styles/lexical.css";
 import "../styles/quill.css";
 import "../styles/slate.css";

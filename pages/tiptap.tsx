@@ -21,19 +21,19 @@ import Underline from "@tiptap/extension-underline";
 import { EditorContent, useEditor } from "@tiptap/react";
 import StarterKit from "@tiptap/starter-kit";
 import {
-    Bold,
-    ChevronDown,
-    ChevronUp,
-    Clock,
-    Code,
-    Italic,
-    List,
-    ListOrdered,
-    Quote,
-    Redo2,
-    Strikethrough,
-    Underline as UnderlineIcon,
-    Undo2,
+  Bold,
+  ChevronDown,
+  ChevronUp,
+  Clock,
+  Code,
+  Italic,
+  List,
+  ListOrdered,
+  Quote,
+  Redo2,
+  Strikethrough,
+  Underline as UnderlineIcon,
+  Undo2,
 } from "lucide-react";
 import dynamic from "next/dynamic";
 import { useEffect, useMemo, useState } from "react";
@@ -87,6 +87,26 @@ const DEFAULT_TOOLBAR_EXTENSIONS = [
   "HardBreak",
 ];
 
+// Template metadata
+const TEMPLATES = [
+  {
+    label: "FAA Advisory Circular",
+    filename: "faa-advisory-circular.html",
+  },
+  {
+    label: "Software Release Notes",
+    filename: "software-release-notes.html",
+  },
+  {
+    label: "Medical Research Article",
+    filename: "medical-research-article.html",
+  },
+  {
+    label: "Legal Contract Template",
+    filename: "legal-contract-template.html",
+  },
+];
+
 function TiptapEditorPage() {
   /* -------- Extension toggle menu -------- */
   const [showExtensionMenu, setShowExtensionMenu] = useState(false);
@@ -114,10 +134,11 @@ function TiptapEditorPage() {
   }, [enabledExtensions]);
 
   /* -------- Editor instance -------- */
+  const [content, setContent] = useState<string>(initialContent);
   const editor = useEditor(
     {
       extensions,
-      content: initialContent,
+      content,
       autofocus: true,
       editorProps: {
         attributes: {
@@ -128,6 +149,16 @@ function TiptapEditorPage() {
     [extensions],
   );
 
+  // Update content state on every editor change
+  useEffect(() => {
+    if (!editor) return;
+    const updateHandler = () => setContent(editor.getHTML());
+    editor.on("update", updateHandler);
+    return () => {
+      editor.off("update", updateHandler);
+    };
+  }, [editor]);
+
   const setHeading = (level: number) => {
     editor?.chain().focus().toggleHeading({ level }).run();
   };
@@ -136,6 +167,23 @@ function TiptapEditorPage() {
     if (editor) {
       alert(editor.getHTML());
       // Hook up to your backend / autosave here
+    }
+  };
+
+  const [loadingTemplate, setLoadingTemplate] = useState(false);
+
+  // Template loader handler
+  const handleTemplateLoad = async (filename: string) => {
+    if (!editor) return;
+    setLoadingTemplate(true);
+    try {
+      const res = await fetch(`/templates/${filename}`);
+      const html = await res.text();
+      editor.commands.setContent(html);
+    } catch (e) {
+      alert("Failed to load template: " + filename);
+    } finally {
+      setLoadingTemplate(false);
     }
   };
 
@@ -163,6 +211,90 @@ function TiptapEditorPage() {
     { id: 2, label: "AutoSave - Jul 8, 3:30 pm" },
     { id: 3, label: "Submitted - Jul 7, 12:15 pm" },
   ];
+
+  // Validation state
+  const [validationSets, setValidationSets] = useState<any[]>([]);
+  const [selectedValidation, setSelectedValidation] = useState<string>("");
+  const [validationRules, setValidationRules] = useState<any[]>([]);
+  const [validationResults, setValidationResults] = useState<any[]>([]);
+  const [loadingValidation, setLoadingValidation] = useState(false);
+
+  // Fetch validation sets on mount
+  useEffect(() => {
+    async function fetchValidations() {
+      try {
+        const files = [
+          "faa-advisory-circular.json",
+          "software-release-notes.json",
+          "medical-research-article.json",
+          "legal-contract-template.json",
+        ];
+        const sets = await Promise.all(
+          files.map(async (f) => {
+            const res = await fetch(`/validation/${f}`);
+            if (!res.ok) return null;
+            const data = await res.json();
+            return { ...data, filename: f };
+          })
+        );
+        setValidationSets(sets.filter(Boolean));
+      } catch (e) {
+        setValidationSets([]);
+      }
+    }
+    fetchValidations();
+  }, []);
+
+  // Load rules when validation set changes
+  useEffect(() => {
+    if (!selectedValidation) return;
+    const set = validationSets.find((v) => v.filename === selectedValidation);
+    setValidationRules(set ? set.rules : []);
+    setValidationResults([]);
+  }, [selectedValidation, validationSets]);
+
+  // Validation logic
+  function runValidation() {
+    if (!editor) return;
+    const html = editor.getHTML();
+    // Use DOMParser for browser-safe HTML parsing
+    const parser = new window.DOMParser();
+    const doc = parser.parseFromString(html, "text/html");
+    const results = validationRules.map((rule: any) => {
+      if (rule.type === "header") {
+        // Check for header of given level
+        const tag = `h${rule.level}`;
+        const found = doc.body.querySelector(tag);
+        return {
+          ...rule,
+          passed: !!found,
+          detail: found ? `Found <${tag}>: ${found.textContent}` : `No <${tag}> found`,
+        };
+      } else if (rule.type === "section") {
+        // Check for heading with given text (any level)
+        const found = Array.from(doc.body.querySelectorAll("h1, h2, h3, h4, h5, h6")).find((el) =>
+          el.textContent?.trim().toLowerCase() === rule.text.trim().toLowerCase()
+        );
+        return {
+          ...rule,
+          passed: !!found,
+          detail: found ? `Found section: ${found.textContent}` : `Section '${rule.text}' not found`,
+        };
+      } else if (rule.type === "footer") {
+        // Check for text in the last block (simulate footer)
+        const blocks = Array.from(doc.body.querySelectorAll("p, div, footer, section, h1, h2, h3, h4, h5, h6"));
+        const last = blocks[blocks.length - 1];
+        const found = last && rule.text ? last.textContent?.includes(rule.text) : !!last;
+        return {
+          ...rule,
+          passed: found,
+          detail: found ? `Footer contains required info.` : `Footer requirement not met`,
+        };
+      }
+      return { ...rule, passed: false, detail: "Unknown rule type" };
+    });
+    setValidationResults(results);
+  }
 
   if (!editor) return <div>Loading TipTap…</div>;
 
@@ -272,6 +404,36 @@ function TiptapEditorPage() {
         {/* Spacer */}
         <div className="flex-1"></div>
 
+        {/* Template Loader dropdown */}
+        <div className="relative mr-2">
+          <select
+            className="px-3 py-1 border rounded bg-gray-50 hover:bg-gray-200"
+            title="Load Template"
+            aria-label="Templates"
+            disabled={loadingTemplate}
+            onChange={async (e) => {
+              const val = e.target.value;
+              if (val === "") return;
+              if (val === "__clear__") {
+                editor?.commands.clearContent();
+                return;
+              }
+              await handleTemplateLoad(val);
+            }}
+            defaultValue=""
+          >
+            <option value="" disabled>
+              Templates
+            </option>
+            {TEMPLATES.map((tpl) => (
+              <option key={tpl.filename} value={tpl.filename}>
+                {tpl.label}
+              </option>
+            ))}
+            <option value="__clear__">Clear</option>
+          </select>
+        </div>
+
         {/* Extensions menu */}
         <div className="relative">
           <button
@@ -356,7 +518,52 @@ function TiptapEditorPage() {
             </div>
           )}
         </div>
+
+        {/* Validation Dropdown */}
+        <div className="relative ml-2">
+          <select
+            className="px-3 py-1 border rounded bg-gray-50 hover:bg-gray-200"
+            title="Select Validation"
+            aria-label="Validation"
+            value={selectedValidation}
+            onChange={(e) => setSelectedValidation(e.target.value)}
+            disabled={loadingValidation || validationSets.length === 0}
+          >
+            <option value="" disabled>
+              Validation
+            </option>
+            {validationSets.map((v) => (
+              <option key={v.filename} value={v.filename}>
+                {v.name}
+              </option>
+            ))}
+          </select>
+        </div>
+        {/* Run Validation Button */}
+        {selectedValidation && (
+          <button
+            className="ml-2 px-3 py-1 border rounded bg-green-600 text-white hover:bg-green-700"
+            onClick={runValidation}
+            disabled={validationRules.length === 0}
+          >
+            Run Validation
+          </button>
+        )}
       </header>
+
+      {/* Validation Results UI */}
+      {validationResults.length > 0 && (
+        <section className="px-6 py-2 bg-yellow-50 border-b">
+          <div className="font-semibold mb-1">Validation Results:</div>
+          <ul>
+            {validationResults.map((r) => (
+              <li key={r.id} className={r.passed ? "text-green-700" : "text-red-700"}>
+                <span className="font-medium">{r.label}:</span> {r.passed ? "PASS" : "FAIL"} <span className="text-xs">({r.detail})</span>
+              </li>
+            ))}
+          </ul>
+        </section>
+      )}
 
       {/* -------- Editor -------- */}
       <main className="flex-1 overflow-auto">

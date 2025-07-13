@@ -1,4 +1,4 @@
-import { test, expect } from "@playwright/test";
+import { expect, test } from "@playwright/test";
 
 interface EditorWorkflow {
   path: string;
@@ -17,34 +17,33 @@ const editors: EditorWorkflow[] = [
   { path: "/ckeditor", pluginMenu: { name: "Plugins" }, pluginLabel: "Bold", hasSave: false },
 ];
 
-for (const editor of editors) {
-  test.describe(`${editor.path} full workflow`, () => {
-    test("runs full editor workflow", async ({ page }) => {
-      await page.goto(editor.path);
+// Only run workflow for TipTap
+test.describe(`${editors[0].path} full workflow`, () => {
+  test("runs full editor workflow", async ({ page }) => {
+    await page.goto(editors[0].path);
 
-      // toggle and persist plugin
-      await page.getByRole("button", editor.pluginMenu).click();
-      const checkbox = page.getByLabel(editor.pluginLabel);
-      await expect(checkbox).toBeChecked();
-      await checkbox.uncheck();
-      await page.getByRole("button", { name: "Close" }).click();
-      await page.reload();
-      await page.getByRole("button", editor.pluginMenu).click();
-      await expect(page.getByLabel(editor.pluginLabel)).not.toBeChecked();
-      await page.getByRole("button", { name: "Close" }).click();
+    // toggle and persist plugin
+    await page.getByRole("button", editors[0].pluginMenu).click();
+    const checkbox = page.getByLabel(editors[0].pluginLabel);
+    await expect(checkbox).toBeChecked();
+    await checkbox.uncheck();
+    await page.getByRole("button", { name: "Close" }).click();
+    await page.reload();
+    await page.getByRole("button", editors[0].pluginMenu).click();
+    await expect(page.getByLabel(editors[0].pluginLabel)).not.toBeChecked();
+    await page.getByRole("button", { name: "Close" }).click();
 
-      // open and close history
-      const historyButton = page.getByRole("button", { name: "History" });
-      await historyButton.click();
-      await expect(page.getByText("Version History")).toBeVisible();
-      await page.getByRole("button", { name: "Close" }).click();
-      await expect(page.getByText("Version History")).not.toBeVisible();
+    // open and close history
+    const historyButton = page.getByRole("button", { name: "History" });
+    await historyButton.click();
+    await expect(page.getByText("Version History")).toBeVisible();
+    await page.getByRole("button", { name: "Close" }).click();
+    await expect(page.getByText("Version History")).not.toBeVisible();
 
-      // save action shows alert if supported
-      if (editor.hasSave) {
-        page.once("dialog", (dialog) => dialog.dismiss());
-        await page.getByRole("button", { name: "Save" }).click();
-      }
-    });
+    // save action shows alert if supported
+    if (editors[0].hasSave) {
+      page.once("dialog", (dialog) => dialog.dismiss());
+      await page.getByRole("button", { name: "Save" }).click();
+    }
   });
-}
+});

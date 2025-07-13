@@ -1,0 +1,10 @@
+{
+  "name": "Software Release Notes Validation",
+  "description": "Validation rules for Software Release Notes template.",
+  "rules": [
+    { "id": "header-h1", "label": "Must have H1 header (Release Title)", "type": "header", "level": 1, "required": true },
+    { "id": "section-features", "label": "Must contain Features section", "type": "section", "text": "Features", "required": true },
+    { "id": "section-bugfixes", "label": "Must contain Bug Fixes section", "type": "section", "text": "Bug Fixes", "required": false },
+    { "id": "footer-version", "label": "Must display version in footer", "type": "footer", "required": true }
+  ]
+}

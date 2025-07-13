@@ -1,6 +1,6 @@
 {
   "name": "doceditorplayground",
-  "version": "0.1.0",
+  "version": "0.1.2",
   "private": true,
   "type": "module",
   "engines": {
@@ -8,6 +8,7 @@
   },
   "scripts": {
     "dev": "next dev",
+    "dev:debug": "set DEBUG=* && next dev",
     "build": "next build",
     "start": "next start",
     "lint": "next lint",
@@ -28,16 +29,28 @@
     "autoprefixer": "^10.4.18",
     "@tiptap/react": "^2.1.10",
     "@tiptap/starter-kit": "^2.1.10",
-    "@editorjs/editorjs": "^2.30.8",
-    "@editorjs/header": "^2.8.1",
-    "@editorjs/list": "^1.7.1",
-    "quill": "^2.0.2",
-    "slate": "^0.117.0",
-    "slate-react": "^0.117.0",
-    "lexical": "^0.15.0",
-    "@lexical/react": "^0.15.0",
-    "@ckeditor/ckeditor5-react": "^6.1.0",
-    "@ckeditor/ckeditor5-build-classic": "^44.3.0"
+    "framer-motion": "^10.16.4",
+    "@tiptap/extension-blockquote": "^2.1.2",
+    "@tiptap/extension-bold": "^2.1.2",
+    "@tiptap/extension-bullet-list": "^2.1.2",
+    "@tiptap/extension-code": "^2.1.2",
+    "@tiptap/extension-code-block": "^2.1.2",
+    "@tiptap/extension-document": "^2.1.2",
+    "@tiptap/extension-dropcursor": "^2.1.2",
+    "@tiptap/extension-gapcursor": "^2.1.2",
+    "@tiptap/extension-hard-break": "^2.1.2",
+    "@tiptap/extension-heading": "^2.1.2",
+    "@tiptap/extension-history": "^2.1.2",
+    "@tiptap/extension-horizontal-rule": "^2.1.2",
+    "@tiptap/extension-italic": "^2.1.2",
+    "@tiptap/extension-list-item": "^2.1.2",
+    "@tiptap/extension-ordered-list": "^2.1.2",
+    "@tiptap/extension-paragraph": "^2.1.2",
+    "@tiptap/extension-strike": "^2.1.2",
+    "@tiptap/extension-text": "^2.1.2",
+    "@tiptap/extension-text-style": "^2.1.2",
+    "@tiptap/extension-underline": "^2.1.2",
+    "lucide-react": "^0.263.0"
   },
   "devDependencies": {
     "typescript": "^5.4.2",
@@ -52,8 +65,5 @@
     "jsdom": "^24.0.0",
     "@testing-library/react": "^14.1.0",
     "@playwright/test": "^1.46.0"
-  },
-  "overrides": {
-    "esbuild": "^0.25.4"
   }
 }

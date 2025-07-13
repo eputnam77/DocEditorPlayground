@@ -1,0 +1,10 @@
+{
+  "name": "Legal Contract Template Validation",
+  "description": "Validation rules for Legal Contract template.",
+  "rules": [
+    { "id": "header-h1", "label": "Must have H1 header (Contract Title)", "type": "header", "level": 1, "required": true },
+    { "id": "section-parties", "label": "Must contain Parties section", "type": "section", "text": "Parties", "required": true },
+    { "id": "section-terms", "label": "Must contain Terms and Conditions section", "type": "section", "text": "Terms and Conditions", "required": true },
+    { "id": "footer-signature", "label": "Must have Signature line in footer", "type": "footer", "required": true }
+  ]
+}

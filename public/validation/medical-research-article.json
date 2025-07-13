@@ -1,0 +1,11 @@
+{
+  "name": "Medical Research Article Validation",
+  "description": "Validation rules for Medical Research Article template.",
+  "rules": [
+    { "id": "header-h1", "label": "Must have H1 header (Article Title)", "type": "header", "level": 1, "required": true },
+    { "id": "section-abstract", "label": "Must contain Abstract section", "type": "section", "text": "Abstract", "required": true },
+    { "id": "section-methods", "label": "Must contain Methods section", "type": "section", "text": "Methods", "required": true },
+    { "id": "section-results", "label": "Must contain Results section", "type": "section", "text": "Results", "required": true },
+    { "id": "section-discussion", "label": "Must contain Discussion section", "type": "section", "text": "Discussion", "required": true }
+  ]
+}

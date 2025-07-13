@@ -112,3 +112,11 @@ See [Integration Guides](docs/integration-guides.md) for quick notes on how to m
 ```
 
 See `docs/adr` for architectural decisions.
+
+## Current Status (July 2025)
+
+- **Only TipTap is currently available in the playground.**
+- All other editors (CKEditor, Editor.js, Lexical, Quill, Slate, Toast UI, etc.) and their dependencies have been removed for now.
+- Over time, the other editors will be reintroduced for testing, comparison, and feature evaluation.
+
+If you are looking for a multi-editor playground, check back as more editors are added back in!

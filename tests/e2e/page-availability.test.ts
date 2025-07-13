@@ -1,4 +1,4 @@
-import { test, expect } from "@playwright/test";
+import { expect, test } from "@playwright/test";
 
 const pages = [
   { path: "/", text: "Document Editor Playground" },
@@ -11,6 +11,7 @@ const pages = [
   { path: "/ckeditor", text: "CKEditor 5" },
 ];
 
+// Only test TipTap page availability
 for (const { path, text } of pages) {
   test(`opens ${path}`, async ({ page }) => {
     await page.goto(path);

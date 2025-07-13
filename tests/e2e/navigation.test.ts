@@ -1,4 +1,4 @@
-import { test, expect } from "@playwright/test";
+import { expect, test } from "@playwright/test";
 
 const pages = [
   { name: "TipTap", path: "/tiptap", heading: "TipTap Editor" },
@@ -14,7 +14,9 @@ test.describe("navigation bar", () => {
   for (const { name, path, heading } of pages) {
     test(`navigates to ${name}`, async ({ page }) => {
       await page.goto("/");
-      await page.getByRole("link", { name }).click();
+      const link = page.getByRole("link", { name });
+      await expect(link).toBeVisible({ timeout: 10000 });
+      await link.click();
       await expect(page).toHaveURL(path);
       await expect(page.getByText(heading)).toBeVisible();
     });

@@ -1,0 +1,9 @@
+{
+  "name": "FAA Advisory Circular Validation",
+  "description": "Validation rules for FAA Advisory Circular template.",
+  "rules": [
+    { "id": "header-h1", "label": "Must have H1 header", "type": "header", "level": 1, "required": true },
+    { "id": "section-summary", "label": "Must contain a Summary section", "type": "section", "text": "Summary", "required": true },
+    { "id": "footer-contact", "label": "Must have Contact Information in footer", "type": "footer", "required": true }
+  ]
+}

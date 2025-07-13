@@ -1,4 +1,4 @@
-import { test, expect } from "@playwright/test";
+import { expect, test } from "@playwright/test";
 
 interface EditorInfo {
   name: string;
@@ -15,23 +15,22 @@ const editors: EditorInfo[] = [
   { name: "CKEditor", path: "/ckeditor", hasSave: false },
 ];
 
-for (const editor of editors) {
-  test.describe(`${editor.name} workflow`, () => {
-    test("opens and closes history", async ({ page }) => {
-      await page.goto(editor.path);
-      const historyButton = page.getByRole("button", { name: "History" });
-      await historyButton.click();
-      await expect(page.getByText("Version History")).toBeVisible();
-      await page.getByRole("button", { name: "Close" }).click();
-      await expect(page.getByText("Version History")).not.toBeVisible();
-    });
-
-    if (editor.hasSave) {
-      test("shows alert on save", async ({ page }) => {
-        await page.goto(editor.path);
-        page.once("dialog", (dialog) => dialog.dismiss());
-        await page.getByRole("button", { name: "Save" }).click();
-      });
-    }
+// Only include TipTap editor workflow
+test.describe(`${editors[0].name} workflow`, () => {
+  test("opens and closes history", async ({ page }) => {
+    await page.goto(editors[0].path);
+    const historyButton = page.getByRole("button", { name: "History" });
+    await historyButton.click();
+    await expect(page.getByText("Version History")).toBeVisible();
+    await page.getByRole("button", { name: "Close" }).click();
+    await expect(page.getByText("Version History")).not.toBeVisible();
   });
-}
+
+  if (editors[0].hasSave) {
+    test("shows alert on save", async ({ page }) => {
+      await page.goto(editors[0].path);
+      page.once("dialog", (dialog) => dialog.dismiss());
+      await page.getByRole("button", { name: "Save" }).click();
+    });
+  }
+});

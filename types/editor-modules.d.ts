@@ -1,6 +1,5 @@
 declare module "@toast-ui/react-editor" {
-  import React from "react";
-  export class Editor {
+    export class Editor {
     getInstance(): any;
   }
   export const ToastEditor: React.FC<any>;
@@ -60,8 +59,6 @@ declare module "next/router";
 declare module "framer-motion";
 declare module "react-editor-js";
 declare module "@editorjs/*";
-declare module "editorjs-underline";
-declare module "lucide-react";
 declare module "@lexical/*";
 declare module "react-quill" {
   const ReactQuill: any;
