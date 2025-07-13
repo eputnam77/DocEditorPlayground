@@ -1,5 +1,4 @@
 import { test, expect } from "@playwright/test";
-test.skip(true, "E2E tests disabled");
 
 test.describe("dark mode toggle", () => {
   test("toggles the dark class", async ({ page }) => {
