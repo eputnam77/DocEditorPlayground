@@ -63,18 +63,16 @@ If you need a Windows-native script, consider creating a `.ps1` (PowerShell) or 
 npm run dev
 ```
 
-```
-
 ---
 
 ### **Extra: Auto-detect Node Version for Contributors**
 
 - **Add a `.nvmrc` file** to your project root with just this line (for LTS 22.x):
-```
 
+```
 22.17.0
-
 ```
+
 - In Codespaces, this will be picked up automatically.
 - In nvm/nvm-windows, users can run `nvm use` with no arguments if `.nvmrc` is present.
 
