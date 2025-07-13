@@ -15,11 +15,12 @@ This project demonstrates multiple rich text editors side by side using **Next.j
    ```bash
    npm install
    ```
-2. Run the setup script (requires `nvm`):
+2. Run the setup script (uses `nvm` if available):
    ```bash
    bash scripts/setup.sh
    ```
-   This installs the latest LTS version of Node, project dependencies,
+   The script installs the latest LTS version of Node when `nvm` is present or
+   falls back to the system `node`. It then installs dependencies,
    builds the app and configures Git hooks.
    If you run into peer dependency conflicts, you can run `npm install --legacy-peer-deps`.
 3. Start the development server:
