@@ -86,7 +86,7 @@ Run all linters and the full test suite after installing dependencies:
 npm run lint
 npm run typecheck
 npm test
-npx playwright test --reporter=line --headless
+npx playwright test --reporter=line
 ```
 
 ## Adding or Removing Plugins
