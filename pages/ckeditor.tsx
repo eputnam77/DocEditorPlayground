@@ -1,4 +1,3 @@
-/* eslint-disable react/jsx-no-bind */
 import React, { useEffect, useMemo, useState } from "react";
 import dynamic from "next/dynamic";
 import { CKEditor } from "@ckeditor/ckeditor5-react";
