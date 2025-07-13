@@ -1,10 +1,9 @@
 # End-to-End Test Report
 
-**Status:** ❌ Tests could not be executed
+**Status:** ❌ Tests skipped (stubbed Playwright)
 
-The Playwright test suite failed to run because required dependencies are missing and the environment has no internet access for installation. Ensure `node_modules` are available or configure a setup script to install them.
+Running `npx playwright test` outputs `playwright stub` because the repository bundles stub executables in `node_modules/.bin`. Real dependencies are not installed and this environment lacks internet access. To execute the full suite, run `bash scripts/setup.sh` in a networked environment and then `npx playwright test`.
 
 ## Summary
 
 No scenarios were executed.
-

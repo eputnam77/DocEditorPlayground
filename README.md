@@ -26,6 +26,10 @@ This project demonstrates multiple rich text editors side by side using **Next.j
    ```bash
    npm test
    ```
+   To execute the end-to-end tests make sure dependencies are installed and run:
+   ```bash
+   npx playwright test
+   ```
 
 ## Adding or Removing Plugins
 
