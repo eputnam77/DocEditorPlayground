@@ -1,8 +1,4 @@
-node_modules/*
-!node_modules/.bin/
-!node_modules/.bin/vitest
-!node_modules/.bin/playwright
-!node_modules/.bin/stryker
+node_modules/
 .dist
 coverage
 .DS_Store
