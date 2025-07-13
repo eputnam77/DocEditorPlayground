@@ -37,9 +37,7 @@
     "lexical": "^0.15.0",
     "@lexical/react": "^0.15.0",
     "@ckeditor/ckeditor5-react": "^6.1.0",
-    "@ckeditor/ckeditor5-build-classic": "^44.3.0",
-    "@toast-ui/editor": "^3.2.2",
-    "@toast-ui/react-editor": "^3.2.3"
+    "@ckeditor/ckeditor5-build-classic": "^44.3.0"
   },
   "devDependencies": {
     "typescript": "^5.4.2",

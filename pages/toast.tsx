@@ -1,28 +1,28 @@
 /* pages/editors/toast.tsx */
-import React, { useRef, useState, useMemo, useEffect } from "react";
-import dynamic from "next/dynamic";
+import codeSyntaxHighlight from "@toast-ui/editor-plugin-code-syntax-highlight";
+import colorSyntax from "@toast-ui/editor-plugin-color-syntax";
+import tableMergedCell from "@toast-ui/editor-plugin-table-merged-cell";
 import { Editor as ToastEditor } from "@toast-ui/react-editor";
+import dynamic from "next/dynamic";
+import Prism from "prismjs";
+import { useEffect, useMemo, useRef, useState } from "react";
 
 const ToastEditorComponent = ToastEditor as unknown as any;
-import codeSyntaxHighlight from "@toast-ui/editor-plugin-code-syntax-highlight";
-import tableMergedCell from "@toast-ui/editor-plugin-table-merged-cell";
-import colorSyntax from "@toast-ui/editor-plugin-color-syntax";
-import Prism from "prismjs";
 
 import {
-  Bold,
-  Italic,
-  Underline as UnderlineIcon,
-  Strikethrough,
-  Code,
-  List,
-  ListOrdered,
-  Quote,
-  Undo2,
-  Redo2,
-  ChevronDown,
-  ChevronUp,
-  Clock,
+    Bold,
+    ChevronDown,
+    ChevronUp,
+    Clock,
+    Code,
+    Italic,
+    List,
+    ListOrdered,
+    Quote,
+    Redo2,
+    Strikethrough,
+    Underline as UnderlineIcon,
+    Undo2,
 } from "lucide-react";
 
 /* ---------- Plugin registry ---------- */
@@ -97,9 +97,11 @@ function ToastUIEditorPage() {
 
   return (
     <div className="fixed inset-0 z-30 bg-white flex flex-col">
+      {/* Ensure testable heading for Playwright */}
+      <h1 className="sr-only">Toast UI Editor</h1>
       {/* ---------- Header / Toolbar ---------- */}
       <header className="flex items-center gap-2 bg-gray-100 px-6 py-3 border-b w-full">
-        <h1 className="text-xl font-bold mr-6">Toast UI Editor</h1>
+        <span className="text-xl font-bold mr-6">Toast UI Editor</span>
 
         {/* Formatting buttons */}
         <div className="flex items-center gap-1">

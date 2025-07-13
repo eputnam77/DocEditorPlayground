@@ -1,8 +1,3 @@
-import React, { useEffect, useMemo, useState } from "react";
-import dynamic from "next/dynamic";
-import { useEditor, EditorContent } from "@tiptap/react";
-import StarterKit from "@tiptap/starter-kit";
-import Underline from "@tiptap/extension-underline";
 import Blockquote from "@tiptap/extension-blockquote";
 import BoldExtension from "@tiptap/extension-bold";
 import BulletList from "@tiptap/extension-bullet-list";
@@ -22,21 +17,26 @@ import Paragraph from "@tiptap/extension-paragraph";
 import StrikeExtension from "@tiptap/extension-strike";
 import TextExtension from "@tiptap/extension-text";
 import TextStyle from "@tiptap/extension-text-style";
+import Underline from "@tiptap/extension-underline";
+import { EditorContent, useEditor } from "@tiptap/react";
+import StarterKit from "@tiptap/starter-kit";
 import {
-  Bold,
-  Italic,
-  Strikethrough,
-  Underline as UnderlineIcon,
-  Code,
-  List,
-  ListOrdered,
-  Quote,
-  Undo2,
-  Redo2,
-  ChevronDown,
-  ChevronUp,
-  Clock,
+    Bold,
+    ChevronDown,
+    ChevronUp,
+    Clock,
+    Code,
+    Italic,
+    List,
+    ListOrdered,
+    Quote,
+    Redo2,
+    Strikethrough,
+    Underline as UnderlineIcon,
+    Undo2,
 } from "lucide-react";
+import dynamic from "next/dynamic";
+import { useEffect, useMemo, useState } from "react";
 
 /* -------- Initial content (blank) -------- */
 const initialContent = ""; // replace with your preferred starter HTML
@@ -168,9 +168,11 @@ function TiptapEditorPage() {
 
   return (
     <div className="fixed inset-0 z-30 bg-white flex flex-col">
+      {/* Ensure testable heading for Playwright */}
+      <h1 className="sr-only">TipTap Editor</h1>
       {/* -------- Toolbar -------- */}
       <header className="flex items-center gap-2 bg-gray-100 px-6 py-3 border-b w-full">
-        <h1 className="text-xl font-bold mr-6">TipTap Editor</h1>
+        <span className="text-xl font-bold mr-6">TipTap Editor</span>
 
         {/* Formatting toolbar */}
         <div className="flex items-center gap-1">
@@ -276,6 +278,7 @@ function TiptapEditorPage() {
             onClick={() => setShowExtensionMenu(!showExtensionMenu)}
             className="px-3 py-1 border rounded bg-gray-50 hover:bg-gray-200 flex items-center gap-1"
             title="Manage Extensions"
+            aria-label="Extensions"
           >
             Extensions <ChevronDown className="w-4 h-4" />
           </button>
@@ -285,11 +288,14 @@ function TiptapEditorPage() {
               {AVAILABLE_EXTENSIONS.map((ext) => (
                 <label
                   key={ext.name}
+                  htmlFor={`ext-toggle-${ext.name}`}
                   className="flex items-center gap-2 text-sm my-1"
                 >
                   <input
+                    id={`ext-toggle-${ext.name}`}
                     type="checkbox"
                     checked={enabledExtensions.includes(ext.name)}
+                    aria-label={ext.name}
                     onChange={() =>
                       setEnabledExtensions((prev) =>
                         prev.includes(ext.name)
@@ -317,6 +323,7 @@ function TiptapEditorPage() {
             onClick={() => setShowHistory(!showHistory)}
             className="px-3 py-1 border rounded bg-gray-50 hover:bg-gray-200 flex items-center gap-1"
             title="Version History"
+            aria-label="History"
           >
             <Clock className="w-4 h-4" />
             History
@@ -342,6 +349,7 @@ function TiptapEditorPage() {
               <button
                 className="mt-2 text-xs px-2 py-1 rounded bg-gray-200"
                 onClick={() => setShowHistory(false)}
+                aria-label="Close"
               >
                 Close
               </button>

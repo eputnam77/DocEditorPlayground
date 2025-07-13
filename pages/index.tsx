@@ -1,8 +1,9 @@
 import { motion } from "framer-motion";
+import dynamic from "next/dynamic";
 import DarkModeToggle from "../components/DarkModeToggle";
 import NavBar from "../components/NavBar";
 
-export default function HomePage() {
+function HomePage() {
   return (
     <main className="relative min-h-screen flex items-center justify-center overflow-hidden bg-gradient-to-br from-slate-100 via-slate-200 to-slate-300 dark:from-zinc-900 dark:via-zinc-800 dark:to-zinc-700 transition-colors">
       {/* moving grid backdrop */}
@@ -23,7 +24,7 @@ export default function HomePage() {
         className="relative z-10 w-[95%] max-w-2xl px-10 py-12 flex flex-col items-center rounded-3xl backdrop-blur-md bg-white/70 dark:bg-zinc-800/80 ring-1 ring-slate-200/60 dark:ring-zinc-700 shadow-xl"
       >
         <h1 className="text-center text-4xl md:text-5xl font-extrabold tracking-tight mb-4 bg-gradient-to-r from-blue-500 via-violet-500 to-emerald-500 text-transparent bg-clip-text drop-shadow-sm">
-          Document&nbsp;Editor&nbsp;Playground
+          Document Editor Playground
         </h1>
 
         <p className="text-lg md:text-xl text-center text-zinc-700 dark:text-zinc-200/90 mb-8 max-w-md">
@@ -40,3 +41,6 @@ export default function HomePage() {
     </main>
   );
 }
+
+// Disable SSR for the home page to avoid hydration/test issues
+export default dynamic(() => Promise.resolve(HomePage), { ssr: false });

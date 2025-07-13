@@ -1,33 +1,32 @@
 /* pages/editors/slate.tsx */
-import React, { useCallback, useMemo, useState } from "react";
-import dynamic from "next/dynamic";
 import {
-  createEditor,
-  Transforms,
-  Editor as SlateEditor,
-  Element as SlateElement,
-  Text,
+    Bold,
+    ChevronDown,
+    ChevronUp,
+    Clock,
+    Code,
+    Italic,
+    List,
+    ListOrdered,
+    Quote,
+    Redo2,
+    Strikethrough,
+    Underline as UnderlineIcon,
+    Undo2,
+} from "lucide-react";
+import dynamic from "next/dynamic";
+import { useMemo, useState } from "react";
+import {
+    createEditor,
+    Editor as SlateEditor,
+    Element as SlateElement,
+    Transforms
 } from "slate";
-import { Slate, Editable, withReact, useSlate } from "slate-react";
-import { withHistory, HistoryEditor } from "slate-history";
+import { HistoryEditor, withHistory } from "slate-history";
+import { Editable, Slate, useSlate, withReact } from "slate-react";
 
 type Editor = any;
 type Descendant = any;
-import {
-  Bold,
-  Italic,
-  Strikethrough,
-  Underline as UnderlineIcon,
-  Code,
-  List,
-  ListOrdered,
-  Quote,
-  Undo2,
-  Redo2,
-  ChevronDown,
-  ChevronUp,
-  Clock,
-} from "lucide-react";
 
 /* ---------- Plugin toggle setup ---------- */
 const PLUGINS = {
@@ -254,6 +253,7 @@ function SlateEditorPage() {
             onClick={() => setShowPluginMenu(!showPluginMenu)}
             className="px-3 py-1 border rounded bg-gray-50 hover:bg-gray-200 flex items-center gap-1"
             title="Manage Plugins"
+            aria-label="Plugins"
           >
             Plugins <ChevronDown className="w-4 h-4" />
           </button>
@@ -263,11 +263,14 @@ function SlateEditorPage() {
               {Object.keys(PLUGINS).map((name) => (
                 <label
                   key={name}
+                  htmlFor={`plugin-toggle-${name}`}
                   className="flex items-center gap-2 text-sm my-1"
                 >
                   <input
+                    id={`plugin-toggle-${name}`}
                     type="checkbox"
                     checked={pluginsEnabled.includes(name)}
+                    aria-label={name}
                     onChange={() =>
                       setPluginsEnabled((prev) =>
                         prev.includes(name)
