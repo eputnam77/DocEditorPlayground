@@ -73,7 +73,7 @@ This file tracks planned tasks for implementing the **Document Editor Playground
 
 - **Priority:** Medium
 - **Estimate:** 4h
-- **Acceptance Criteria:** `/ckeditor` provides CKEditor 5 with plugin management, toolbar customization, validation area, template loader and integration info section.
+- **Acceptance Criteria:** `/ckeditor` provides CKEditor 5 with plugin management, toolbar customization, validation area, template loader and integration info section, and demonstrates the DXPR AI Agent plugin.
 - **Labels:** `feature`, `editor`, `ckeditor`
 - **Tests:** `tests/e2e/features/ckeditor_page.feature`
 
