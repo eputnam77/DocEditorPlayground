@@ -44,7 +44,7 @@ function QuillEditorPage() {
   });
   const [showModuleMenu, setShowModuleMenu] = useState(false);
   const [showHistory, setShowHistory] = useState(false);
-  const quillRef = useRef<ReactQuill>(null);
+  const quillRef = useRef<any>(null);
 
   /* Persist module selection */
   useEffect(() => {

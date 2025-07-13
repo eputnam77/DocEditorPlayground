@@ -27,19 +27,9 @@ declare module "quill" {
     on(event: string, cb: () => void): void;
   }
 }
-declare module "slate" {
-  export type Descendant = any;
-  export function createEditor(): any;
-}
-declare module "slate-react" {
-  export function Slate(props: any): any;
-  export function Editable(props: any): any;
-  export function withReact(e: any): any;
-}
-declare module "lexical" {
-  export function $getRoot(): any;
-  export function $getSelection(): any;
-}
+declare module "slate";
+declare module "slate-react";
+declare module "lexical";
 declare module "@lexical/react/LexicalComposer" {
   export function LexicalComposer(props: any): any;
   export function ContentEditable(props: any): any;
@@ -55,9 +45,10 @@ declare module "@ckeditor/ckeditor5-build-classic" {
   const ClassicEditor: any;
   export default ClassicEditor;
 }
+declare module "@ckeditor/*";
 declare module "@tiptap/react" {
   export function EditorContent(props: any): any;
-  export function useEditor(props: any): any;
+  export function useEditor(props: any, deps?: any[]): any;
   export type Extension = any;
 }
 declare module "@tiptap/starter-kit" {
@@ -72,7 +63,11 @@ declare module "@editorjs/*";
 declare module "editorjs-underline";
 declare module "lucide-react";
 declare module "@lexical/*";
-declare module "react-quill";
+declare module "react-quill" {
+  const ReactQuill: any;
+  export const Quill: any;
+  export default ReactQuill;
+}
 declare module "slate-history";
 declare module "@tiptap/*";
 declare module "@toast-ui/editor-plugin-code-syntax-highlight";

@@ -10,10 +10,10 @@ declare namespace JSX {
 
 declare module "react" {
   export function useState<T>(
-    initial: T,
+    initial: T | (() => T),
   ): [T, (value: T | ((prev: T) => T)) => void];
   export const useEffect: any;
-  export function useRef<T>(initial?: T): { current: T };
+  export function useRef<T>(initial?: T | null): { current: T | null };
   export function useMemo<T>(factory: () => T, deps: any[]): T;
   export function useCallback<T extends (...args: any[]) => any>(
     fn: T,
@@ -39,6 +39,12 @@ declare module "next/app" {
     Component: any;
     pageProps: any;
   }
+}
+declare module "next/dynamic";
+declare module "@playwright/test";
+
+interface Window {
+  __ckeditor?: any;
 }
 declare module "@tiptap/react";
 declare module "@tiptap/starter-kit";

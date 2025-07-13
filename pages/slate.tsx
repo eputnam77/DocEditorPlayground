@@ -3,14 +3,16 @@ import React, { useCallback, useMemo, useState } from "react";
 import dynamic from "next/dynamic";
 import {
   createEditor,
-  Descendant,
   Transforms,
-  Editor,
+  Editor as SlateEditor,
   Element as SlateElement,
   Text,
 } from "slate";
 import { Slate, Editable, withReact, useSlate } from "slate-react";
 import { withHistory, HistoryEditor } from "slate-history";
+
+type Editor = any;
+type Descendant = any;
 import {
   Bold,
   Italic,
@@ -34,8 +36,14 @@ const PLUGINS = {
 };
 const DEFAULT_PLUGINS = Object.keys(PLUGINS);
 
+const DUMMY_HISTORY = [
+  { id: 1, label: "Draft – Jul 9, 8:00 am" },
+  { id: 2, label: "Autosave – Jul 8, 3:30 pm" },
+  { id: 3, label: "Submitted – Jul 7, 12:15 pm" },
+];
+
 /* ---------- Initial value ---------- */
-const initialValue: Descendant[] = [
+const initialValue: any[] = [
   { type: "paragraph", children: [{ text: "" }] },
 ];
 
@@ -71,31 +79,31 @@ const Leaf = ({ attributes, children, leaf }: any) => {
 };
 
 /* ---------- Helpers ---------- */
-const isMarkActive = (editor: Editor, format: string) => {
-  const marks = Editor.marks(editor);
+const isMarkActive = (editor: any, format: string) => {
+  const marks = SlateEditor.marks(editor);
   return marks ? (marks as any)[format] === true : false;
 };
-const toggleMark = (editor: Editor, format: string) => {
+const toggleMark = (editor: any, format: string) => {
   const active = isMarkActive(editor, format);
-  if (active) Editor.removeMark(editor, format);
-  else Editor.addMark(editor, format, true);
+  if (active) SlateEditor.removeMark(editor, format);
+  else SlateEditor.addMark(editor, format, true);
 };
 
-const isBlockActive = (editor: Editor, type: string) => {
+const isBlockActive = (editor: any, type: string) => {
   const [match] = Array.from(
-    Editor.nodes(editor, {
+    SlateEditor.nodes(editor, {
       match: (n) =>
-        !Editor.isEditor(n) && SlateElement.isElement(n) && n.type === type,
+        !SlateEditor.isEditor(n) && SlateElement.isElement(n) && n.type === type,
     }),
   );
   return !!match;
 };
-const toggleBlock = (editor: Editor, type: string) => {
+const toggleBlock = (editor: any, type: string) => {
   const isActive = isBlockActive(editor, type);
   const isList = type === "bulleted-list" || type === "numbered-list";
   Transforms.unwrapNodes(editor, {
     match: (n) =>
-      !Editor.isEditor(n) &&
+      !SlateEditor.isEditor(n) &&
       SlateElement.isElement(n) &&
       (n.type === "bulleted-list" || n.type === "numbered-list"),
     split: true,
