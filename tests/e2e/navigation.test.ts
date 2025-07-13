@@ -1,5 +1,4 @@
 import { test, expect } from "@playwright/test";
-test.skip(true, "E2E tests disabled");
 
 const pages = [
   { name: "TipTap", path: "/tiptap", heading: "TipTap Editor" },
