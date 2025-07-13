@@ -11,27 +11,74 @@ This project demonstrates multiple rich text editors side by side using **Next.j
 
 ## Installation
 
-1. Ensure **Node.js 18.18+** is available. If you use `nvm`, install the latest
-   LTS release:
-   ```bash
-   nvm install --lts
-   ```
-2. Install project dependencies:
-   ```bash
-   npm install
-   ```
-3. Run the setup script (uses `nvm` if available):
-   ```bash
-   bash scripts/setup.sh
-   ```
-   The script installs the latest LTS version of Node when `nvm` is present or
-   falls back to the system `node`. It then installs dependencies,
-   builds the app and configures Git hooks.
-   If you run into peer dependency conflicts, you can run `npm install --legacy-peer-deps`.
-4. Start the development server:
-   ```bash
-   npm run dev
-   ```
+````markdown
+## Prerequisites
+
+- **Node.js 18.18+ required** (Recommended: Node.js LTS 22.x)
+- [npm](https://www.npmjs.com/) is bundled with Node.js
+
+### Install Node.js (choose your environment)
+
+#### On Codespaces, Mac, or Linux (using nvm)
+
+```bash
+nvm install --lts
+nvm use --lts
+````
+
+#### On Windows (using nvm-windows)
+
+```cmd
+nvm install lts
+nvm use lts
+```
+
+*or specify a version:*
+
+```cmd
+nvm install 22.17.0
+nvm use 22.17.0
+```
+
+### 1. Install project dependencies
+
+```bash
+npm install
+```
+
+### 2. Run setup script (optional)
+
+If your setup script is bash-based and you are on Windows, use **Git Bash** or **WSL** (Windows Subsystem for Linux).
+Otherwise, run:
+
+```bash
+bash scripts/setup.sh
+```
+
+If you need a Windows-native script, consider creating a `.ps1` (PowerShell) or `.cmd` alternative.
+
+### 3. Start development server
+
+```bash
+npm run dev
+```
+
+```
+
+---
+
+### **Extra: Auto-detect Node Version for Contributors**
+
+- **Add a `.nvmrc` file** to your project root with just this line (for LTS 22.x):
+```
+
+22.17.0
+
+```
+- In Codespaces, this will be picked up automatically.
+- In nvm/nvm-windows, users can run `nvm use` with no arguments if `.nvmrc` is present.
+
+---
 
 ## Running Tests
 
