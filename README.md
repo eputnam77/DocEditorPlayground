@@ -9,13 +9,18 @@ This project demonstrates multiple rich text editors side by side using **Next.j
 - Quick integration tips for each editor
 - Dark mode switch
 
-## Setup
+## Installation
 
-1. Install dependencies (requires internet access):
+1. Ensure **Node.js 18.18+** is available. If you use `nvm`, install the latest
+   LTS release:
+   ```bash
+   nvm install --lts
+   ```
+2. Install project dependencies:
    ```bash
    npm install
    ```
-2. Run the setup script (uses `nvm` if available):
+3. Run the setup script (uses `nvm` if available):
    ```bash
    bash scripts/setup.sh
    ```
@@ -23,18 +28,21 @@ This project demonstrates multiple rich text editors side by side using **Next.j
    falls back to the system `node`. It then installs dependencies,
    builds the app and configures Git hooks.
    If you run into peer dependency conflicts, you can run `npm install --legacy-peer-deps`.
-3. Start the development server:
+4. Start the development server:
    ```bash
    npm run dev
    ```
-4. Run the test suite:
-   ```bash
-   npm test
-   ```
-   To execute the end-to-end tests make sure dependencies are installed and run:
-   ```bash
-   npx playwright test
-   ```
+
+## Running Tests
+
+Run all linters and the full test suite after installing dependencies:
+
+```bash
+npm run lint
+npm run typecheck
+npm test
+npx playwright test --reporter=line --headless
+```
 
 ## Adding or Removing Plugins
 
