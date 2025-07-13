@@ -12,7 +12,7 @@
 
 ## ⚠️ Partially Implemented Features
 
-- **Template examples and validation utils** — validation helpers exist and are tested property-based, but no `templates/` directory or template loader components【F:utils/validation.ts†L1-L24】【F:tests/property/validation.property.ts†L1-L25】.
+- **Template examples and validation utils** — validation helpers exist and are tested property-based, but no `templates/` directory or template loader components【F:utils/validation.ts†L1-L24】【F:tests/property/validation.test.ts†L1-L25】.
 - **Modern page designs & advanced toolbars** appear in editor pages but lack validation areas or template loaders; shared components `PluginManager`, `TemplateLoader`, `EditorIntegrationInfo` are missing despite being planned in PRD/TASKS.
 - **Tests** exist but the `vitest` binary is stubbed, so coverage and execution are skipped (see `npm run test:coverage` output showing `vitest stub - tests skipped`)【9d171f†L1-L8】.
 - **E2E tests** defined in `.feature` files but Playwright tests were not executed; `tests/E2E_REPORT.md` notes missing dependencies【F:tests/E2E_REPORT.md†L1-L10】.

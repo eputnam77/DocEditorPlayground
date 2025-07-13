@@ -90,7 +90,7 @@ This file tracks planned tasks for implementing the **Document Editor Playground
 - **Estimate:** 2h
 - **Acceptance Criteria:** `templates/` directory contains sample templates; utility functions handle basic validation logic shared across editors.
 - **Labels:** `feature`, `templates`, `validation`
-- **Tests:** `tests/property/validation.property.ts`
+- **Tests:** `tests/property/validation.test.ts`
 
 ### 12. Implement dark mode toggle
 
