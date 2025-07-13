@@ -26,5 +26,5 @@
     "tests/**/*.tsx",
     "components/**/*.tsx"
   ],
-  "exclude": ["node_modules", "pages/**", "tests"]
+  "exclude": ["node_modules", "pages/**"]
 }
