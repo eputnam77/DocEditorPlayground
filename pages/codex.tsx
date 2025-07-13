@@ -60,7 +60,7 @@ function CodexEditorPage() {
   }, [enabledPlugins]);
 
   /* Editor ref for saving */
-  const editorCore = useRef<ReactEditorJS>(null);
+  const editorCore = useRef<any>(null);
   const ReactEditor = useMemo(() => createReactEditorJS(), []);
 
   const handleSave = async () => {
