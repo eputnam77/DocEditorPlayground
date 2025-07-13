@@ -2,6 +2,8 @@
 import React, { useRef, useState, useMemo, useEffect } from "react";
 import dynamic from "next/dynamic";
 import { Editor as ToastEditor } from "@toast-ui/react-editor";
+
+const ToastEditorComponent = ToastEditor as unknown as any;
 import codeSyntaxHighlight from "@toast-ui/editor-plugin-code-syntax-highlight";
 import tableMergedCell from "@toast-ui/editor-plugin-table-merged-cell";
 import colorSyntax from "@toast-ui/editor-plugin-color-syntax";
@@ -43,7 +45,7 @@ const DUMMY_HISTORY = [
 
 /* ---------- Page ---------- */
 function ToastUIEditorPage() {
-  const editorRef = useRef<ToastEditor>(null);
+  const editorRef = useRef<any>(null);
 
   const [enabledPlugins, setEnabledPlugins] = useState<string[]>(() => {
     if (typeof window === "undefined") return DEFAULT_PLUGINS;
@@ -225,7 +227,7 @@ function ToastUIEditorPage() {
 
       {/* ---------- Toast UI canvas ---------- */}
       <main className="flex-1 overflow-auto px-4 py-6">
-        <ToastEditor
+        <ToastEditorComponent
           ref={editorRef}
           initialValue=""
           previewStyle="vertical"

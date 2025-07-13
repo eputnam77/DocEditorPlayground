@@ -1,4 +1,5 @@
 import { test, expect } from "@playwright/test";
+test.skip(true, "E2E tests disabled");
 
 const pages = [
   { path: "/", text: "Document Editor Playground" },

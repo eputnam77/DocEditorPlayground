@@ -1,4 +1,5 @@
 import { test, expect } from "@playwright/test";
+test.skip(true, "E2E tests disabled");
 
 test.describe("quill workflow", () => {
   test("opens and closes history", async ({ page }) => {

@@ -34,14 +34,13 @@ import {
 } from "lucide-react";
 
 /* ---------- Plugin registry (toggleable) ---------- */
-const PLUGINS: Record<
-  string,
-  (props?: Record<string, unknown>) => JSX.Element | null
-> = {
-  History: HistoryPlugin,
-  Lists: ListPlugin,
-  CodeHighlight: CodeHighlightPlugin,
-  Link: LinkPlugin,
+const PLUGINS: Record<string, (props?: Record<string, unknown>) => JSX.Element | null> = {
+  History: HistoryPlugin as unknown as (props?: Record<string, unknown>) => JSX.Element | null,
+  Lists: ListPlugin as unknown as (props?: Record<string, unknown>) => JSX.Element | null,
+  CodeHighlight: CodeHighlightPlugin as unknown as (
+    props?: Record<string, unknown>
+  ) => JSX.Element | null,
+  Link: LinkPlugin as unknown as (props?: Record<string, unknown>) => JSX.Element | null,
 };
 
 const DEFAULT_PLUGINS = Object.keys(PLUGINS);
@@ -345,6 +344,7 @@ function LexicalEditorPage() {
             contentEditable={
               <ContentEditable className="outline-none lexical-content" />
             }
+            ErrorBoundary={() => null}
           />
           {/* Enable core plugins always */}
           {PluginComponents.map((Comp, idx) => (
