@@ -1,5 +1,5 @@
 import { test, expect } from "@playwright/test";
-test.skip(true, "E2E tests disabled");
+// test.skip(true, "E2E tests disabled");
 
 const PLUGINS = ["Bold", "Italic", "Underline"];
 
