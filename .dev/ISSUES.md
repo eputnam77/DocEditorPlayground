@@ -1350,4 +1350,664 @@ Running 64 tests using 14 workers
     tests\e2e\toast-plugin-toggle.test.ts:12:5 › toast plugin toggles › toggle TableMerge ──────────
     tests\e2e\toast-plugin-toggle.test.ts:12:5 › toast plugin toggles › toggle ColorSyntax ─────────
 
+PS C:\Users\ericp\Documents\Vengeance Coding and Script Files\DocEditorPlayground\DocEditorPlayground> npx playwright test --reporter=line
+
+Running 64 tests using 14 workers
+[WebServer] (node:3160) [DEP_WEBPACK_MODULE_ISSUER] DeprecationWarning: Module.issuer: Use new ModuleGraph API
+[WebServer] (Use `node --trace-deprecation ...` to show where the warning was created)
+[WebServer]  ⨯ ./node_modules/@ckeditor/ckeditor5-basic-styles/theme/code.css
+[WebServer] Global CSS cannot be imported from within node_modules.
+[WebServer] Read more: https://nextjs.org/docs/messages/css-npm
+[WebServer] Location: node_modules\@ckeditor\ckeditor5-basic-styles\src\code.js
+[WebServer] 
+[WebServer] Import trace for requested module:
+[WebServer] ./node_modules/@ckeditor/ckeditor5-basic-styles/theme/code.css
+[WebServer] ./node_modules/@ckeditor/ckeditor5-basic-styles/src/code.js
+[WebServer]  ⨯ ./node_modules/@ckeditor/ckeditor5-basic-styles/theme/code.css
+[WebServer] Global CSS cannot be imported from within node_modules.
+[WebServer] Read more: https://nextjs.org/docs/messages/css-npm
+[WebServer] Location: node_modules\@ckeditor\ckeditor5-basic-styles\src\code.js
+[WebServer] 
+[WebServer] Import trace for requested module:
+[WebServer] ./node_modules/@ckeditor/ckeditor5-basic-styles/theme/code.css
+[WebServer] ./node_modules/@ckeditor/ckeditor5-basic-styles/src/code.js
+[WebServer] <w> [webpack.cache.PackFileCacheStrategy] Caching failed for pack: Error: ENOENT: no such file or directory, rename 'C:\Users\ericp\Documents\Vengeance Coding and Script Files\DocEditorPlayground\DocEditorPlayground\.next\cache\webpack\client-development-fallback\0.pack.gz_' -> 'C:\Users\ericp\Documents\Vengeance Coding and Script Files\DocEditorPlayground\DocEditorPlayground\.next\cache\webpack\client-development-fallback\0.pack.gz'
+[WebServer] <w> [webpack.cache.PackFileCacheStrategy] Caching failed for pack: Error: ENOENT: no such file or directory, rename 'C:\Users\ericp\Documents\Vengeance Coding and Script Files\DocEditorPlayground\DocEditorPlayground\.next\cache\webpack\client-development-fallback\0.pack.gz_' -> 'C:\Users\ericp\Documents\Vengeance Coding and Script Files\DocEditorPlayground\DocEditorPlayground\.next\cache\webpack\client-development-fallback\0.pack.gz'       
+[WebServer] <w> [webpack.cache.PackFileCacheStrategy] Caching failed for pack: Error: ENOENT: no such file or directory, rename 'C:\Users\ericp\Documents\Vengeance Coding and Script Files\DocEditorPlayground\DocEditorPlayground\.next\cache\webpack\client-development-fallback\0.pack.gz_' -> 'C:\Users\ericp\Documents\Vengeance Coding and Script Files\DocEditorPlayground\DocEditorPlayground\.next\cache\webpack\client-development-fallback\0.pack.gz'       
+[WebServer] <w> [webpack.cache.PackFileCacheStrategy] Caching failed for pack: Error: ENOENT: no such file or directory, rename 'C:\Users\ericp\Documents\Vengeance Coding and Script Files\DocEditorPlayground\DocEditorPlayground\.next\cache\webpack\client-development-fallback\0.pack.gz_' -> 'C:\Users\ericp\Documents\Vengeance Coding and Script Files\DocEditorPlayground\DocEditorPlayground\.next\cache\webpack\client-development-fallback\0.pack.gz'
+  1) tests\e2e\ckeditor-plugin-toggle.test.ts:12:5 › ckeditor plugin toggles › toggle Bold ─────────
+
+    Test timeout of 30000ms exceeded while running "beforeEach" hook.
+
+      4 |
+      5 | test.describe("ckeditor plugin toggles", () => {
+    > 6 |   test.beforeEach(async ({ page }) => {
+        |        ^
+      7 |     await page.goto("/ckeditor");
+      8 |     await page.getByRole("button", { name: "Plugins" }).click();
+      9 |   });
+        at C:\Users\ericp\Documents\Vengeance Coding and Script Files\DocEditorPlayground\DocEditorPlayground\tests\e2e\ckeditor-plugin-toggle.test.ts:6:8
+
+    Error: locator.click: Test timeout of 30000ms exceeded.
+    Call log:
+      - waiting for getByRole('button', { name: 'Plugins' })
+
+
+       6 |   test.beforeEach(async ({ page }) => {
+       7 |     await page.goto("/ckeditor");
+    >  8 |     await page.getByRole("button", { name: "Plugins" }).click();
+         |                                                         ^
+       9 |   });
+      10 |
+      11 |   for (const name of PLUGINS) {
+        at C:\Users\ericp\Documents\Vengeance Coding and Script Files\DocEditorPlayground\DocEditorPlayground\tests\e2e\ckeditor-plugin-toggle.test.ts:8:57
+
+    Error Context: test-results\ckeditor-plugin-toggle-ckeditor-plugin-toggles-toggle-Bold\error-context.md
+
+  2) tests\e2e\dark-mode-toggle.test.ts:4:3 › dark mode toggle › toggles the dark class ────────────                                                                                                                                
+
+    Test timeout of 30000ms exceeded.
+
+    Error: locator.click: Test timeout of 30000ms exceeded.
+    Call log:
+      - waiting for getByTestId('dark-mode-toggle')
+
+
+       6 |     const toggle = page.getByTestId("dark-mode-toggle");
+       7 |     await expect(page.locator("html")).not.toHaveClass(/dark/);
+    >  8 |     await toggle.click();
+         |                  ^
+       9 |     await expect(page.locator("html")).toHaveClass(/dark/);
+      10 |     await toggle.click();
+      11 |     await expect(page.locator("html")).not.toHaveClass(/dark/);
+        at C:\Users\ericp\Documents\Vengeance Coding and Script Files\DocEditorPlayground\DocEditorPlayground\tests\e2e\dark-mode-toggle.test.ts:8:18
+
+    Error Context: test-results\dark-mode-toggle-dark-mode-toggle-toggles-the-dark-class\error-context.md
+
+  3) tests\e2e\full-workflow.test.ts:22:5 › /tiptap full workflow › runs full editor workflow ──────                                                                                                                                
+
+    Test timeout of 30000ms exceeded.
+
+    Error: locator.click: Test timeout of 30000ms exceeded.
+    Call log:
+      - waiting for getByRole('button', { name: 'Extensions' })
+
+
+      24 |
+      25 |       // toggle and persist plugin
+    > 26 |       await page.getByRole("button", editor.pluginMenu).click();
+         |                                                         ^
+      27 |       const checkbox = page.getByLabel(editor.pluginLabel);
+      28 |       await expect(checkbox).toBeChecked();
+      29 |       await checkbox.uncheck();
+        at C:\Users\ericp\Documents\Vengeance Coding and Script Files\DocEditorPlayground\DocEditorPlayground\tests\e2e\full-workflow.test.ts:26:57
+
+    Error Context: test-results\full-workflow--tiptap-full-6e0f1-w-runs-full-editor-workflow\error-context.md
+
+  4) tests\e2e\editor-workflows.test.ts:20:5 › TipTap workflow › opens and closes history ──────────                                                                                                                                
+
+    Test timeout of 30000ms exceeded.
+
+    Error: locator.click: Test timeout of 30000ms exceeded.
+    Call log:
+      - waiting for getByRole('button', { name: 'History' })
+
+
+      21 |       await page.goto(editor.path);
+      22 |       const historyButton = page.getByRole("button", { name: "History" });
+    > 23 |       await historyButton.click();
+         |                           ^
+      24 |       await expect(page.getByText("Version History")).toBeVisible();
+      25 |       await page.getByRole("button", { name: "Close" }).click();
+      26 |       await expect(page.getByText("Version History")).not.toBeVisible();
+        at C:\Users\ericp\Documents\Vengeance Coding and Script Files\DocEditorPlayground\DocEditorPlayground\tests\e2e\editor-workflows.test.ts:23:27
+
+    Error Context: test-results\editor-workflows-TipTap-workflow-opens-and-closes-history\error-context.md
+
+  5) tests\e2e\codex-plugin-toggle.test.ts:12:5 › codex plugin toggles › toggle Header ─────────────                                                                                                                                
+
+    Test timeout of 30000ms exceeded while running "beforeEach" hook.
+
+      4 |
+      5 | test.describe("codex plugin toggles", () => {
+    > 6 |   test.beforeEach(async ({ page }) => {
+        |        ^
+      7 |     await page.goto("/codex");
+      8 |     await page.getByRole("button", { name: "Plugins" }).click();
+      9 |   });
+        at C:\Users\ericp\Documents\Vengeance Coding and Script Files\DocEditorPlayground\DocEditorPlayground\tests\e2e\codex-plugin-toggle.test.ts:6:8
+
+    Error: locator.click: Test timeout of 30000ms exceeded.
+    Call log:
+      - waiting for getByRole('button', { name: 'Plugins' })
+
+
+       6 |   test.beforeEach(async ({ page }) => {
+       7 |     await page.goto("/codex");
+    >  8 |     await page.getByRole("button", { name: "Plugins" }).click();
+         |                                                         ^
+       9 |   });
+      10 |
+      11 |   for (const name of PLUGINS) {
+        at C:\Users\ericp\Documents\Vengeance Coding and Script Files\DocEditorPlayground\DocEditorPlayground\tests\e2e\codex-plugin-toggle.test.ts:8:57
+
+    Error Context: test-results\codex-plugin-toggle-codex-plugin-toggles-toggle-Header\error-context.md
+
+[WebServer]  ⨯ ./node_modules/@ckeditor/ckeditor5-basic-styles/theme/code.css
+[WebServer] Global CSS cannot be imported from within node_modules.
+[WebServer] Read more: https://nextjs.org/docs/messages/css-npm
+[WebServer] Location: node_modules\@ckeditor\ckeditor5-basic-styles\src\code.js
+[WebServer] 
+[WebServer] Import trace for requested module:
+[WebServer] ./node_modules/@ckeditor/ckeditor5-basic-styles/theme/code.css
+[WebServer] ./node_modules/@ckeditor/ckeditor5-basic-styles/src/code.js
+  6) tests\e2e\full-workflow.test.ts:22:5 › /toast full workflow › runs full editor workflow ───────
+
+    Test timeout of 30000ms exceeded.
+
+    Error: locator.click: Test timeout of 30000ms exceeded.
+    Call log:
+      - waiting for getByRole('button', { name: 'Plugins' })
+
+
+      24 |
+      25 |       // toggle and persist plugin
+    > 26 |       await page.getByRole("button", editor.pluginMenu).click();
+         |                                                         ^
+      27 |       const checkbox = page.getByLabel(editor.pluginLabel);
+      28 |       await expect(checkbox).toBeChecked();
+      29 |       await checkbox.uncheck();
+        at C:\Users\ericp\Documents\Vengeance Coding and Script Files\DocEditorPlayground\DocEditorPlayground\tests\e2e\full-workflow.test.ts:26:57
+
+    Error Context: test-results\full-workflow--toast-full-workflow-runs-full-editor-workflow\error-context.md
+
+  7) tests\e2e\codex-plugin-toggle.test.ts:12:5 › codex plugin toggles › toggle List ───────────────                                                                                                                                
+
+    Test timeout of 30000ms exceeded while running "beforeEach" hook.
+
+      4 |
+      5 | test.describe("codex plugin toggles", () => {
+    > 6 |   test.beforeEach(async ({ page }) => {
+        |        ^
+      7 |     await page.goto("/codex");
+      8 |     await page.getByRole("button", { name: "Plugins" }).click();
+      9 |   });
+        at C:\Users\ericp\Documents\Vengeance Coding and Script Files\DocEditorPlayground\DocEditorPlayground\tests\e2e\codex-plugin-toggle.test.ts:6:8
+
+    Error: locator.click: Test timeout of 30000ms exceeded.
+    Call log:
+      - waiting for getByRole('button', { name: 'Plugins' })
+
+
+       6 |   test.beforeEach(async ({ page }) => {
+       7 |     await page.goto("/codex");
+    >  8 |     await page.getByRole("button", { name: "Plugins" }).click();
+         |                                                         ^
+       9 |   });
+      10 |
+      11 |   for (const name of PLUGINS) {
+        at C:\Users\ericp\Documents\Vengeance Coding and Script Files\DocEditorPlayground\DocEditorPlayground\tests\e2e\codex-plugin-toggle.test.ts:8:57
+
+    Error Context: test-results\codex-plugin-toggle-codex-plugin-toggles-toggle-List\error-context.md
+
+  8) tests\e2e\ckeditor-plugin-toggle.test.ts:12:5 › ckeditor plugin toggles › toggle Italic ───────                                                                                                                                
+
+    Test timeout of 30000ms exceeded while running "beforeEach" hook.
+
+      4 |
+      5 | test.describe("ckeditor plugin toggles", () => {
+    > 6 |   test.beforeEach(async ({ page }) => {
+        |        ^
+      7 |     await page.goto("/ckeditor");
+      8 |     await page.getByRole("button", { name: "Plugins" }).click();
+      9 |   });
+        at C:\Users\ericp\Documents\Vengeance Coding and Script Files\DocEditorPlayground\DocEditorPlayground\tests\e2e\ckeditor-plugin-toggle.test.ts:6:8
+
+    Error: locator.click: Test timeout of 30000ms exceeded.
+    Call log:
+      - waiting for getByRole('button', { name: 'Plugins' })
+
+
+       6 |   test.beforeEach(async ({ page }) => {
+       7 |     await page.goto("/ckeditor");
+    >  8 |     await page.getByRole("button", { name: "Plugins" }).click();
+         |                                                         ^
+       9 |   });
+      10 |
+      11 |   for (const name of PLUGINS) {
+        at C:\Users\ericp\Documents\Vengeance Coding and Script Files\DocEditorPlayground\DocEditorPlayground\tests\e2e\ckeditor-plugin-toggle.test.ts:8:57
+
+    Error Context: test-results\ckeditor-plugin-toggle-ckeditor-plugin-toggles-toggle-Italic\error-context.md
+
+  9) tests\e2e\editor-workflows.test.ts:30:7 › TipTap workflow › shows alert on save ───────────────                                                                                                                                
+
+    Test timeout of 30000ms exceeded.
+
+    Error: locator.click: Test timeout of 30000ms exceeded.
+    Call log:
+      - waiting for getByRole('button', { name: 'Save' })
+
+
+      31 |         await page.goto(editor.path);
+      32 |         page.once("dialog", (dialog) => dialog.dismiss());
+    > 33 |         await page.getByRole("button", { name: "Save" }).click();
+         |                                                          ^
+      34 |       });
+      35 |     }
+      36 |   });
+        at C:\Users\ericp\Documents\Vengeance Coding and Script Files\DocEditorPlayground\DocEditorPlayground\tests\e2e\editor-workflows.test.ts:33:58
+
+    Error Context: test-results\editor-workflows-TipTap-workflow-shows-alert-on-save\error-context.md
+
+[52/64] tests\e2e\editor-workflows.test.ts:20:5 › Toast UI workflow › opens and closes history
+
+10) tests\e2e\ckeditor-plugin-toggle.test.ts:12:5 › ckeditor plugin toggles › toggle Underline ───
+
+    Test timeout of 30000ms exceeded while running "beforeEach" hook.
+
+      4 |
+      5 | test.describe("ckeditor plugin toggles", () => {
+    > 6 |   test.beforeEach(async ({ page }) => {
+        |        ^
+      7 |     await page.goto("/ckeditor");
+      8 |     await page.getByRole("button", { name: "Plugins" }).click();
+      9 |   });
+        at C:\Users\ericp\Documents\Vengeance Coding and Script Files\DocEditorPlayground\DocEditorPlayground\tests\e2e\ckeditor-plugin-toggle.test.ts:6:8
+
+    Error: locator.click: Test timeout of 30000ms exceeded.
+    Call log:
+      - waiting for getByRole('button', { name: 'Plugins' })
+
+
+       6 |   test.beforeEach(async ({ page }) => {
+       7 |     await page.goto("/ckeditor");
+    >  8 |     await page.getByRole("button", { name: "Plugins" }).click();
+         |                                                         ^
+       9 |   });
+      10 |
+      11 |   for (const name of PLUGINS) {
+        at C:\Users\ericp\Documents\Vengeance Coding and Script Files\DocEditorPlayground\DocEditorPlayground\tests\e2e\ckeditor-plugin-toggle.test.ts:8:57
+
+    Error Context: test-results\ckeditor-plugin-toggle-cke-e5e14-in-toggles-toggle-Underline\error-context.md
+
+  11) tests\e2e\codex-plugin-toggle.test.ts:12:5 › codex plugin toggles › toggle Checklist ─────────                                                                                                                                
+
+    Test timeout of 30000ms exceeded while running "beforeEach" hook.
+
+      4 |
+      5 | test.describe("codex plugin toggles", () => {
+    > 6 |   test.beforeEach(async ({ page }) => {
+        |        ^
+      7 |     await page.goto("/codex");
+      8 |     await page.getByRole("button", { name: "Plugins" }).click();
+      9 |   });
+        at C:\Users\ericp\Documents\Vengeance Coding and Script Files\DocEditorPlayground\DocEditorPlayground\tests\e2e\codex-plugin-toggle.test.ts:6:8
+
+    Error: locator.click: Test timeout of 30000ms exceeded.
+    Call log:
+      - waiting for getByRole('button', { name: 'Plugins' })
+
+
+       6 |   test.beforeEach(async ({ page }) => {
+       7 |     await page.goto("/codex");
+    >  8 |     await page.getByRole("button", { name: "Plugins" }).click();
+         |                                                         ^
+       9 |   });
+      10 |
+      11 |   for (const name of PLUGINS) {
+        at C:\Users\ericp\Documents\Vengeance Coding and Script Files\DocEditorPlayground\DocEditorPlayground\tests\e2e\codex-plugin-toggle.test.ts:8:57
+
+    Error Context: test-results\codex-plugin-toggle-codex-plugin-toggles-toggle-Checklist\error-context.md
+
+  12) tests\e2e\editor-workflows.test.ts:20:5 › Toast UI workflow › opens and closes history ───────                                                                                                                                
+
+    Test timeout of 30000ms exceeded.
+
+    Error: locator.click: Test timeout of 30000ms exceeded.
+    Call log:
+      - waiting for getByRole('button', { name: 'History' })
+
+
+      21 |       await page.goto(editor.path);
+      22 |       const historyButton = page.getByRole("button", { name: "History" });
+    > 23 |       await historyButton.click();
+         |                           ^
+      24 |       await expect(page.getByText("Version History")).toBeVisible();
+      25 |       await page.getByRole("button", { name: "Close" }).click();
+      26 |       await expect(page.getByText("Version History")).not.toBeVisible();
+        at C:\Users\ericp\Documents\Vengeance Coding and Script Files\DocEditorPlayground\DocEditorPlayground\tests\e2e\editor-workflows.test.ts:23:27
+
+    Error Context: test-results\editor-workflows-Toast-UI-workflow-opens-and-closes-history\error-context.md
+
+  13) tests\e2e\full-workflow.test.ts:22:5 › /codex full workflow › runs full editor workflow ──────                                                                                                                                
+
+    Test timeout of 30000ms exceeded.
+
+    Error: locator.click: Test timeout of 30000ms exceeded.
+    Call log:
+      - waiting for getByRole('button', { name: 'Plugins' })
+
+
+      24 |
+      25 |       // toggle and persist plugin
+    > 26 |       await page.getByRole("button", editor.pluginMenu).click();
+         |                                                         ^
+      27 |       const checkbox = page.getByLabel(editor.pluginLabel);
+      28 |       await expect(checkbox).toBeChecked();
+      29 |       await checkbox.uncheck();
+        at C:\Users\ericp\Documents\Vengeance Coding and Script Files\DocEditorPlayground\DocEditorPlayground\tests\e2e\full-workflow.test.ts:26:57
+
+    Error Context: test-results\full-workflow--codex-full-workflow-runs-full-editor-workflow\error-context.md
+
+[WebServer]  ⨯ ./node_modules/@ckeditor/ckeditor5-basic-styles/theme/code.css
+[WebServer] Global CSS cannot be imported from within node_modules.
+[WebServer] Read more: https://nextjs.org/docs/messages/css-npm
+[WebServer] Location: node_modules\@ckeditor\ckeditor5-basic-styles\src\code.js
+[WebServer] 
+[WebServer] Import trace for requested module:
+[WebServer] ./node_modules/@ckeditor/ckeditor5-basic-styles/theme/code.css
+[WebServer] ./node_modules/@ckeditor/ckeditor5-basic-styles/src/code.js
+
+  14) tests\e2e\editor-workflows.test.ts:30:7 › Toast UI workflow › shows alert on save ────────────
+
+    Test timeout of 30000ms exceeded.
+
+    Error: locator.click: Test timeout of 30000ms exceeded.
+    Call log:
+      - waiting for getByRole('button', { name: 'Save' })
+        - waiting for" http://localhost:3000/toast" navigation to finish...
+        - navigated to "http://localhost:3000/toast"
+
+
+      31 |         await page.goto(editor.path);
+      32 |         page.once("dialog", (dialog) => dialog.dismiss());
+    > 33 |         await page.getByRole("button", { name: "Save" }).click();
+         |                                                          ^
+      34 |       });
+      35 |     }
+      36 |   });
+        at C:\Users\ericp\Documents\Vengeance Coding and Script Files\DocEditorPlayground\DocEditorPlayground\tests\e2e\editor-workflows.test.ts:33:58
+
+    Error Context: test-results\editor-workflows-Toast-UI-workflow-shows-alert-on-save\error-context.md
+
+  15) tests\e2e\full-workflow.test.ts:22:5 › /quill full workflow › runs full editor workflow ──────                                                                                                                                
+
+    Test timeout of 30000ms exceeded.
+
+    Error: locator.click: Test timeout of 30000ms exceeded.
+    Call log:
+      - waiting for getByRole('button', { name: 'Modules' })
+
+
+      24 |
+      25 |       // toggle and persist plugin
+    > 26 |       await page.getByRole("button", editor.pluginMenu).click();
+         |                                                         ^
+      27 |       const checkbox = page.getByLabel(editor.pluginLabel);
+      28 |       await expect(checkbox).toBeChecked();
+      29 |       await checkbox.uncheck();
+        at C:\Users\ericp\Documents\Vengeance Coding and Script Files\DocEditorPlayground\DocEditorPlayground\tests\e2e\full-workflow.test.ts:26:57
+
+    Error Context: test-results\full-workflow--quill-full-workflow-runs-full-editor-workflow\error-context.md
+
+[WebServer]  ⨯ ./node_modules/@ckeditor/ckeditor5-basic-styles/theme/code.css
+[WebServer] Global CSS cannot be imported from within node_modules.
+[WebServer] Read more: https://nextjs.org/docs/messages/css-npm
+[WebServer] Location: node_modules\@ckeditor\ckeditor5-basic-styles\src\code.js
+[WebServer] 
+[WebServer] Import trace for requested module:
+[WebServer] ./node_modules/@ckeditor/ckeditor5-basic-styles/theme/code.css
+[WebServer] ./node_modules/@ckeditor/ckeditor5-basic-styles/src/code.js
+
+  16) tests\e2e\full-workflow.test.ts:22:5 › /slate full workflow › runs full editor workflow ──────
+
+    Test timeout of 30000ms exceeded.
+
+    Error: locator.click: Test timeout of 30000ms exceeded.
+    Call log:
+      - waiting for getByRole('button', { name: 'Plugins' })
+
+
+      24 |
+      25 |       // toggle and persist plugin
+    > 26 |       await page.getByRole("button", editor.pluginMenu).click();
+         |                                                         ^
+      27 |       const checkbox = page.getByLabel(editor.pluginLabel);
+      28 |       await expect(checkbox).toBeChecked();
+      29 |       await checkbox.uncheck();
+        at C:\Users\ericp\Documents\Vengeance Coding and Script Files\DocEditorPlayground\DocEditorPlayground\tests\e2e\full-workflow.test.ts:26:57
+
+    Error Context: test-results\full-workflow--slate-full-workflow-runs-full-editor-workflow\error-context.md
+
+  17) tests\e2e\editor-workflows.test.ts:20:5 › CodeX workflow › opens and closes history ──────────                                                                                                                                
+
+    Test timeout of 30000ms exceeded.
+
+    Error: locator.click: Test timeout of 30000ms exceeded.
+    Call log:
+      - waiting for getByRole('button', { name: 'History' })
+
+
+      21 |       await page.goto(editor.path);
+      22 |       const historyButton = page.getByRole("button", { name: "History" });
+    > 23 |       await historyButton.click();
+         |                           ^
+      24 |       await expect(page.getByText("Version History")).toBeVisible();
+      25 |       await page.getByRole("button", { name: "Close" }).click();
+      26 |       await expect(page.getByText("Version History")).not.toBeVisible();
+        at C:\Users\ericp\Documents\Vengeance Coding and Script Files\DocEditorPlayground\DocEditorPlayground\tests\e2e\editor-workflows.test.ts:23:27
+
+    Error Context: test-results\editor-workflows-CodeX-workflow-opens-and-closes-history\error-context.md
+
+[WebServer]  ⨯ ./pages/_app.tsx:3:1
+[WebServer] Module not found: Can't resolve '@toast-ui/editor/dist/toastui-editor.css'
+[WebServer]   1 | import type { AppProps } from "next/app";
+[WebServer]   2 | import "../styles/globals.css";
+[WebServer] > 3 | import "@toast-ui/editor/dist/toastui-editor.css";
+[WebServer]     | ^
+[WebServer]   4 | import "../styles/ckeditor.css";
+[WebServer]   5 | import "../styles/codex.css";
+[WebServer]   6 | import "../styles/lexical.css";
+[WebServer] 
+[WebServer] https://nextjs.org/docs/messages/module-not-found
+
+  18) tests\e2e\full-workflow.test.ts:22:5 › /lexical full workflow › runs full editor workflow ────
+
+    Test timeout of 30000ms exceeded.
+
+    Error: locator.click: Test timeout of 30000ms exceeded.
+    Call log:
+      - waiting for getByRole('button', { name: 'Plugins' })
+
+
+      24 |
+      25 |       // toggle and persist plugin
+    > 26 |       await page.getByRole("button", editor.pluginMenu).click();
+         |                                                         ^
+      27 |       const checkbox = page.getByLabel(editor.pluginLabel);
+      28 |       await expect(checkbox).toBeChecked();
+      29 |       await checkbox.uncheck();
+        at C:\Users\ericp\Documents\Vengeance Coding and Script Files\DocEditorPlayground\DocEditorPlayground\tests\e2e\full-workflow.test.ts:26:57
+
+    Error Context: test-results\full-workflow--lexical-ful-3fc25-w-runs-full-editor-workflow\error-context.md
+
+  19) tests\e2e\editor-workflows.test.ts:30:7 › CodeX workflow › shows alert on save ───────────────                                                                                                                                
+
+    Test timeout of 30000ms exceeded.
+
+    Error: locator.click: Test timeout of 30000ms exceeded.
+    Call log:
+      - waiting for getByRole('button', { name: 'Save' })
+
+
+      31 |         await page.goto(editor.path);
+      32 |         page.once("dialog", (dialog) => dialog.dismiss());
+    > 33 |         await page.getByRole("button", { name: "Save" }).click();
+         |                                                          ^
+      34 |       });
+      35 |     }
+      36 |   });
+        at C:\Users\ericp\Documents\Vengeance Coding and Script Files\DocEditorPlayground\DocEditorPlayground\tests\e2e\editor-workflows.test.ts:33:58
+
+    Error Context: test-results\editor-workflows-CodeX-workflow-shows-alert-on-save\error-context.md
+
+[WebServer]  ⨯ ./node_modules/@ckeditor/ckeditor5-basic-styles/theme/code.css
+[WebServer] Global CSS cannot be imported from within node_modules.
+[WebServer] Read more: https://nextjs.org/docs/messages/css-npm
+[WebServer] Location: node_modules\@ckeditor\ckeditor5-basic-styles\src\code.js
+[WebServer] 
+[WebServer] Import trace for requested module:
+[WebServer] ./node_modules/@ckeditor/ckeditor5-basic-styles/theme/code.css
+[WebServer] ./node_modules/@ckeditor/ckeditor5-basic-styles/src/code.js
+
+
+ 20) tests\e2e\full-workflow.test.ts:22:5 › /ckeditor full workflow › runs full editor workflow ───
+
+    Test timeout of 30000ms exceeded.
+
+    Error: locator.click: Test timeout of 30000ms exceeded.
+    Call log:
+      - waiting for getByRole('button', { name: 'Plugins' })
+
+
+      24 |
+      25 |       // toggle and persist plugin
+    > 26 |       await page.getByRole("button", editor.pluginMenu).click();
+         |                                                         ^
+      27 |       const checkbox = page.getByLabel(editor.pluginLabel);
+      28 |       await expect(checkbox).toBeChecked();
+      29 |       await checkbox.uncheck();
+        at C:\Users\ericp\Documents\Vengeance Coding and Script Files\DocEditorPlayground\DocEditorPlayground\tests\e2e\full-workflow.test.ts:26:57
+
+    Error Context: test-results\full-workflow--ckeditor-fu-09751-w-runs-full-editor-workflow\error-context.md
+
+  21) tests\e2e\editor-workflows.test.ts:20:5 › Slate workflow › opens and closes history ──────────                                                                                                                                
+
+    Test timeout of 30000ms exceeded.
+
+    Error: locator.click: Test timeout of 30000ms exceeded.
+    Call log:
+      - waiting for getByRole('button', { name: 'History' })
+
+
+      21 |       await page.goto(editor.path);
+      22 |       const historyButton = page.getByRole("button", { name: "History" });
+    > 23 |       await historyButton.click();
+         |                           ^
+      24 |       await expect(page.getByText("Version History")).toBeVisible();
+      25 |       await page.getByRole("button", { name: "Close" }).click();
+      26 |       await expect(page.getByText("Version History")).not.toBeVisible();
+        at C:\Users\ericp\Documents\Vengeance Coding and Script Files\DocEditorPlayground\DocEditorPlayground\tests\e2e\editor-workflows.test.ts:23:27
+
+    Error Context: test-results\editor-workflows-Slate-workflow-opens-and-closes-history\error-context.md
+
+  22) tests\e2e\editor-workflows.test.ts:30:7 › Slate workflow › shows alert on save ───────────────
+
+    Test timeout of 30000ms exceeded.
+
+    Error: locator.click: Test timeout of 30000ms exceeded.
+    Call log:
+      - waiting for getByRole('button', { name: 'Save' })
+
+
+      31 |         await page.goto(editor.path);
+      32 |         page.once("dialog", (dialog) => dialog.dismiss());
+    > 33 |         await page.getByRole("button", { name: "Save" }).click();
+         |                                                          ^
+      34 |       });
+      35 |     }
+      36 |   });
+        at C:\Users\ericp\Documents\Vengeance Coding and Script Files\DocEditorPlayground\DocEditorPlayground\tests\e2e\editor-workflows.test.ts:33:58
+
+    Error Context: test-results\editor-workflows-Slate-workflow-shows-alert-on-save\error-context.md
+
+  23) tests\e2e\editor-workflows.test.ts:20:5 › Lexical workflow › opens and closes history ────────
+
+    Test timeout of 30000ms exceeded.
+
+    Error: locator.click: Test timeout of 30000ms exceeded.
+    Call log:
+      - waiting for getByRole('button', { name: 'History' })
+
+
+      21 |       await page.goto(editor.path);
+      22 |       const historyButton = page.getByRole("button", { name: "History" });
+    > 23 |       await historyButton.click();
+         |                           ^
+      24 |       await expect(page.getByText("Version History")).toBeVisible();
+      25 |       await page.getByRole("button", { name: "Close" }).click();
+      26 |       await expect(page.getByText("Version History")).not.toBeVisible();
+        at C:\Users\ericp\Documents\Vengeance Coding and Script Files\DocEditorPlayground\DocEditorPlayground\tests\e2e\editor-workflows.test.ts:23:27
+
+    Error Context: test-results\editor-workflows-Lexical-workflow-opens-and-closes-history\error-context.md
+
+  24) tests\e2e\editor-workflows.test.ts:30:7 › Lexical workflow › shows alert on save ─────────────
+
+    Test timeout of 30000ms exceeded.
+
+    Error: locator.click: Test timeout of 30000ms exceeded.
+    Call log:
+      - waiting for getByRole('button', { name: 'Save' })
+
+
+      31 |         await page.goto(editor.path);
+      32 |         page.once("dialog", (dialog) => dialog.dismiss());
+    > 33 |         await page.getByRole("button", { name: "Save" }).click();
+         |                                                          ^
+      34 |       });
+      35 |     }
+      36 |   });
+        at C:\Users\ericp\Documents\Vengeance Coding and Script Files\DocEditorPlayground\DocEditorPlayground\tests\e2e\editor-workflows.test.ts:33:58
+
+    Error Context: test-results\editor-workflows-Lexical-workflow-shows-alert-on-save\error-context.md
+
+[64/64] tests\e2e\editor-workflows.test.ts:20:5 › CKEditor workflow › opens and closes history
+
+ 25) tests\e2e\editor-workflows.test.ts:20:5 › CKEditor workflow › opens and closes history ───────
+
+    Test timeout of 30000ms exceeded.
+
+    Error: locator.click: Test timeout of 30000ms exceeded.
+    Call log:
+      - waiting for getByRole('button', { name: 'History' })
+
+
+      21 |       await page.goto(editor.path);
+      22 |       const historyButton = page.getByRole("button", { name: "History" });
+    > 23 |       await historyButton.click();
+         |                           ^
+      24 |       await expect(page.getByText("Version History")).toBeVisible();
+      25 |       await page.getByRole("button", { name: "Close" }).click();
+      26 |       await expect(page.getByText("Version History")).not.toBeVisible();
+        at C:\Users\ericp\Documents\Vengeance Coding and Script Files\DocEditorPlayground\DocEditorPlayground\tests\e2e\editor-workflows.test.ts:23:27
+
+    Error Context: test-results\editor-workflows-CKEditor-workflow-opens-and-closes-history\error-context.md
+
+  25 failed
+    tests\e2e\ckeditor-plugin-toggle.test.ts:12:5 › ckeditor plugin toggles › toggle Bold ──────────
+    tests\e2e\ckeditor-plugin-toggle.test.ts:12:5 › ckeditor plugin toggles › toggle Italic ────────
+    tests\e2e\ckeditor-plugin-toggle.test.ts:12:5 › ckeditor plugin toggles › toggle Underline ─────
+    tests\e2e\codex-plugin-toggle.test.ts:12:5 › codex plugin toggles › toggle Header ──────────────
+    tests\e2e\codex-plugin-toggle.test.ts:12:5 › codex plugin toggles › toggle List ────────────────
+    tests\e2e\codex-plugin-toggle.test.ts:12:5 › codex plugin toggles › toggle Checklist ───────────
+    tests\e2e\dark-mode-toggle.test.ts:4:3 › dark mode toggle › toggles the dark class ─────────────
+    tests\e2e\editor-workflows.test.ts:20:5 › TipTap workflow › opens and closes history ───────────
+    tests\e2e\editor-workflows.test.ts:30:7 › TipTap workflow › shows alert on save ────────────────
+    tests\e2e\editor-workflows.test.ts:20:5 › Toast UI workflow › opens and closes history ─────────
+    tests\e2e\editor-workflows.test.ts:30:7 › Toast UI workflow › shows alert on save ──────────────
+    tests\e2e\editor-workflows.test.ts:20:5 › CodeX workflow › opens and closes history ────────────
+    tests\e2e\editor-workflows.test.ts:30:7 › CodeX workflow › shows alert on save ─────────────────
+    tests\e2e\editor-workflows.test.ts:20:5 › Slate workflow › opens and closes history ────────────
+    tests\e2e\editor-workflows.test.ts:30:7 › Slate workflow › shows alert on save ─────────────────
+    tests\e2e\editor-workflows.test.ts:20:5 › Lexical workflow › opens and closes history ──────────
+    tests\e2e\editor-workflows.test.ts:30:7 › Lexical workflow › shows alert on save ───────────────
+    tests\e2e\editor-workflows.test.ts:20:5 › CKEditor workflow › opens and closes history ─────────
+    tests\e2e\full-workflow.test.ts:22:5 › /tiptap full workflow › runs full editor workflow ───────
+    tests\e2e\full-workflow.test.ts:22:5 › /toast full workflow › runs full editor workflow ────────
+    tests\e2e\full-workflow.test.ts:22:5 › /codex full workflow › runs full editor workflow ────────
+    tests\e2e\full-workflow.test.ts:22:5 › /quill full workflow › runs full editor workflow ────────
+    tests\e2e\full-workflow.test.ts:22:5 › /slate full workflow › runs full editor workflow ────────
+    tests\e2e\full-workflow.test.ts:22:5 › /lexical full workflow › runs full editor workflow ──────
+    tests\e2e\full-workflow.test.ts:22:5 › /ckeditor full workflow › runs full editor workflow ─────
+  39 skipped
 
