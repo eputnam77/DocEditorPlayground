@@ -24,6 +24,7 @@ This project demonstrates multiple rich text editors side by side using **Next.j
 ```bash
 nvm install --lts
 nvm use --lts
+```
 ````
 
 #### On Windows (using nvm-windows)
@@ -33,7 +34,7 @@ nvm install lts
 nvm use lts
 ```
 
-*or specify a version:*
+_or specify a version:_
 
 ```cmd
 nvm install 22.17.0
@@ -86,8 +87,13 @@ Run all linters and the full test suite after installing dependencies:
 npm run lint
 npm run typecheck
 npm test
+npx playwright install   # install browsers for E2E tests
 npx playwright test --reporter=line
 ```
+
+> **Note** The E2E tests in `tests/e2e` use `test.skip` to avoid failures in
+> environments without Playwright browsers. Remove those lines and ensure
+> `npx playwright install` has run before executing the suite locally.
 
 ## Adding or Removing Plugins
 
