@@ -218,6 +218,7 @@ function TiptapEditorPage() {
   const [validationRules, setValidationRules] = useState<any[]>([]);
   const [validationResults, setValidationResults] = useState<any[]>([]);
   const [loadingValidation, setLoadingValidation] = useState(false);
+  const [showValidationPanel, setShowValidationPanel] = useState(true);
 
   // Fetch validation sets on mount
   useEffect(() => {
@@ -235,7 +236,7 @@ function TiptapEditorPage() {
             if (!res.ok) return null;
             const data = await res.json();
             return { ...data, filename: f };
-          })
+          }),
         );
         setValidationSets(sets.filter(Boolean));
       } catch (e) {
@@ -268,27 +269,42 @@ function TiptapEditorPage() {
         return {
           ...rule,
           passed: !!found,
-          detail: found ? `Found <${tag}>: ${found.textContent}` : `No <${tag}> found`,
+          detail: found
+            ? `Found <${tag}>: ${found.textContent}`
+            : `No <${tag}> found`,
         };
       } else if (rule.type === "section") {
         // Check for heading with given text (any level)
-        const found = Array.from(doc.body.querySelectorAll("h1, h2, h3, h4, h5, h6")).find((el) =>
-          el.textContent?.trim().toLowerCase() === rule.text.trim().toLowerCase()
+        const found = Array.from(
+          doc.body.querySelectorAll("h1, h2, h3, h4, h5, h6"),
+        ).find(
+          (el) =>
+            el.textContent?.trim().toLowerCase() ===
+            rule.text.trim().toLowerCase(),
         );
         return {
           ...rule,
           passed: !!found,
-          detail: found ? `Found section: ${found.textContent}` : `Section '${rule.text}' not found`,
+          detail: found
+            ? `Found section: ${found.textContent}`
+            : `Section '${rule.text}' not found`,
         };
       } else if (rule.type === "footer") {
         // Check for text in the last block (simulate footer)
-        const blocks = Array.from(doc.body.querySelectorAll("p, div, footer, section, h1, h2, h3, h4, h5, h6"));
+        const blocks = Array.from(
+          doc.body.querySelectorAll(
+            "p, div, footer, section, h1, h2, h3, h4, h5, h6",
+          ),
+        );
         const last = blocks[blocks.length - 1];
-        const found = last && rule.text ? last.textContent?.includes(rule.text) : !!last;
+        const found =
+          last && rule.text ? last.textContent?.includes(rule.text) : !!last;
         return {
           ...rule,
           passed: found,
-          detail: found ? `Footer contains required info.` : `Footer requirement not met`,
+          detail: found
+            ? `Footer contains required info.`
+            : `Footer requirement not met`,
         };
       }
       return { ...rule, passed: false, detail: "Unknown rule type" };
@@ -552,18 +568,39 @@ function TiptapEditorPage() {
       </header>
 
       {/* Validation Results UI */}
-      {validationResults.length > 0 && (
-        <section className="px-6 py-2 bg-yellow-50 border-b">
-          <div className="font-semibold mb-1">Validation Results:</div>
-          <ul>
-            {validationResults.map((r) => (
-              <li key={r.id} className={r.passed ? "text-green-700" : "text-red-700"}>
-                <span className="font-medium">{r.label}:</span> {r.passed ? "PASS" : "FAIL"} <span className="text-xs">({r.detail})</span>
-              </li>
-            ))}
-          </ul>
-        </section>
-      )}
+      {validationResults.length > 0 &&
+        (showValidationPanel ? (
+          <div className="fixed top-24 right-4 bg-yellow-50 border rounded shadow-md p-4 max-w-sm max-h-[70vh] overflow-y-auto z-40">
+            <div className="flex justify-between mb-2">
+              <span className="font-semibold">Validation Results</span>
+              <button
+                className="text-xs"
+                onClick={() => setShowValidationPanel(false)}
+              >
+                Hide
+              </button>
+            </div>
+            <ul className="text-sm">
+              {validationResults.map((r) => (
+                <li
+                  key={r.id}
+                  className={r.passed ? "text-green-700" : "text-red-700"}
+                >
+                  <span className="font-medium">{r.label}:</span>{" "}
+                  {r.passed ? "PASS" : "FAIL"}{" "}
+                  <span className="text-xs">({r.detail})</span>
+                </li>
+              ))}
+            </ul>
+          </div>
+        ) : (
+          <button
+            className="fixed top-24 right-4 bg-yellow-50 border rounded shadow-md px-3 py-1 text-sm z-40"
+            onClick={() => setShowValidationPanel(true)}
+          >
+            Show Validation
+          </button>
+        ))}
 
       {/* -------- Editor -------- */}
       <main className="flex-1 overflow-auto">
