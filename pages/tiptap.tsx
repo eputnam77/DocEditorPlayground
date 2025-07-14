@@ -573,12 +573,20 @@ function TiptapEditorPage() {
           <div className="fixed top-24 right-4 bg-yellow-50 border rounded shadow-md p-4 max-w-sm max-h-[70vh] overflow-y-auto z-40">
             <div className="flex justify-between mb-2">
               <span className="font-semibold">Validation Results</span>
-              <button
-                className="text-xs"
-                onClick={() => setShowValidationPanel(false)}
-              >
-                Hide
-              </button>
+              <div className="space-x-2">
+                <button
+                  className="text-xs"
+                  onClick={() => setValidationResults([])}
+                >
+                  Clear
+                </button>
+                <button
+                  className="text-xs"
+                  onClick={() => setShowValidationPanel(false)}
+                >
+                  Hide
+                </button>
+              </div>
             </div>
             <ul className="text-sm">
               {validationResults.map((r) => (
