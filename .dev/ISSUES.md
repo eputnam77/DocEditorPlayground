@@ -2011,3 +2011,30 @@ Running 64 tests using 14 workers
     tests\e2e\full-workflow.test.ts:22:5 › /ckeditor full workflow › runs full editor workflow ─────
   39 skipped
 
+## Tester run 2025-07-14
+
+### `npm run typecheck`
+```
+
+> doceditorplayground@0.1.2 typecheck
+> tsc --noEmit
+
+pages/tiptap.tsx(37,8): error TS2307: Cannot find module 'lucide-react' or its corresponding type declarations.
+tests/pages/ckeditor.test.tsx(3,26): error TS2306: File '/workspace/DocEditorPlayground/pages/ckeditor.tsx' is not a module.
+tests/pages/codex.test.tsx(3,23): error TS2306: File '/workspace/DocEditorPlayground/pages/codex.tsx' is not a module.
+tests/pages/lexical.test.tsx(3,25): error TS2306: File '/workspace/DocEditorPlayground/pages/lexical.tsx' is not a module.
+tests/pages/quill.test.tsx(3,23): error TS2306: File '/workspace/DocEditorPlayground/pages/quill.tsx' is not a module.
+tests/pages/slate.test.tsx(3,23): error TS2306: File '/workspace/DocEditorPlayground/pages/slate.tsx' is not a module.
+tests/pages/toast.test.tsx(3,23): error TS2306: File '/workspace/DocEditorPlayground/pages/toast.tsx' is not a module.
+```
+
+### `vitest`
+```
+npm warn Unknown env config "http-proxy". This will stop working in the next major version of npm.
+npm error code E403
+npm error 403 403 Forbidden - GET https://registry.npmjs.org/vitest
+npm error 403 In most cases, you or one of your dependencies are requesting
+npm error 403 a package version that is forbidden by your security policy, or
+npm error 403 on a server you do not have access to.
+npm error A complete log of this run can be found in: /root/.npm/_logs/2025-07-14T19_17_48_642Z-debug-0.log
+```
