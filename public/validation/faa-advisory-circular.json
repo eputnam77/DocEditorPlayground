@@ -1,9 +1,129 @@
 {
   "name": "FAA Advisory Circular Validation",
-  "description": "Validation rules for FAA Advisory Circular template.",
+  "description": "Validation rules for FAA Advisory Circular template. Last updated 2025-07-14.",
   "rules": [
-    { "id": "header-h1", "label": "Must have H1 header", "type": "header", "level": 1, "required": true },
-    { "id": "section-summary", "label": "Must contain a Summary section", "type": "section", "text": "Summary", "required": true },
-    { "id": "footer-contact", "label": "Must have Contact Information in footer", "type": "footer", "required": true }
+    {
+      "id": "h2-purpose-required",
+      "label": "Must contain heading: '1. Purpose.'",
+      "type": "heading",
+      "level": 2,
+      "text": "Purpose.",
+      "required": true
+    },
+    {
+      "id": "h2-applicability-required",
+      "label": "Must contain heading: '2. Applicability.'",
+      "type": "heading",
+      "level": 2,
+      "text": "Applicability.",
+      "required": true
+    },
+    {
+      "id": "h2-related-material-required",
+      "label": "Must contain heading: '4. Related Material.'",
+      "type": "heading",
+      "level": 2,
+      "text": "Related Material.",
+      "required": true
+    },
+    {
+      "id": "doc-titles-italics",
+      "label": "All document titles (AC, section, etc.) must be in italics",
+      "type": "style",
+      "selector": ".doc-title",
+      "required": true
+    },
+    {
+      "id": "heading-period",
+      "label": "All section and subsection headings must end with a period.",
+      "type": "format",
+      "selector": "h2, h3, h4, h5, h6",
+      "pattern": "\\.$",
+      "required": true
+    },
+    {
+      "id": "heading-numbering",
+      "label": "All headings must be hierarchically numbered (e.g., 1., 1.1., 1.1.1.)",
+      "type": "structure",
+      "selector": "h2, h3, h4, h5, h6",
+      "pattern": "^(\\d+\\.)+(\\s+.+)?\\.$",
+      "required": true
+    },
+    {
+      "id": "lists-multiple-items",
+      "label": "Lists must not have only one item.",
+      "type": "list-length",
+      "selector": "ul, ol",
+      "minItems": 2
+    },
+    {
+      "id": "para-numbering",
+      "label": "<p> elements in main body must start with a paragraph number (e.g., 1.1, 2.1.1).",
+      "type": "structure",
+      "selector": "p",
+      "pattern": "^(\\d+(\\.\\d+)+)\\s+",
+      "required": true
+    },
+    {
+      "id": "signature-block",
+      "label": "Signature block with title and office required at end.",
+      "type": "footer",
+      "required": true
+    },
+    {
+      "id": "no-placeholders",
+      "label": "No placeholder strings (<ac no.>, [Purpose goes here], etc.) in final document.",
+      "type": "content",
+      "pattern": "(<ac no\\.|<ac title\\.|\\[Purpose goes here\\]|<Word or Phrase>|<Definition>)",
+      "prohibited": true
+    },
+    {
+      "id": "heading-title-case",
+      "label": "All headings must be in title case.",
+      "type": "format",
+      "selector": "h2, h3, h4, h5, h6",
+      "titleCase": true
+    },
+    {
+      "id": "no-empty-headings",
+      "label": "No heading can be immediately followed by another heading at same level or higher, must have content or subheading.",
+      "type": "structure",
+      "selector": "h2, h3, h4, h5, h6",
+      "mustFollowedBy": ["p", "h3", "h4", "h5", "h6"]
+    },
+    {
+      "id": "no-duplicate-headings",
+      "label": "No duplicate headings at same outline level.",
+      "type": "structure",
+      "selector": "h2, h3, h4, h5, h6",
+      "unique": true
+    },
+    {
+      "id": "no-numbering-gaps",
+      "label": "Heading numbers must be consecutive with no gaps.",
+      "type": "structure",
+      "consecutive": true
+    },
+    {
+      "id": "table-caption-italics",
+      "label": "All tables and figures must have italicized captions.",
+      "type": "structure",
+      "selector": "table, figure",
+      "captionItalic": true
+    },
+    {
+      "id": "no-draft-in-final",
+      "label": "\"DRAFT\" must not appear in the finalized document.",
+      "type": "content",
+      "pattern": "DRAFT",
+      "prohibited": true
+    },
+    {
+      "id": "toc-matches-headings",
+      "label": "If Table of Contents is present, must match document heading order.",
+      "type": "structure",
+      "selector": ".toc",
+      "mustMatchHeadings": true
+    }
   ]
 }
