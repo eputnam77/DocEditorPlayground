@@ -364,7 +364,12 @@ function TiptapEditorPage() {
           )}
           {toolbarButton(
             <UnderlineIcon className="w-4 h-4" />,
-            () => editor.chain().focus().toggleUnderline().run(),
+            () => {
+              const chain = editor.chain().focus();
+              if (typeof (chain as any).toggleUnderline === "function") {
+                (chain as any).toggleUnderline().run();
+              }
+            },
             editor.isActive("underline"),
             "Underline",
           )}
