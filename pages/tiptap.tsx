@@ -18,6 +18,9 @@ import StrikeExtension from "@tiptap/extension-strike";
 import TextExtension from "@tiptap/extension-text";
 import TextStyle from "@tiptap/extension-text-style";
 import Underline from "@tiptap/extension-underline";
+import PluginManager from "../components/PluginManager";
+import TemplateLoader from "../components/TemplateLoader";
+import EditorIntegrationInfo from "../components/EditorIntegrationInfo";
 import { EditorContent, useEditor } from "@tiptap/react";
 import StarterKit from "@tiptap/starter-kit";
 import {
@@ -108,8 +111,6 @@ const TEMPLATES = [
 ];
 
 function TiptapEditorPage() {
-  /* -------- Extension toggle menu -------- */
-  const [showExtensionMenu, setShowExtensionMenu] = useState(false);
   const [enabledExtensions, setEnabledExtensions] = useState<string[]>(() => {
     if (typeof window === "undefined") return DEFAULT_TOOLBAR_EXTENSIONS;
     const stored = localStorage.getItem("tiptapExtensions");
@@ -420,79 +421,23 @@ function TiptapEditorPage() {
         {/* Spacer */}
         <div className="flex-1"></div>
 
-        {/* Template Loader dropdown */}
+        {/* Template Loader */}
         <div className="relative mr-2">
-          <select
-            className="px-3 py-1 border rounded bg-gray-50 hover:bg-gray-200"
-            title="Load Template"
-            aria-label="Templates"
+          <TemplateLoader
+            templates={TEMPLATES}
             disabled={loadingTemplate}
-            onChange={async (e) => {
-              const val = e.target.value;
-              if (val === "") return;
-              if (val === "__clear__") {
-                editor?.commands.clearContent();
-                return;
-              }
-              await handleTemplateLoad(val);
-            }}
-            defaultValue=""
-          >
-            <option value="" disabled>
-              Templates
-            </option>
-            {TEMPLATES.map((tpl) => (
-              <option key={tpl.filename} value={tpl.filename}>
-                {tpl.label}
-              </option>
-            ))}
-            <option value="__clear__">Clear</option>
-          </select>
+            onLoad={handleTemplateLoad}
+            onClear={() => editor?.commands.clearContent()}
+          />
         </div>
 
-        {/* Extensions menu */}
+        {/* Extension Manager */}
         <div className="relative">
-          <button
-            onClick={() => setShowExtensionMenu(!showExtensionMenu)}
-            className="px-3 py-1 border rounded bg-gray-50 hover:bg-gray-200 flex items-center gap-1"
-            title="Manage Extensions"
-            aria-label="Extensions"
-          >
-            Extensions <ChevronDown className="w-4 h-4" />
-          </button>
-          {showExtensionMenu && (
-            <div className="absolute right-0 mt-2 bg-white shadow-lg border rounded p-4 z-50 max-h-72 overflow-y-auto w-64">
-              <div className="mb-2 font-semibold">Enabled Extensions</div>
-              {AVAILABLE_EXTENSIONS.map((ext) => (
-                <label
-                  key={ext.name}
-                  htmlFor={`ext-toggle-${ext.name}`}
-                  className="flex items-center gap-2 text-sm my-1"
-                >
-                  <input
-                    id={`ext-toggle-${ext.name}`}
-                    type="checkbox"
-                    checked={enabledExtensions.includes(ext.name)}
-                    aria-label={ext.name}
-                    onChange={() =>
-                      setEnabledExtensions((prev) =>
-                        prev.includes(ext.name)
-                          ? prev.filter((n) => n !== ext.name)
-                          : [...prev, ext.name],
-                      )
-                    }
-                  />
-                  {ext.name}
-                </label>
-              ))}
-              <button
-                className="mt-2 text-xs px-2 py-1 rounded bg-gray-200"
-                onClick={() => setShowExtensionMenu(false)}
-              >
-                Close
-              </button>
-            </div>
-          )}
+          <PluginManager
+            plugins={AVAILABLE_EXTENSIONS.map((e) => ({ name: e.name }))}
+            enabled={enabledExtensions}
+            onChange={setEnabledExtensions}
+          />
         </div>
 
         {/* Version History */}
@@ -613,6 +558,7 @@ function TiptapEditorPage() {
       {/* -------- Editor -------- */}
       <main className="flex-1 overflow-auto">
         <EditorContent editor={editor} className="tiptap-content" />
+        <EditorIntegrationInfo editorName="TipTap" />
       </main>
     </div>
   );
