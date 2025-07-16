@@ -1,3 +1,7 @@
+import React, { useEffect, useMemo, useState } from "react";
+import dynamic from "next/dynamic";
+import { EditorContent, useEditor } from "@tiptap/react";
+
 import Blockquote from "@tiptap/extension-blockquote";
 import BoldExtension from "@tiptap/extension-bold";
 import BulletList from "@tiptap/extension-bullet-list";
@@ -18,43 +22,32 @@ import StrikeExtension from "@tiptap/extension-strike";
 import TextExtension from "@tiptap/extension-text";
 import TextStyle from "@tiptap/extension-text-style";
 import Underline from "@tiptap/extension-underline";
+
+// Plug in your own
 import PluginManager from "../components/PluginManager";
 import TemplateLoader from "../components/TemplateLoader";
 import EditorIntegrationInfo from "../components/EditorIntegrationInfo";
-import { EditorContent, useEditor } from "@tiptap/react";
-import StarterKit from "@tiptap/starter-kit";
+
+// Icons
 import {
-  Bold,
-  ChevronDown,
-  ChevronUp,
-  Clock,
-  Code,
-  Italic,
-  List,
-  ListOrdered,
-  Quote,
-  Redo2,
-  Strikethrough,
-  Underline as UnderlineIcon,
-  Undo2,
+  Bold, ChevronDown, ChevronUp, Clock, Code, Italic, List, ListOrdered,
+  Quote, Redo2, Strikethrough, Underline as UnderlineIcon, Undo2,
 } from "lucide-react";
-import dynamic from "next/dynamic";
-import { useEffect, useMemo, useState } from "react";
 
-/* -------- Initial content (blank) -------- */
-const initialContent = ""; // replace with your preferred starter HTML
-
-/* -------- Extension Management -------- */
-const AVAILABLE_EXTENSIONS = [
-  { name: "StarterKit", extension: StarterKit.configure({ history: false }) },
-  { name: "Underline", extension: Underline },
+// ----- Required Extensions: ALWAYS ON, HIDDEN FROM USER -----
+const ALWAYS_ENABLED = [
   { name: "Document", extension: DocumentExtension },
   { name: "Paragraph", extension: Paragraph },
   { name: "Text", extension: TextExtension },
+];
+
+// ----- Core Editing Features: ALWAYS ON, HIDDEN FROM USER -----
+const CORE_DEFAULTS = [
   { name: "History", extension: History },
   { name: "Bold", extension: BoldExtension },
   { name: "Italic", extension: ItalicExtension },
   { name: "Strike", extension: StrikeExtension },
+  { name: "Underline", extension: Underline },
   { name: "Heading", extension: Heading },
   { name: "Code", extension: CodeExtension },
   { name: "CodeBlock", extension: CodeBlock },
@@ -62,6 +55,10 @@ const AVAILABLE_EXTENSIONS = [
   { name: "BulletList", extension: BulletList },
   { name: "OrderedList", extension: OrderedList },
   { name: "ListItem", extension: ListItem },
+];
+
+// ----- "Internals": Loaded but not user-toggleable -----
+const INTERNALS = [
   { name: "HardBreak", extension: HardBreak },
   { name: "HorizontalRule", extension: HorizontalRule },
   { name: "Dropcursor", extension: Dropcursor },
@@ -69,77 +66,53 @@ const AVAILABLE_EXTENSIONS = [
   { name: "TextStyle", extension: TextStyle },
 ];
 
-/* -------- Extensions Default -------- */
-const DEFAULT_TOOLBAR_EXTENSIONS = [
-  "StarterKit",
-  "Underline",
-  "Document",
-  "Paragraph",
-  "Text",
-  "History",
-  "Bold",
-  "Italic",
-  "Strike",
-  "Heading",
-  "Code",
-  "CodeBlock",
-  "Blockquote",
-  "BulletList",
-  "OrderedList",
-  "ListItem",
-  "HardBreak",
+// ----- Only show these in the Extension Dropdown -----
+const TOGGLEABLE_EXTENSIONS = [
+  // Example:
+  // { name: "CustomHighlight", extension: CustomHighlight },
+  // { name: "MyMath", extension: MyMathExtension },
 ];
-
-// Extensions that must remain enabled for TipTap to function
-const ALWAYS_ENABLED = ["Document", "Paragraph", "Text"];
 
 // Template metadata
 const TEMPLATES = [
-  {
-    label: "FAA Advisory Circular",
-    filename: "faa-advisory-circular.html",
-  },
-  {
-    label: "Software Release Notes",
-    filename: "software-release-notes.html",
-  },
-  {
-    label: "Medical Research Article",
-    filename: "medical-research-article.html",
-  },
-  {
-    label: "Legal Contract Template",
-    filename: "legal-contract-template.html",
-  },
+  { label: "FAA Advisory Circular", filename: "faa-advisory-circular.html" },
+  { label: "Software Release Notes", filename: "software-release-notes.html" },
+  { label: "Medical Research Article", filename: "medical-research-article.html" },
+  { label: "Legal Contract Template", filename: "legal-contract-template.html" },
 ];
 
 function TiptapEditorPage() {
-  const [enabledExtensions, setEnabledExtensions] = useState<string[]>(() => {
-    if (typeof window === "undefined") return DEFAULT_TOOLBAR_EXTENSIONS;
-    const stored = localStorage.getItem("tiptapExtensions");
-    const parsed = stored ? JSON.parse(stored) : DEFAULT_TOOLBAR_EXTENSIONS;
-    return Array.from(new Set([...parsed, ...ALWAYS_ENABLED]));
+  const [enabledExtensions, setEnabledExtensions] = useState(() => {
+    if (typeof window === "undefined") return [];
+    // Only remember toggleable extensions, always-on ones never get toggled.
+    const stored = localStorage.getItem("tiptapToggleableExtensions");
+    return stored ? JSON.parse(stored) : TOGGLEABLE_EXTENSIONS.map(e => e.name);
   });
 
+  // Compose the extensions in this order:
   const extensions = useMemo(
-    () =>
-      AVAILABLE_EXTENSIONS.filter((e) =>
-        enabledExtensions.includes(e.name),
-      ).map((e) => e.extension),
-    [enabledExtensions],
+    () => [
+      ...ALWAYS_ENABLED,
+      ...CORE_DEFAULTS,
+      ...INTERNALS,
+      ...TOGGLEABLE_EXTENSIONS.filter(e => enabledExtensions.includes(e.name)),
+    ].map(e => e.extension),
+    [enabledExtensions]
   );
 
+  // Store only toggled extensions
   useEffect(() => {
     if (typeof window !== "undefined") {
       localStorage.setItem(
-        "tiptapExtensions",
-        JSON.stringify(enabledExtensions),
+        "tiptapToggleableExtensions",
+        JSON.stringify(enabledExtensions)
       );
     }
   }, [enabledExtensions]);
 
-  /* -------- Editor instance -------- */
-  const [content, setContent] = useState<string>(initialContent);
+  const initialContent = "";
+
+  const [content, setContent] = useState(initialContent);
   const editor = useEditor(
     {
       extensions,
@@ -151,7 +124,7 @@ function TiptapEditorPage() {
         },
       },
     },
-    [extensions],
+    [extensions]
   );
 
   // Update content state on every editor change
@@ -159,46 +132,38 @@ function TiptapEditorPage() {
     if (!editor) return;
     const updateHandler = () => setContent(editor.getHTML());
     editor.on("update", updateHandler);
-    return () => {
-      editor.off("update", updateHandler);
-    };
+    return () => editor.off("update", updateHandler);
   }, [editor]);
 
-  const setHeading = (level: number) => {
+  const setHeading = (level) => {
     editor?.chain().focus().toggleHeading({ level }).run();
   };
 
   const handleSave = () => {
     if (editor) {
       alert(editor.getHTML());
-      // Hook up to your backend / autosave here
+      // Save logic
     }
   };
 
   const [loadingTemplate, setLoadingTemplate] = useState(false);
 
-  // Template loader handler
-  const handleTemplateLoad = async (filename: string) => {
+  const handleTemplateLoad = async (filename) => {
     if (!editor) return;
     setLoadingTemplate(true);
     try {
       const res = await fetch(`/templates/${filename}`);
       const html = await res.text();
       editor.commands.setContent(html);
-    } catch (e) {
+    } catch {
       alert("Failed to load template: " + filename);
     } finally {
       setLoadingTemplate(false);
     }
   };
 
-  /* -------- Toolbar button helper -------- */
-  const toolbarButton = (
-    icon: any,
-    command: () => void,
-    active: boolean,
-    title = "",
-  ) => (
+  // Toolbar helper
+  const toolbarButton = (icon, command, active, title = "") => (
     <button
       type="button"
       className={`px-2 py-1 rounded ${active ? "bg-indigo-100" : ""}`}
@@ -209,7 +174,7 @@ function TiptapEditorPage() {
     </button>
   );
 
-  /* -------- Dummy version history -------- */
+  // Dummy history
   const [showHistory, setShowHistory] = useState(false);
   const DUMMY_HISTORY = [
     { id: 1, label: "Draft - Jul 9, 8:00 am" },
@@ -217,15 +182,14 @@ function TiptapEditorPage() {
     { id: 3, label: "Submitted - Jul 7, 12:15 pm" },
   ];
 
-  // Validation state
-  const [validationSets, setValidationSets] = useState<any[]>([]);
-  const [selectedValidation, setSelectedValidation] = useState<string>("");
-  const [validationRules, setValidationRules] = useState<any[]>([]);
-  const [validationResults, setValidationResults] = useState<any[]>([]);
+  // Validation state (unchanged)
+  const [validationSets, setValidationSets] = useState([]);
+  const [selectedValidation, setSelectedValidation] = useState("");
+  const [validationRules, setValidationRules] = useState([]);
+  const [validationResults, setValidationResults] = useState([]);
   const [loadingValidation, setLoadingValidation] = useState(false);
   const [showValidationPanel, setShowValidationPanel] = useState(true);
 
-  // Fetch validation sets on mount
   useEffect(() => {
     async function fetchValidations() {
       try {
@@ -241,17 +205,16 @@ function TiptapEditorPage() {
             if (!res.ok) return null;
             const data = await res.json();
             return { ...data, filename: f };
-          }),
+          })
         );
         setValidationSets(sets.filter(Boolean));
-      } catch (e) {
+      } catch {
         setValidationSets([]);
       }
     }
     fetchValidations();
   }, []);
 
-  // Load rules when validation set changes
   useEffect(() => {
     if (!selectedValidation) return;
     const set = validationSets.find((v) => v.filename === selectedValidation);
@@ -259,16 +222,13 @@ function TiptapEditorPage() {
     setValidationResults([]);
   }, [selectedValidation, validationSets]);
 
-  // Validation logic
   function runValidation() {
     if (!editor) return;
     const html = editor.getHTML();
-    // Use DOMParser for browser-safe HTML parsing
     const parser = new window.DOMParser();
     const doc = parser.parseFromString(html, "text/html");
-    const results = validationRules.map((rule: any) => {
+    const results = validationRules.map((rule) => {
       if (rule.type === "header") {
-        // Check for header of given level
         const tag = `h${rule.level}`;
         const found = doc.body.querySelector(tag);
         return {
@@ -279,13 +239,12 @@ function TiptapEditorPage() {
             : `No <${tag}> found`,
         };
       } else if (rule.type === "section") {
-        // Check for heading with given text (any level)
         const found = Array.from(
-          doc.body.querySelectorAll("h1, h2, h3, h4, h5, h6"),
+          doc.body.querySelectorAll("h1, h2, h3, h4, h5, h6")
         ).find(
           (el) =>
             el.textContent?.trim().toLowerCase() ===
-            rule.text.trim().toLowerCase(),
+            rule.text.trim().toLowerCase()
         );
         return {
           ...rule,
@@ -295,11 +254,10 @@ function TiptapEditorPage() {
             : `Section '${rule.text}' not found`,
         };
       } else if (rule.type === "footer") {
-        // Check for text in the last block (simulate footer)
         const blocks = Array.from(
           doc.body.querySelectorAll(
-            "p, div, footer, section, h1, h2, h3, h4, h5, h6",
-          ),
+            "p, div, footer, section, h1, h2, h3, h4, h5, h6"
+          )
         );
         const last = blocks[blocks.length - 1];
         const found =
@@ -321,13 +279,9 @@ function TiptapEditorPage() {
 
   return (
     <div className="fixed inset-0 z-30 bg-white flex flex-col">
-      {/* Ensure testable heading for Playwright */}
       <h1 className="sr-only">TipTap Editor</h1>
-      {/* -------- Toolbar -------- */}
       <header className="flex items-center gap-2 bg-gray-100 px-6 py-3 border-b w-full">
         <span className="text-xl font-bold mr-6">TipTap Editor</span>
-
-        {/* Formatting toolbar */}
         <div className="flex items-center gap-1">
           <select
             value={
@@ -358,66 +312,66 @@ function TiptapEditorPage() {
             <Bold className="w-4 h-4" />,
             () => editor.chain().focus().toggleBold().run(),
             editor.isActive("bold"),
-            "Bold",
+            "Bold"
           )}
           {toolbarButton(
             <Italic className="w-4 h-4" />,
             () => editor.chain().focus().toggleItalic().run(),
             editor.isActive("italic"),
-            "Italic",
+            "Italic"
           )}
           {toolbarButton(
             <UnderlineIcon className="w-4 h-4" />,
             () => {
               const chain = editor.chain().focus();
-              if (typeof (chain as any).toggleUnderline === "function") {
-                (chain as any).toggleUnderline().run();
+              if (typeof (chain).toggleUnderline === "function") {
+                chain.toggleUnderline().run();
               }
             },
             editor.isActive("underline"),
-            "Underline",
+            "Underline"
           )}
           {toolbarButton(
             <Strikethrough className="w-4 h-4" />,
             () => editor.chain().focus().toggleStrike().run(),
             editor.isActive("strike"),
-            "Strikethrough",
+            "Strikethrough"
           )}
           {toolbarButton(
             <Code className="w-4 h-4" />,
             () => editor.chain().focus().toggleCode().run(),
             editor.isActive("code"),
-            "Inline Code",
+            "Inline Code"
           )}
           {toolbarButton(
             <Quote className="w-4 h-4" />,
             () => editor.chain().focus().toggleBlockquote().run(),
             editor.isActive("blockquote"),
-            "Blockquote",
+            "Blockquote"
           )}
           {toolbarButton(
             <List className="w-4 h-4" />,
             () => editor.chain().focus().toggleBulletList().run(),
             editor.isActive("bulletList"),
-            "Bullet List",
+            "Bullet List"
           )}
           {toolbarButton(
             <ListOrdered className="w-4 h-4" />,
             () => editor.chain().focus().toggleOrderedList().run(),
             editor.isActive("orderedList"),
-            "Numbered List",
+            "Numbered List"
           )}
           {toolbarButton(
             <Undo2 className="w-4 h-4" />,
             () => editor.chain().focus().undo().run(),
             false,
-            "Undo",
+            "Undo"
           )}
           {toolbarButton(
             <Redo2 className="w-4 h-4" />,
             () => editor.chain().focus().redo().run(),
             false,
-            "Redo",
+            "Redo"
           )}
           <button
             onClick={handleSave}
@@ -426,11 +380,7 @@ function TiptapEditorPage() {
             Save
           </button>
         </div>
-
-        {/* Spacer */}
         <div className="flex-1"></div>
-
-        {/* Template Loader */}
         <div className="relative mr-2">
           <TemplateLoader
             templates={TEMPLATES}
@@ -439,24 +389,15 @@ function TiptapEditorPage() {
             onClear={() => editor?.commands.clearContent()}
           />
         </div>
-
-        {/* Extension Manager */}
         <div className="relative">
+          {/* Only show toggleable extensions in PluginManager */}
           <PluginManager
-            plugins={AVAILABLE_EXTENSIONS.filter(
-              (e) => !ALWAYS_ENABLED.includes(e.name),
-            ).map((e) => ({ name: e.name }))}
+            plugins={TOGGLEABLE_EXTENSIONS.map((e) => ({ name: e.name }))}
             enabled={enabledExtensions}
-            locked={ALWAYS_ENABLED}
-            onChange={(exts) =>
-              setEnabledExtensions(
-                Array.from(new Set([...exts, ...ALWAYS_ENABLED])),
-              )
-            }
+            locked={[]}
+            onChange={(exts) => setEnabledExtensions(exts)}
           />
         </div>
-
-        {/* Version History */}
         <div className="relative ml-4">
           <button
             onClick={() => setShowHistory(!showHistory)}
@@ -495,8 +436,6 @@ function TiptapEditorPage() {
             </div>
           )}
         </div>
-
-        {/* Validation Dropdown */}
         <div className="relative ml-2">
           <select
             className="px-3 py-1 border rounded bg-gray-50 hover:bg-gray-200"
@@ -516,7 +455,6 @@ function TiptapEditorPage() {
             ))}
           </select>
         </div>
-        {/* Run Validation Button */}
         {selectedValidation && (
           <button
             className="ml-2 px-3 py-1 border rounded bg-green-600 text-white hover:bg-green-700"
@@ -528,7 +466,6 @@ function TiptapEditorPage() {
         )}
       </header>
 
-      {/* Validation Results UI */}
       {validationResults.length > 0 &&
         (showValidationPanel ? (
           <div className="fixed top-24 right-4 bg-yellow-50 border rounded shadow-md p-4 max-w-sm max-h-[70vh] overflow-y-auto z-40">
@@ -571,7 +508,6 @@ function TiptapEditorPage() {
           </button>
         ))}
 
-      {/* -------- Editor -------- */}
       <main className="flex-1 overflow-auto">
         <EditorContent editor={editor} className="tiptap-content" />
         <EditorIntegrationInfo editorName="TipTap" />
@@ -580,5 +516,5 @@ function TiptapEditorPage() {
   );
 }
 
-/* Disable SSR for Next.js hydration issues */
+// Disable SSR for Next.js hydration issues
 export default dynamic(() => Promise.resolve(TiptapEditorPage), { ssr: false });
