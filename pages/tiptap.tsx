@@ -90,6 +90,9 @@ const DEFAULT_TOOLBAR_EXTENSIONS = [
   "HardBreak",
 ];
 
+// Extensions that must remain enabled for TipTap to function
+const ALWAYS_ENABLED = ["Document"];
+
 // Template metadata
 const TEMPLATES = [
   {
@@ -114,7 +117,8 @@ function TiptapEditorPage() {
   const [enabledExtensions, setEnabledExtensions] = useState<string[]>(() => {
     if (typeof window === "undefined") return DEFAULT_TOOLBAR_EXTENSIONS;
     const stored = localStorage.getItem("tiptapExtensions");
-    return stored ? JSON.parse(stored) : DEFAULT_TOOLBAR_EXTENSIONS;
+    const parsed = stored ? JSON.parse(stored) : DEFAULT_TOOLBAR_EXTENSIONS;
+    return Array.from(new Set([...parsed, ...ALWAYS_ENABLED]));
   });
 
   const extensions = useMemo(
@@ -441,7 +445,12 @@ function TiptapEditorPage() {
           <PluginManager
             plugins={AVAILABLE_EXTENSIONS.map((e) => ({ name: e.name }))}
             enabled={enabledExtensions}
-            onChange={setEnabledExtensions}
+            locked={ALWAYS_ENABLED}
+            onChange={(exts) =>
+              setEnabledExtensions(
+                Array.from(new Set([...exts, ...ALWAYS_ENABLED])),
+              )
+            }
           />
         </div>
 

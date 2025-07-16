@@ -9,6 +9,12 @@ export interface PluginItem {
 export interface PluginManagerProps {
   plugins: PluginItem[];
   enabled: string[];
+  /**
+   * Names of plugins that cannot be toggled off.
+   * These will always remain enabled and their
+   * checkboxes will be disabled in the UI.
+   */
+  locked?: string[];
   onChange(enabled: string[]): void;
 }
 
@@ -20,10 +26,12 @@ export interface PluginManagerProps {
 export default function PluginManager({
   plugins,
   enabled,
+  locked = [],
   onChange,
 }: PluginManagerProps) {
   const [open, setOpen] = useState(false);
   const toggle = (name: string) => {
+    if (locked.includes(name)) return;
     const next = enabled.includes(name)
       ? enabled.filter((n) => n !== name)
       : [...enabled, name];
@@ -54,6 +62,7 @@ export default function PluginManager({
                 type="checkbox"
                 checked={enabled.includes(p.name)}
                 onChange={() => toggle(p.name)}
+                disabled={locked.includes(p.name)}
                 aria-label={p.name}
               />
               {p.label ?? p.name}
