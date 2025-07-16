@@ -91,7 +91,7 @@ const DEFAULT_TOOLBAR_EXTENSIONS = [
 ];
 
 // Extensions that must remain enabled for TipTap to function
-const ALWAYS_ENABLED = ["Document"];
+const ALWAYS_ENABLED = ["Document", "Paragraph", "Text"];
 
 // Template metadata
 const TEMPLATES = [
@@ -443,7 +443,9 @@ function TiptapEditorPage() {
         {/* Extension Manager */}
         <div className="relative">
           <PluginManager
-            plugins={AVAILABLE_EXTENSIONS.map((e) => ({ name: e.name }))}
+            plugins={AVAILABLE_EXTENSIONS.filter(
+              (e) => !ALWAYS_ENABLED.includes(e.name),
+            ).map((e) => ({ name: e.name }))}
             enabled={enabledExtensions}
             locked={ALWAYS_ENABLED}
             onChange={(exts) =>
