@@ -1,0 +1,16 @@
+[tool.poetry]
+name = "doceditorplayground"
+version = "0.1.0"
+description = "Python helpers for Document Editor Playground"
+authors = ["Doc Editor Team <dev@example.com>"]
+
+[tool.poetry.dependencies]
+python = "^3.11"
+
+[tool.poetry.group.dev.dependencies]
+
+[tool.black]
+line-length = 88
+
+[tool.isort]
+profile = "black"
