@@ -163,6 +163,50 @@ This file tracks planned tasks for implementing the **Document Editor Playground
 - **Acceptance Criteria:** Unit and E2E tests cover the modernized UI and toolbar interactions.
 - **Labels:** `test`
 
+### 23. Lock headings in TipTap
+
+- **Priority:** Medium
+- **Estimate:** 2h
+- **Acceptance Criteria:** Heading levels 1 and 2 cannot be edited in the TipTap page.
+- **Labels:** `feature`, `tiptap`
+- **Tests:** `tests/e2e/features/tiptap_heading_lock.feature`
+
+### 24. Enforce heading structure in TipTap
+
+- **Priority:** Medium
+- **Estimate:** 3h
+- **Acceptance Criteria:** TipTap enforces a paragraph or list after headings and prevents consecutive headings.
+- **Labels:** `feature`, `validation`, `tiptap`
+- **Tests:** `tests/property/tiptap_structure.test.ts`
+
+### 25. Add indentation for lists and paragraphs under headings
+
+- **Priority:** Low
+- **Estimate:** 2h
+- **Acceptance Criteria:** Paragraphs and lists under Heading 1 or 2 support indentation controls.
+- **Labels:** `enhancement`, `tiptap`
+
+### 26. Customizable watermark for TipTap
+
+- **Priority:** Low
+- **Estimate:** 2h
+- **Acceptance Criteria:** Users can toggle and edit a watermark overlay in the TipTap editor.
+- **Labels:** `enhancement`, `tiptap`
+
+### 27. Section nodes with draggable Heading 2 blocks
+
+- **Priority:** Medium
+- **Estimate:** 3h
+- **Acceptance Criteria:** Content can be organized into draggable sections using Heading 2 as the section title.
+- **Labels:** `feature`, `tiptap`
+
+### 28. Integrate Yjs collaboration for TipTap
+
+- **Priority:** High
+- **Estimate:** 4h
+- **Acceptance Criteria:** TipTap page supports real-time collaboration via Yjs.
+- **Labels:** `feature`, `tiptap`, `collaboration`
+
 ---
 
 **Next agent:** ready-for:scenario-gen
