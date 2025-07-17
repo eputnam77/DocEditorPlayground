@@ -23,12 +23,21 @@ import TextExtension from "@tiptap/extension-text";
 import TextStyle from "@tiptap/extension-text-style";
 import Underline from "@tiptap/extension-underline";
 
+// Custom extensions implementing playground tasks
+import { tiptapHeadingLock } from "../extensions/tiptapHeadingLock";
+import { tiptapStructure } from "../extensions/tiptapStructure";
+import { tiptapIndentation } from "../extensions/tiptapIndentation";
+import { tiptapWatermark } from "../extensions/tiptapWatermark";
+import { tiptapSectionNode } from "../extensions/tiptapSectionNode";
+import { tiptapYjsCollab } from "../extensions/tiptapYjsCollab";
+
 // Plug in your own
 import PluginManager from "../components/PluginManager";
 import TemplateLoader from "../components/TemplateLoader";
 import EditorIntegrationInfo from "../components/EditorIntegrationInfo";
 import ValidationStatus from "../components/ValidationStatus";
 import CommentTrack from "../components/CommentTrack";
+import TrackChanges from "../components/TrackChanges";
 import HeadingStylePresets from "../components/HeadingStylePresets";
 import { TEMPLATES } from "../utils/templates";
 
@@ -63,6 +72,8 @@ const ALWAYS_ENABLED = [
   { name: "Document", extension: DocumentExtension },
   { name: "Paragraph", extension: Paragraph },
   { name: "Text", extension: TextExtension },
+  { name: "HeadingLock", extension: tiptapHeadingLock() },
+  { name: "Structure", extension: tiptapStructure() },
 ];
 
 // ----- Core Editing Features: ALWAYS ON, HIDDEN FROM USER -----
@@ -79,6 +90,7 @@ const CORE_DEFAULTS = [
   { name: "BulletList", extension: BulletList },
   { name: "OrderedList", extension: OrderedList },
   { name: "ListItem", extension: ListItem },
+  { name: "Indentation", extension: tiptapIndentation() },
 ];
 
 // ----- "Internals": Loaded but not user-toggleable -----
@@ -92,9 +104,9 @@ const INTERNALS = [
 
 // ----- Only show these in the Extension Dropdown -----
 const TOGGLEABLE_EXTENSIONS = [
-  // Example:
-  // { name: "CustomHighlight", extension: CustomHighlight },
-  // { name: "MyMath", extension: MyMathExtension },
+  { name: "Watermark", extension: tiptapWatermark() },
+  { name: "SectionNode", extension: tiptapSectionNode() },
+  { name: "YjsCollab", extension: tiptapYjsCollab() },
 ];
 
 
@@ -495,6 +507,7 @@ function TiptapEditorPage() {
 
       <main className="flex-1 overflow-auto">
         <EditorContent editor={editor} className="tiptap-content" />
+        <TrackChanges content={content} />
         <CommentTrack />
         <EditorIntegrationInfo editorName="TipTap" />
       </main>

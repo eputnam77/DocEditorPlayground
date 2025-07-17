@@ -5,6 +5,7 @@ import PluginManager from "../components/PluginManager";
 import TemplateLoader from "../components/TemplateLoader";
 import ValidationStatus, { ValidationResult } from "../components/ValidationStatus";
 import CommentTrack from "../components/CommentTrack";
+import TrackChanges from "../components/TrackChanges";
 import { validateDocument } from "../utils/validation";
 import { TEMPLATES } from "../utils/templates";
 import ModernLayout from "../components/ModernLayout";
@@ -56,6 +57,7 @@ function SlatePage() {
         value={content}
         onChange={(e) => setContent(e.target.value)}
       />
+      <TrackChanges content={content} />
       {validationResults.length > 0 && (
         <ValidationStatus
           results={validationResults}
