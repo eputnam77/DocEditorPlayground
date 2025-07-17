@@ -1,39 +1,39 @@
 # Code Review: Document Editor Playground
 
 ## Summary
-This repository implements a Next.js playground for multiple rich text editors. The PRD in `.dev/PRD.md` describes pages for TipTap, Toast UI, CodeX (Editor.js), Slate, Lexical and CKEditor 5 with plugin management, template loading and validation features.
+This repository provides a Next.js playground with multiple rich text editors. The PRD in `.dev/PRD.md` requires individual pages for TipTap, Toast UI, CodeX (Editor.js), Slate, Lexical and CKEditor 5 along with plugin toggles, template loading and validation features.
 
 ## PRD Coverage
-- **Implemented**: Home page with navigation and dark‑mode toggle, shared components (PluginManager, TemplateLoader, EditorIntegrationInfo). The TipTap page contains an extensive editor with plugin toggles, validation UI and template loader.
-- **Missing/Partial**: Pages for Toast UI, Editor.js, Slate, Lexical and CKEditor show only a textarea placeholder without real editors【F:pages/ckeditor.tsx†L40-L45】. Planned TipTap extensions (heading lock, structure enforcement, watermark, sections, Yjs collaboration) are stubs. Property-based tests are skipped【F:tests/property/validation.test.ts†L5-L8】.
+- **Implemented**: Home page with navigation and dark‑mode toggle. TipTap page demonstrates custom extensions, plugin toggles, template loader and validation panel. The README now explains how validation results appear in a panel【F:README.md†L120-L124】.
+- **Missing/Partial**: Toast UI, Editor.js, Slate, Lexical and CKEditor pages still render only a textarea placeholder without real editors【F:pages/ckeditor.tsx†L40-L45】. Planned TipTap features like heading locking, structure enforcement and Yjs collaboration exist as stubs but are not fully wired up. Property-based tests exist but cannot run due to missing dependencies【817af9†L1-L24】.
 
-Overall coverage is partial; only a subset of tasks in `.dev/TASKS.md` are fully implemented.
+Overall only part of `.dev/TASKS.md` is complete; remaining editor implementations and advanced TipTap features are pending.
 
 ## Integration & Maintainability Risks
-- The TipTap page is nearly 400 lines long; splitting it into focused components would improve readability.
-- Placeholder pages could mislead users; mark them as TODO or implement the actual editors.
-- Template loading parses HTML via `DOMParser` without sanitization, so templates could inject scripts.
-- TypeScript compilation fails because packages like `lucide-react` are missing【d446d7†L1-L11】.
-- Stubbed extensions (heading lock, Yjs collab, etc.) are not wired into the editor.
+- TipTap page is over 400 lines and mixes UI logic with state management—extract smaller components for readability.
+- Placeholder pages could confuse users; consider implementing the actual editors or marking them clearly as TODO.
+- Template loading uses `DOMParser` without sanitizing HTML, allowing script injection from templates.
+- TypeScript build fails because packages such as `lucide-react` and `prosemirror-*` are missing【a1cdf2†L1-L18】.
+- Stub extensions (heading lock, Yjs collab, watermark) increase bundle size but provide no functionality until integrated.
 
 ## Performance Notes
-- `lucide-react` icons are dynamically imported in `pages/tiptap.tsx`, but other large editor packages are eagerly loaded.
-- Static templates and validation files are served with cache headers【F:next.config.js†L7-L27】.
-- `framer-motion` is only used for navigation animations and could be replaced with CSS transitions.
-- Consider lazy‑loading editor packages to reduce the initial bundle.
+- `lucide-react` icons are dynamically imported in TipTap but large editor packages are eagerly loaded.
+- Static templates and validation JSON are served with long‑term cache headers【F:next.config.js†L27-L45】.
+- Navigation animations rely on `framer-motion`; simple CSS transitions might suffice.
+- Consider code‑splitting optional extensions and editor libraries to reduce initial bundle size.
 
 ## Mandatory Fixes
-1. **Install dependencies & pass TypeScript build** – `tsc --noEmit` fails due to missing modules and type errors【d446d7†L1-L11】【4a7ad3†L1-L11】.
-2. **Run Prettier** – `npx prettier --check .` reports style issues in 46 files【8f6032†L1-L43】.
-3. **Fix audit and test scripts** – `npm install` fails with a 403 error【7177b5†L1-L12】 which causes ESLint, Vitest, Playwright and Stryker to fail【071709†L1-L20】【f37df7†L1-L12】【d7d6b7†L1-L12】【9ce200†L1-L12】.
-4. **Connect planned extensions** – implement or remove stub modules (e.g., heading lock, Yjs collab) to avoid dead code.
+1. **Install dependencies and fix TypeScript errors.** `tsc --noEmit` reports missing modules and type errors【a1cdf2†L1-L18】.
+2. **Run Prettier.** Formatting check lists many files with style issues【d3d06d†L1-L30】.
+3. **Resolve failing npm scripts.** `npm install` and subsequent lint/test commands fail due to 403 errors fetching packages【64a5ab†L1-L21】【c93578†L1-L27】.
+4. **Hook up or remove stub extensions** so dead code does not linger.
 
 ## Optional Improvements
-- Refactor `pages/tiptap.tsx` into smaller components for maintainability.
-- Add basic editor implementations for the remaining pages or clearly mark them as TODO.
-- Consider dynamic importing of TipTap extensions and `lucide-react` icons.
-- Replace Framer Motion with CSS transitions if animations are minimal.
-- Enable property tests by removing `describe.skip` in `tests/property/validation.test.ts`.
+- Break `pages/tiptap.tsx` into smaller components.
+- Provide functional implementations for the other editor pages.
+- Lazy‑load editor packages and optional extensions.
+- Replace `framer-motion` with CSS transitions if animation needs are simple.
+- Enable property‑based tests once dependencies are installed.
 
 ---
 Next agent: `ready-for:builder`
