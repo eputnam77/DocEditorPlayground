@@ -1,5 +1,10 @@
 import React from "react";
 
+/**
+ * ModernLayout wraps all pages with a simple header and centered content.
+ * It keeps styling consistent and avoids repeating boilerplate.
+ */
+
 export default function ModernLayout({ children }: { children: React.ReactNode }) {
   return (
     <div className="min-h-screen flex flex-col">

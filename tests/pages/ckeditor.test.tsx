@@ -6,5 +6,6 @@ describe("CkeditorPage", () => {
   it("renders heading", () => {
     render(<CkeditorPage />);
     expect(screen.getByText("CKEditor 5")).toBeInTheDocument();
+    expect(screen.getByLabelText("Add Comment")).toBeInTheDocument();
   });
 });

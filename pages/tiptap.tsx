@@ -29,6 +29,7 @@ import TemplateLoader from "../components/TemplateLoader";
 import EditorIntegrationInfo from "../components/EditorIntegrationInfo";
 import ValidationStatus from "../components/ValidationStatus";
 import CommentTrack from "../components/CommentTrack";
+import HeadingStylePresets from "../components/HeadingStylePresets";
 import { TEMPLATES } from "../utils/templates";
 
 // Icons
@@ -297,6 +298,7 @@ function TiptapEditorPage() {
       <h1 className="sr-only">TipTap Editor</h1>
       <header className="flex items-center gap-2 bg-gray-100 px-6 py-3 border-b w-full">
         <span className="text-xl font-bold mr-6">TipTap Editor</span>
+        <HeadingStylePresets onSelect={setHeading} />
         <div className="flex items-center gap-1">
           <select
             value={
