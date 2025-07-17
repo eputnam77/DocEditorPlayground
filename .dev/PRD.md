@@ -5,7 +5,7 @@
 ## 1. Overview
 
 **Goal:**
-Build a minimal, modular web app that allows in-depth side-by-side testing of modern document editors, including TipTap, Toast UI Editor, CodeX (Editor.js), Quill, Slate, Lexical, and CKEditor 5. The purpose is to evaluate their extensibility, plugin integration, validation features, and template support before integrating them into a larger platform.
+Build a minimal, modular web app that allows in-depth side-by-side testing of modern document editors, including TipTap, Toast UI Editor, CodeX (Editor.js), Slate, Lexical, and CKEditor 5. The purpose is to evaluate their extensibility, plugin integration, validation features, and template support before integrating them into a larger platform.
 
 ---
 
@@ -34,8 +34,6 @@ Build a minimal, modular web app that allows in-depth side-by-side testing of mo
 - `/codex`:
   Editor.js, with block/plugin management, block validation, and templates.
 
-- `/quill`:
-  Quill editor, with module/plugin toggling, validation options, and template support.
 
 - `/slate`:
   Slate editor, demonstrating custom schema/validation, plugin integration, and templates.
@@ -83,7 +81,6 @@ Each editor page includes:
   - TipTap: `@tiptap/react`, `@tiptap/starter-kit`, etc.
   - Toast UI Editor: `@toast-ui/react-editor`
   - Editor.js: `@editorjs/editorjs`, `@editorjs/header`, etc.
-  - Quill: `quill`, `react-quill`
   - Slate: `slate`, `slate-react`
   - Lexical: `@lexical/react`, etc.
   - CKEditor 5: `@ckeditor/ckeditor5-react`, `@ckeditor/ckeditor5-build-classic` or custom build, plus the `dxpr-ai-agent` plugin
@@ -98,7 +95,6 @@ Each editor page includes:
 │   ├── tiptap.tsx
 │   ├── toast.tsx
 │   ├── codex.tsx
-│   ├── quill.tsx
 │   ├── slate.tsx
 │   ├── lexical.tsx
 │   └── ckeditor.tsx
@@ -159,7 +155,7 @@ Each editor page includes an **Integration** section:
    - Integration guide.
 
 4. **Repeat for each editor:**
-   - Toast UI, CodeX, Quill, Slate, Lexical, CKEditor 5.
+   - Toast UI, CodeX, Slate, Lexical, CKEditor 5.
    - Each with plugin/extensions management, validation, templates, and Integration section.
 
 5. **Add shared components for Integration Info.**
@@ -189,7 +185,6 @@ Each editor page includes an **Integration** section:
 - [TipTap](https://tiptap.dev)
 - [Toast UI Editor](https://nhn.github.io/tui.editor/latest/)
 - [Editor.js](https://editorjs.io/)
-- [Quill](https://quilljs.com/)
 - [Slate](https://docs.slatejs.org/)
 - [Lexical](https://lexical.dev/)
 - [CKEditor 5](https://ckeditor.com/docs/)

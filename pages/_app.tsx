@@ -4,7 +4,6 @@ import "../styles/ckeditor.css";
 import "../styles/codex.css";
 import "../styles/globals.css";
 import "../styles/lexical.css";
-import "../styles/quill.css";
 import "../styles/slate.css";
 import "../styles/tiptap.css";
 import "../styles/toast.css";

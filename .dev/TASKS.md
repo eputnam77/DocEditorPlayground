@@ -45,13 +45,6 @@ This file tracks planned tasks for implementing the **Document Editor Playground
 - **Labels:** `feature`, `editor`, `codex`
 - **Tests:** `tests/e2e/features/codex_page.feature`
 
-### 6. Implement Quill page
-
-- **Priority:** Medium
-- **Estimate:** 3h
-- **Acceptance Criteria:** `/quill` shows Quill editor with module toggles, validation display, template loader and integration info section.
-- **Labels:** `feature`, `editor`, `quill`
-- **Tests:** `tests/e2e/features/quill_page.feature`
 
 ### 7. Implement Slate page
 

@@ -16,7 +16,6 @@ Adopt a simple Next.js layout:
 │   ├── tiptap.tsx        # Individual editor pages
 │   ├── toast.tsx
 │   ├── codex.tsx
-│   ├── quill.tsx
 │   ├── slate.tsx
 │   ├── lexical.tsx
 │   └── ckeditor.tsx
