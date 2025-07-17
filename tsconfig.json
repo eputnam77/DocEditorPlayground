@@ -15,7 +15,12 @@
     "isolatedModules": true,
     "jsx": "preserve",
     "incremental": true,
-    "baseUrl": "."
+    "baseUrl": ".",
+    "paths": {
+      "yjs": ["stubs/yjs.ts"],
+      "y-webrtc": ["stubs/y-webrtc.ts"],
+      "y-protocols/awareness": ["stubs/y-protocols-awareness.ts"]
+    }
   },
   "include": [
     "next-env.d.ts",
