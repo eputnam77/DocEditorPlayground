@@ -1,6 +1,10 @@
 import React, { useState } from "react";
 
-/** Simple comment list with an input box to demonstrate comment tracking. */
+/**
+ * CommentTrack is a tiny demonstration component that allows users to add
+ * comments to a list. It purposely avoids persistence and rich features so the
+ * surrounding editor pages remain lightweight.
+ */
 export default function CommentTrack() {
   const [comment, setComment] = useState("");
   const [comments, setComments] = useState<string[]>([]);

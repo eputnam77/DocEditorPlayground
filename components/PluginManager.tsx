@@ -52,6 +52,8 @@ export default function PluginManager({
   const [open, setOpen] = useState(false);
   const toggle = (name: string) => {
     if (locked.includes(name)) return;
+    // Toggle plugin name in the enabled list without mutating state directly
+    // to keep React state updates predictable.
     const next = enabled.includes(name)
       ? enabled.filter((n) => n !== name)
       : [...enabled, name];

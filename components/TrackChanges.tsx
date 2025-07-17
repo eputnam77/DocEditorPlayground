@@ -13,6 +13,9 @@ export interface TrackChangesProps {
 export default function TrackChanges({ content }: TrackChangesProps) {
   // Capture the initial content on first render
   const [initial] = useState(content);
+  // Compare current content length to the captured initial length to determine
+  // simple added/removed character counts. This avoids diff algorithms while
+  // providing basic insight into editing activity.
   const added = Math.max(0, content.length - initial.length);
   const removed = Math.max(0, initial.length - content.length);
 
