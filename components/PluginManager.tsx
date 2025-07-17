@@ -1,5 +1,13 @@
 import React, { useState } from "react";
-import { ChevronDown, ChevronUp } from "lucide-react";
+import dynamic from "next/dynamic";
+
+// Dynamically import icons so the entire lucide-react bundle isn't loaded
+const ChevronDown = dynamic(() =>
+  import("lucide-react").then((m) => m.ChevronDown)
+);
+const ChevronUp = dynamic(() =>
+  import("lucide-react").then((m) => m.ChevronUp)
+);
 
 export interface PluginItem {
   name: string;
