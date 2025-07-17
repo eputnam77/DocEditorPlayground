@@ -12,6 +12,10 @@ This project demonstrates multiple rich text editors side by side using **Next.j
 - Optional Yjs collaboration, section nodes and watermark
 - Indentation controls
 - Dark mode switch
+- Caches templates and validation files for a year via \`Cache-Control\` headers
+  configured in **next.config.js**.
+- Icons load on demand using dynamic imports so the bundle remains small.
+- Navigation links prefetch their target pages on hover for snappy transitions.
 
 ### Analyze bundles
 
