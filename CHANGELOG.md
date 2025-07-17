@@ -13,3 +13,5 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
 - Dark mode toggle.
 - Integration guides for managing plugins.
 - Setup script for installing Node LTS, dependencies and Husky hooks.
+- Scenario guides for all editors covering track changes, comments, heading lock,
+  Yjs collaboration, draggable sections, watermarks, indentation and structure enforcement.

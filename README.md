@@ -4,9 +4,13 @@ This project demonstrates multiple rich text editors side by side using **Next.j
 
 ## Features
 
- - Dedicated pages for **TipTap**, **Toast UI**, **CodeX**, **Slate**, **Lexical** and **CKEditor 5**. Removed **Toast UI** and **Quill** as of July 2025 because those repos haven't been active in over a year.
+- Dedicated pages for **TipTap**, **Toast UI**, **CodeX**, **Slate**, **Lexical** and **CKEditor 5**. Removed **Toast UI** and **Quill** as of July 2025 because those repos haven't been active in over a year.
 - Plugin toggles built into each page
 - Quick integration tips for each editor
+- Track changes and comment widgets
+- Heading locking and structure enforcement
+- Optional Yjs collaboration, section nodes and watermark
+- Indentation controls
 - Dark mode switch
 
 ## Installation
@@ -106,6 +110,17 @@ See [Integration Guides](docs/integration-guides.md) for quick notes on how to m
 Each editor page also features a **Template Loader** for quickly inserting example
 documents. Comments can be added using the built-in comment tracker below the
 editor, and a simple change summary appears via the Track Changes widget.
+
+## Scenario Guides
+
+Detailed walkthroughs for each editor live under `docs/scenarios`:
+
+- [TipTap](docs/scenarios/tiptap.md)
+- [Toast UI](docs/scenarios/toast.md)
+- [Editor.js](docs/scenarios/codex.md)
+- [Slate](docs/scenarios/slate.md)
+- [Lexical](docs/scenarios/lexical.md)
+- [CKEditor 5](docs/scenarios/ckeditor.md)
 
 ## Folder Structure
 
