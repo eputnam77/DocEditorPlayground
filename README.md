@@ -68,14 +68,16 @@ npm run dev
 
 ### **Extra: Auto-detect Node Version for Contributors**
 
-- **Add a `.nvmrc` file** to your project root with just this line (for LTS 22.x):
+This repository includes a `.nvmrc` file pinned to the recommended Node.js LTS
+version. Most `nvm` implementations will automatically pick up this version so
+contributors can simply run `nvm use`.
 
 ```
-22.17.0
+cat .nvmrc
 ```
 
-- In Codespaces, this will be picked up automatically.
-- In nvm/nvm-windows, users can run `nvm use` with no arguments if `.nvmrc` is present.
+If you maintain your own fork without the file you can create one manually with
+a single line containing the desired Node.js version.
 
 ---
 
