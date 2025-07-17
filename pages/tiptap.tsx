@@ -45,25 +45,25 @@ import { TEMPLATES } from "../utils/templates";
 // Dynamically load icons to avoid bundling the entire set
 const Bold = dynamic(() => import("lucide-react").then((m) => m.Bold));
 const ChevronDown = dynamic(() =>
-  import("lucide-react").then((m) => m.ChevronDown)
+  import("lucide-react").then((m) => m.ChevronDown),
 );
 const ChevronUp = dynamic(() =>
-  import("lucide-react").then((m) => m.ChevronUp)
+  import("lucide-react").then((m) => m.ChevronUp),
 );
 const Clock = dynamic(() => import("lucide-react").then((m) => m.Clock));
 const Code = dynamic(() => import("lucide-react").then((m) => m.Code));
 const Italic = dynamic(() => import("lucide-react").then((m) => m.Italic));
 const List = dynamic(() => import("lucide-react").then((m) => m.List));
 const ListOrdered = dynamic(() =>
-  import("lucide-react").then((m) => m.ListOrdered)
+  import("lucide-react").then((m) => m.ListOrdered),
 );
 const Quote = dynamic(() => import("lucide-react").then((m) => m.Quote));
 const Redo2 = dynamic(() => import("lucide-react").then((m) => m.Redo2));
 const Strikethrough = dynamic(() =>
-  import("lucide-react").then((m) => m.Strikethrough)
+  import("lucide-react").then((m) => m.Strikethrough),
 );
 const UnderlineIcon = dynamic(() =>
-  import("lucide-react").then((m) => m.Underline)
+  import("lucide-react").then((m) => m.Underline),
 );
 const Undo2 = dynamic(() => import("lucide-react").then((m) => m.Undo2));
 
@@ -109,24 +109,28 @@ const TOGGLEABLE_EXTENSIONS = [
   { name: "YjsCollab", extension: tiptapYjsCollab() },
 ];
 
-
 function TiptapEditorPage() {
   const [enabledExtensions, setEnabledExtensions] = useState(() => {
     if (typeof window === "undefined") return [];
     // Only remember toggleable extensions, always-on ones never get toggled.
     const stored = localStorage.getItem("tiptapToggleableExtensions");
-    return stored ? JSON.parse(stored) : TOGGLEABLE_EXTENSIONS.map(e => e.name);
+    return stored
+      ? JSON.parse(stored)
+      : TOGGLEABLE_EXTENSIONS.map((e) => e.name);
   });
 
   // Compose the extensions in this order:
   const extensions = useMemo(
-    () => [
-      ...ALWAYS_ENABLED,
-      ...CORE_DEFAULTS,
-      ...INTERNALS,
-      ...TOGGLEABLE_EXTENSIONS.filter(e => enabledExtensions.includes(e.name)),
-    ].map(e => e.extension),
-    [enabledExtensions]
+    () =>
+      [
+        ...ALWAYS_ENABLED,
+        ...CORE_DEFAULTS,
+        ...INTERNALS,
+        ...TOGGLEABLE_EXTENSIONS.filter((e) =>
+          enabledExtensions.includes(e.name),
+        ),
+      ].map((e) => e.extension),
+    [enabledExtensions],
   );
 
   // Store only toggled extensions
@@ -134,7 +138,7 @@ function TiptapEditorPage() {
     if (typeof window !== "undefined") {
       localStorage.setItem(
         "tiptapToggleableExtensions",
-        JSON.stringify(enabledExtensions)
+        JSON.stringify(enabledExtensions),
       );
     }
   }, [enabledExtensions]);
@@ -153,7 +157,7 @@ function TiptapEditorPage() {
         },
       },
     },
-    [extensions]
+    [extensions],
   );
 
   // Update content state on every editor change
@@ -233,7 +237,7 @@ function TiptapEditorPage() {
             if (!res.ok) return null;
             const data = await res.json();
             return { ...data, filename: f };
-          })
+          }),
         );
         setValidationSets(sets.filter(Boolean));
       } catch {
@@ -262,44 +266,44 @@ function TiptapEditorPage() {
           const found = doc.body.querySelector(tag);
           return {
             ...rule,
-          passed: !!found,
-          detail: found
-            ? `Found <${tag}>: ${found.textContent}`
-            : `No <${tag}> found`,
-        };
-      } else if (rule.type === "section") {
-        const found = Array.from(
-          doc.body.querySelectorAll("h1, h2, h3, h4, h5, h6")
-        ).find(
-          (el) =>
-            el.textContent?.trim().toLowerCase() ===
-            rule.text.trim().toLowerCase()
-        );
-        return {
-          ...rule,
-          passed: !!found,
-          detail: found
-            ? `Found section: ${found.textContent}`
-            : `Section '${rule.text}' not found`,
-        };
-      } else if (rule.type === "footer") {
-        const blocks = Array.from(
-          doc.body.querySelectorAll(
-            "p, div, footer, section, h1, h2, h3, h4, h5, h6"
-          )
-        );
-        const last = blocks[blocks.length - 1];
-        const found =
-          last && rule.text ? last.textContent?.includes(rule.text) : !!last;
-        return {
-          ...rule,
-          passed: found,
-          detail: found
-            ? `Footer contains required info.`
-            : `Footer requirement not met`,
-        };
-      }
-      return { ...rule, passed: false, detail: "Unknown rule type" };
+            passed: !!found,
+            detail: found
+              ? `Found <${tag}>: ${found.textContent}`
+              : `No <${tag}> found`,
+          };
+        } else if (rule.type === "section") {
+          const found = Array.from(
+            doc.body.querySelectorAll("h1, h2, h3, h4, h5, h6"),
+          ).find(
+            (el) =>
+              el.textContent?.trim().toLowerCase() ===
+              rule.text.trim().toLowerCase(),
+          );
+          return {
+            ...rule,
+            passed: !!found,
+            detail: found
+              ? `Found section: ${found.textContent}`
+              : `Section '${rule.text}' not found`,
+          };
+        } else if (rule.type === "footer") {
+          const blocks = Array.from(
+            doc.body.querySelectorAll(
+              "p, div, footer, section, h1, h2, h3, h4, h5, h6",
+            ),
+          );
+          const last = blocks[blocks.length - 1];
+          const found =
+            last && rule.text ? last.textContent?.includes(rule.text) : !!last;
+          return {
+            ...rule,
+            passed: found,
+            detail: found
+              ? `Footer contains required info.`
+              : `Footer requirement not met`,
+          };
+        }
+        return { ...rule, passed: false, detail: "Unknown rule type" };
       });
       setValidationResults(results);
     } catch {
@@ -345,66 +349,66 @@ function TiptapEditorPage() {
             <Bold className="w-4 h-4" />,
             () => editor.chain().focus().toggleBold().run(),
             editor.isActive("bold"),
-            "Bold"
+            "Bold",
           )}
           {toolbarButton(
             <Italic className="w-4 h-4" />,
             () => editor.chain().focus().toggleItalic().run(),
             editor.isActive("italic"),
-            "Italic"
+            "Italic",
           )}
           {toolbarButton(
             <UnderlineIcon className="w-4 h-4" />,
             () => {
               const chain = editor.chain().focus();
-              if (typeof (chain).toggleUnderline === "function") {
+              if (typeof chain.toggleUnderline === "function") {
                 chain.toggleUnderline().run();
               }
             },
             editor.isActive("underline"),
-            "Underline"
+            "Underline",
           )}
           {toolbarButton(
             <Strikethrough className="w-4 h-4" />,
             () => editor.chain().focus().toggleStrike().run(),
             editor.isActive("strike"),
-            "Strikethrough"
+            "Strikethrough",
           )}
           {toolbarButton(
             <Code className="w-4 h-4" />,
             () => editor.chain().focus().toggleCode().run(),
             editor.isActive("code"),
-            "Inline Code"
+            "Inline Code",
           )}
           {toolbarButton(
             <Quote className="w-4 h-4" />,
             () => editor.chain().focus().toggleBlockquote().run(),
             editor.isActive("blockquote"),
-            "Blockquote"
+            "Blockquote",
           )}
           {toolbarButton(
             <List className="w-4 h-4" />,
             () => editor.chain().focus().toggleBulletList().run(),
             editor.isActive("bulletList"),
-            "Bullet List"
+            "Bullet List",
           )}
           {toolbarButton(
             <ListOrdered className="w-4 h-4" />,
             () => editor.chain().focus().toggleOrderedList().run(),
             editor.isActive("orderedList"),
-            "Numbered List"
+            "Numbered List",
           )}
           {toolbarButton(
             <Undo2 className="w-4 h-4" />,
             () => editor.chain().focus().undo().run(),
             false,
-            "Undo"
+            "Undo",
           )}
           {toolbarButton(
             <Redo2 className="w-4 h-4" />,
             () => editor.chain().focus().redo().run(),
             false,
-            "Redo"
+            "Redo",
           )}
           <button
             onClick={handleSave}
@@ -420,6 +424,7 @@ function TiptapEditorPage() {
             disabled={loadingTemplate}
             onLoad={handleTemplateLoad}
             onClear={() => editor?.commands.clearContent()}
+            onError={(e) => alert(String(e))}
           />
         </div>
         <div className="relative">
@@ -498,7 +503,6 @@ function TiptapEditorPage() {
           </button>
         )}
       </header>
-
 
       {validationResults.length > 0 && (
         <div className="fixed top-24 right-4 z-40">

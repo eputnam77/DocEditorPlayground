@@ -3,7 +3,9 @@ import { useState } from "react";
 import EditorIntegrationInfo from "../components/EditorIntegrationInfo";
 import PluginManager from "../components/PluginManager";
 import TemplateLoader from "../components/TemplateLoader";
-import ValidationStatus, { ValidationResult } from "../components/ValidationStatus";
+import ValidationStatus, {
+  ValidationResult,
+} from "../components/ValidationStatus";
 import CommentTrack from "../components/CommentTrack";
 import TrackChanges from "../components/TrackChanges";
 import { validateDocument } from "../utils/validation";
@@ -15,7 +17,9 @@ const PLUGINS = [{ name: "table" }, { name: "chart" }];
 function ToastPage() {
   const [enabled, setEnabled] = useState<string[]>(PLUGINS.map((p) => p.name));
   const [content, setContent] = useState("");
-  const [validationResults, setValidationResults] = useState<ValidationResult[]>([]);
+  const [validationResults, setValidationResults] = useState<
+    ValidationResult[]
+  >([]);
 
   async function loadTemplate(filename: string) {
     try {
@@ -38,44 +42,45 @@ function ToastPage() {
 
   return (
     <ModernLayout>
-    <div className="p-4 space-y-2">
-      <h1>Toast UI Editor</h1>
-      <p className="text-sm text-zinc-600 dark:text-zinc-300">
-        This demo uses a simple textarea placeholder.
-      </p>
-      <div className="flex gap-2">
-        <TemplateLoader
-          templates={TEMPLATES}
-          onLoad={loadTemplate}
-          onClear={() => setContent("")}
+      <div className="p-4 space-y-2">
+        <h1>Toast UI Editor</h1>
+        <p className="text-sm text-zinc-600 dark:text-zinc-300">
+          This demo uses a simple textarea placeholder.
+        </p>
+        <div className="flex gap-2">
+          <TemplateLoader
+            templates={TEMPLATES}
+            onLoad={loadTemplate}
+            onClear={() => setContent("")}
+            onError={(e) => alert(String(e))}
+          />
+          <PluginManager
+            plugins={PLUGINS}
+            enabled={enabled}
+            onChange={setEnabled}
+          />
+          <button
+            className="px-3 py-1 border rounded bg-gray-50 hover:bg-gray-200"
+            onClick={runValidation}
+          >
+            Validate
+          </button>
+        </div>
+        <textarea
+          className="w-full border rounded p-2 min-h-[200px]"
+          value={content}
+          onChange={(e) => setContent(e.target.value)}
         />
-        <PluginManager
-          plugins={PLUGINS}
-          enabled={enabled}
-          onChange={setEnabled}
-        />
-        <button
-          className="px-3 py-1 border rounded bg-gray-50 hover:bg-gray-200"
-          onClick={runValidation}
-        >
-          Validate
-        </button>
+        <TrackChanges content={content} />
+        {validationResults.length > 0 && (
+          <ValidationStatus
+            results={validationResults}
+            onClear={() => setValidationResults([])}
+          />
+        )}
+        <CommentTrack />
+        <EditorIntegrationInfo editorName="Toast UI" />
       </div>
-      <textarea
-        className="w-full border rounded p-2 min-h-[200px]"
-        value={content}
-        onChange={(e) => setContent(e.target.value)}
-      />
-      <TrackChanges content={content} />
-      {validationResults.length > 0 && (
-        <ValidationStatus
-          results={validationResults}
-          onClear={() => setValidationResults([])}
-        />
-      )}
-      <CommentTrack />
-      <EditorIntegrationInfo editorName="Toast UI" />
-    </div>
     </ModernLayout>
   );
 }
