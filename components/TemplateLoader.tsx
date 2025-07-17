@@ -22,6 +22,19 @@ export default function TemplateLoader({
   onLoad,
   onClear,
 }: TemplateLoaderProps) {
+  if (!Array.isArray(templates)) {
+    console.warn(
+      "TemplateLoader: expected `templates` prop to be an array."
+    );
+    return null;
+  }
+
+  if (typeof onLoad !== "function" || typeof onClear !== "function") {
+    console.warn(
+      "TemplateLoader: `onLoad` and `onClear` callbacks are required."
+    );
+    return null;
+  }
   const handleChange = async (e: React.ChangeEvent<HTMLSelectElement>) => {
     const val = e.target.value;
     if (val === '') return;

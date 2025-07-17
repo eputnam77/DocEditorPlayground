@@ -18,13 +18,22 @@ function SlatePage() {
   const [validationResults, setValidationResults] = useState<ValidationResult[]>([]);
 
   async function loadTemplate(filename: string) {
-    const res = await fetch(`/templates/${filename}`);
-    setContent(await res.text());
+    try {
+      const res = await fetch(`/templates/${filename}`);
+      if (!res.ok) throw new Error("fetch failed");
+      setContent(await res.text());
+    } catch {
+      alert("Failed to load template: " + filename);
+    }
   }
 
   function runValidation() {
-    const passed = validateDocument({ content });
-    setValidationResults([{ id: 1, label: "Document", passed }]);
+    try {
+      const passed = validateDocument({ content });
+      setValidationResults([{ id: 1, label: "Document", passed }]);
+    } catch {
+      alert("Validation failed");
+    }
   }
 
   return (

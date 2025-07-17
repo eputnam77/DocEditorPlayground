@@ -252,15 +252,16 @@ function TiptapEditorPage() {
 
   function runValidation() {
     if (!editor) return;
-    const html = editor.getHTML();
-    const parser = new window.DOMParser();
-    const doc = parser.parseFromString(html, "text/html");
-    const results = validationRules.map((rule) => {
-      if (rule.type === "header") {
-        const tag = `h${rule.level}`;
-        const found = doc.body.querySelector(tag);
-        return {
-          ...rule,
+    try {
+      const html = editor.getHTML();
+      const parser = new window.DOMParser();
+      const doc = parser.parseFromString(html, "text/html");
+      const results = validationRules.map((rule) => {
+        if (rule.type === "header") {
+          const tag = `h${rule.level}`;
+          const found = doc.body.querySelector(tag);
+          return {
+            ...rule,
           passed: !!found,
           detail: found
             ? `Found <${tag}>: ${found.textContent}`
@@ -299,8 +300,11 @@ function TiptapEditorPage() {
         };
       }
       return { ...rule, passed: false, detail: "Unknown rule type" };
-    });
-    setValidationResults(results);
+      });
+      setValidationResults(results);
+    } catch {
+      alert("Validation failed");
+    }
   }
 
   if (!editor) return <div>Loading TipTap…</div>;

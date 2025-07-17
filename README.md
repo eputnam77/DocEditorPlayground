@@ -81,7 +81,9 @@ npm run dev
 
 ## Running Tests
 
-Run all linters and the full test suite after installing dependencies:
+Run all linters and the full test suite after installing dependencies.
+Navigation links prefetch their destination pages on hover for snappier
+transitions.
 
 ```bash
 npm run lint
@@ -98,6 +100,10 @@ npx playwright test --reporter=line
 ## Adding or Removing Plugins
 
 See [Integration Guides](docs/integration-guides.md) for quick notes on how to manage plugins or extensions in each editor.
+
+Each editor page also features a **Template Loader** for quickly inserting example
+documents. Comments can be added using the built-in comment tracker below the
+editor, and a simple change summary appears via the Track Changes widget.
 
 ## Folder Structure
 

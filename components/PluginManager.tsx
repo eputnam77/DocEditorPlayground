@@ -37,6 +37,18 @@ export default function PluginManager({
   locked = [],
   onChange,
 }: PluginManagerProps) {
+  if (!Array.isArray(plugins)) {
+    console.warn(
+      "PluginManager: expected `plugins` prop to be an array."
+    );
+    return null;
+  }
+  if (!Array.isArray(enabled)) {
+    console.warn(
+      "PluginManager: expected `enabled` prop to be an array."
+    );
+    return null;
+  }
   const [open, setOpen] = useState(false);
   const toggle = (name: string) => {
     if (locked.includes(name)) return;
