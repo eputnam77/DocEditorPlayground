@@ -21,13 +21,13 @@ This report cross-references `.dev/PRD.md` with `TASKS.md` and the current codeb
 
 ## ❌ Missing Features
 
-* Commenting/track changes support (`TASKS #19`).
+<!-- All major features implemented -->
+<!-- Placeholder section kept for future items -->
 
 ## 📋 Recommended Next Steps
 
-1. **Builder**: Add shared `PluginManager` and `TemplateLoader` components with sample templates and wire them into each page.
-2. **Tester**: Install real testing dependencies so unit and Playwright tests execute with coverage ≥75 %.
-3. **Docwriter**: Document how to use templates and display validation status in the editors.
+1. **Tester**: Install real testing dependencies so unit and Playwright tests execute with coverage ≥75 %.
+2. **Docwriter**: Document how to use templates and display validation status in the editors.
 
 ---
 
