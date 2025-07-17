@@ -120,6 +120,8 @@ See [Integration Guides](docs/integration-guides.md) for quick notes on how to m
 Each editor page also features a **Template Loader** for quickly inserting example
 documents. Comments can be added using the built-in comment tracker below the
 editor, and a simple change summary appears via the Track Changes widget.
+Running **Run Validation** will parse the current document and show pass/fail
+information in a small panel powered by the `ValidationStatus` component.
 
 ## Scenario Guides
 
