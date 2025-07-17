@@ -9,9 +9,8 @@ declare namespace JSX {
 }
 
 declare module "react" {
-  export function useState<T>(
-    initial: T | (() => T),
-  ): [T, (value: T | ((prev: T) => T)) => void];
+  /** Minimal React type definitions for offline compilation */
+  export function useState<T = any>(initial: T): [T, (value: T) => void];
   export const useEffect: any;
   export function useRef<T>(initial?: T | null): { current: T | null };
   export function useMemo<T>(factory: () => T, deps: any[]): T;
@@ -19,9 +18,15 @@ declare module "react" {
     fn: T,
     deps: any[],
   ): T;
-  export type ReactNode = any;
   const React: any;
   export default React;
+  namespace React {
+    export type FC<P = {}> = (props: P) => any;
+    export interface ChangeEvent<T = Element> {
+      target: T;
+    }
+    export type ReactNode = any;
+  }
 }
 
 declare module "react-dom" {
