@@ -17,7 +17,7 @@ export function tiptapSectionNode() {
     name: "section-node",
     group: "block",
     draggable: true,
-    content: "heading level=2 block*",
+    content: "heading block*",
     parseHTML() {
       return [{ tag: "section" }];
     },
