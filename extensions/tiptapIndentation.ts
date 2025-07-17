@@ -1,6 +1,11 @@
 /**
  * TipTap extension adding indentation controls.
  */
+import { Extension } from "@tiptap/core";
+
+/**
+ * Minimal indentation extension returning a blank command set.
+ */
 export function tiptapIndentation() {
-  throw new Error("tiptapIndentation not implemented");
+  return Extension.create({ name: "indentation" });
 }

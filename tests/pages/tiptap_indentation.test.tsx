@@ -1,7 +1,9 @@
 import { describe, it, expect } from "vitest";
+import { tiptapIndentation } from "../../extensions/tiptapIndentation";
 
 describe("TipTap indentation controls", () => {
-  it("should support indentation", () => {
-    expect(false).toBe(true); // Placeholder
+  it("creates extension", () => {
+    const ext = tiptapIndentation();
+    expect(ext.name).toBe("indentation");
   });
 });

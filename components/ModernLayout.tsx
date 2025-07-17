@@ -1,9 +1,12 @@
 import React from "react";
 
-/**
- * Placeholder for a modern page layout with spacious navigation
- * and full-page text areas.
- */
-export default function ModernLayout() {
-  return <div>ModernLayout not implemented</div>;
+export default function ModernLayout({ children }: { children: React.ReactNode }) {
+  return (
+    <div className="min-h-screen flex flex-col">
+      <header className="bg-gray-100 dark:bg-zinc-800 p-4 border-b">
+        <nav className="container mx-auto">Document Editor Playground</nav>
+      </header>
+      <main className="flex-1 container mx-auto p-4">{children}</main>
+    </div>
+  );
 }

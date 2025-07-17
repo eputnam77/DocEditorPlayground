@@ -1,6 +1,11 @@
 /**
  * TipTap extension for Yjs real-time collaboration.
  */
+import { Extension } from "@tiptap/core";
+
+/**
+ * Barebones Yjs collaboration extension placeholder.
+ */
 export function tiptapYjsCollab() {
-  throw new Error("tiptapYjsCollab not implemented");
+  return Extension.create({ name: "yjs-collab" });
 }
