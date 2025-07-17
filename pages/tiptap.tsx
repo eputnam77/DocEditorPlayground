@@ -32,8 +32,6 @@ import CommentTrack from "../components/CommentTrack";
 import { TEMPLATES } from "../utils/templates";
 
 // Icons
-import dynamic from "next/dynamic";
-
 // Dynamically load icons to avoid bundling the entire set
 const Bold = dynamic(() => import("lucide-react").then((m) => m.Bold));
 const ChevronDown = dynamic(() =>
