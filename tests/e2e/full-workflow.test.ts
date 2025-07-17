@@ -11,7 +11,6 @@ const editors: EditorWorkflow[] = [
   { path: "/tiptap", pluginMenu: { name: "Extensions" }, pluginLabel: "Underline", hasSave: true },
   { path: "/toast", pluginMenu: { name: "Plugins" }, pluginLabel: "ColorSyntax", hasSave: true },
   { path: "/codex", pluginMenu: { name: "Plugins" }, pluginLabel: "Checklist", hasSave: true },
-  { path: "/quill", pluginMenu: { name: "Modules" }, pluginLabel: "History", hasSave: true },
   { path: "/slate", pluginMenu: { name: "Plugins" }, pluginLabel: "History", hasSave: true },
   { path: "/lexical", pluginMenu: { name: "Plugins" }, pluginLabel: "CodeHighlight", hasSave: true },
   { path: "/ckeditor", pluginMenu: { name: "Plugins" }, pluginLabel: "Bold", hasSave: false },

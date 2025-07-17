@@ -6,7 +6,7 @@ This report cross-references `.dev/PRD.md` with `TASKS.md` and the current codeb
 
 * **Project skeleton** with Next.js + TypeScript and Tailwind CSS. See `package.json` and `tailwind.config.js`.
 * **Home page with navigation** and dark mode toggle – `pages/index.tsx` and `components/DarkModeToggle.tsx`.
-* **Rich editor pages** for TipTap, Toast UI, CodeX, Quill, Slate, Lexical and CKEditor 5. Example implementation in `pages/tiptap.tsx` shows extension management and toolbar.
+* **Rich editor pages** for TipTap, Toast UI, CodeX, Slate, Lexical and CKEditor 5. Example implementation in `pages/tiptap.tsx` shows extension management and toolbar.
 * **Validation utility** `utils/validation.ts`.
 * **Unit tests** for pages and components (e.g. `tests/pages/index.test.tsx`).
 * **CI workflow** `.github/workflows/ci.yml`.

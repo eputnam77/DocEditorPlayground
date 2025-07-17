@@ -5,7 +5,6 @@ const pages = [
   { path: "/tiptap", text: "TipTap Editor" },
   { path: "/toast", text: "Toast UI Editor" },
   { path: "/codex", text: "Editor.js" },
-  { path: "/quill", text: "Quill Editor" },
   { path: "/slate", text: "Slate Editor" },
   { path: "/lexical", text: "Lexical Editor" },
   { path: "/ckeditor", text: "CKEditor 5" },

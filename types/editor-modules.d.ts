@@ -19,13 +19,6 @@ declare module "@editorjs/header" {
 declare module "@editorjs/list" {
   export default class List {}
 }
-declare module "quill" {
-  export default class Quill {
-    constructor(el: HTMLElement, options?: any);
-    root: { innerHTML: string };
-    on(event: string, cb: () => void): void;
-  }
-}
 declare module "slate";
 declare module "slate-react";
 declare module "lexical";
@@ -60,11 +53,6 @@ declare module "framer-motion";
 declare module "react-editor-js";
 declare module "@editorjs/*";
 declare module "@lexical/*";
-declare module "react-quill" {
-  const ReactQuill: any;
-  export const Quill: any;
-  export default ReactQuill;
-}
 declare module "slate-history";
 declare module "@tiptap/*";
 declare module "@toast-ui/editor-plugin-code-syntax-highlight";

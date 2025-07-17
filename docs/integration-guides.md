@@ -33,16 +33,6 @@ These quick notes show how to add or remove plugins or extensions when you use t
    ```
 3. To remove a tool, delete its entry from the `tools` object.
 
-## Quill
-
-1. Install `react-quill`.
-2. Register modules when creating the component:
-   ```ts
-   const modules = { toolbar: ['bold', 'italic'] }
-   <ReactQuill modules={modules} />
-   ```
-3. Remove a module by omitting it from the modules object.
-
 ## Slate
 
 1. Install `slate` and `slate-react`.

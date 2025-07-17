@@ -6,7 +6,6 @@ const editors = [
   { name: "TipTap", path: "/tiptap" },
   // { name: "Toast Editor", path: "/toast" }, // Hidden for now
   // { name: "CodeX", path: "/codex" }, // Hidden for now
-  // { name: "Quill", path: "/quill" }, // Hidden for now
   // { name: "Slate", path: "/slate" }, // Hidden for now
   // { name: "Lexical", path: "/lexical" }, // Hidden for now
   // { name: "CKEditor 5", path: "/ckeditor" }, // Hidden for now
