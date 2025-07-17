@@ -18,7 +18,8 @@
     "test:watch": "vitest",
     "test:coverage": "vitest run --coverage",
     "test:e2e": "playwright test",
-    "analyze": "ANALYZE=true npm run build"
+    "analyze": "ANALYZE=true npm run build",
+    "lighthouse": "npm run build && npx lighthouse http://localhost:3000 --output=html --output-path=./lighthouse.html"
   },
   "dependencies": {
     "next": "^15.3.5",

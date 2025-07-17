@@ -121,8 +121,4 @@ See `docs/adr` for architectural decisions.
 
 ## Current Status (July 2025)
 
-- **Only TipTap is currently available in the playground.**
-- All other editors (CKEditor, Editor.js, Lexical, Slate, Toast UI, etc.) and their dependencies have been removed for now.
-- Over time, the other editors will be reintroduced for testing, comparison, and feature evaluation.
-
-If you are looking for a multi-editor playground, check back as more editors are added back in!
+All editor pages are available with lightweight placeholder implementations. TipTap demonstrates custom extensions while the other editors currently render a basic textarea to keep the dependency footprint small. Plugin toggles, template loading, validation checks, commenting and track changes widgets are shared across pages so you can compare workflows between editors.
