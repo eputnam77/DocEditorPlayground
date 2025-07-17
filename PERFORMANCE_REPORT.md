@@ -1,6 +1,7 @@
 # Performance Optimization Report
 
 This audit identifies opportunities to improve build and runtime speed in the Document Editor Playground. Tools such as k6, Lighthouse, Chrome DevTools and React Profiler should be used locally to gather metrics. Network access was unavailable in this environment, so recommendations are based on static inspection.
+Profiling tools like k6 and cProfile could not be installed due to network restrictions. No API endpoints or database queries were found, so the audit focuses on frontend performance.
 
 ## Safe to Try
 
@@ -30,6 +31,15 @@ This audit identifies opportunities to improve build and runtime speed in the Do
 - **Dependencies:** Build output
 - **Priority:** P1
 - ready-for:verifier
+### Recommendation: Prefetch editor pages on hover
+- **Description:** Use Next.js `Link` `prefetch` or router events to prefetch `/tiptap` and other editor pages when the user hovers over nav links.
+- **Expected Impact:** Low (snappier navigation)
+- **Effort Required:** Low
+- **Breakage Risk:** Safe
+- **Dependencies:** None
+- **Priority:** P1
+- ready-for:builder
+
 
 ## Review Needed
 
@@ -59,4 +69,22 @@ This audit identifies opportunities to improve build and runtime speed in the Do
 - **Dependencies:** Development tools
 - **Priority:** P2
 - ready-for:verifier
+
+### Recommendation: Replace framer-motion with CSS transitions
+- **Description:** Navigation animations in `components/NavBar.tsx` use framer-motion. Consider simple CSS transitions to drop this dependency.
+- **Expected Impact:** Low (smaller JS bundle)
+- **Effort Required:** Low
+- **Breakage Risk:** Moderate (UI animations)
+- **Dependencies:** None
+- **Priority:** P2
+- ready-for:builder
+
+### Recommendation: Dynamically import lucide-react icons
+- **Description:** Replace direct `import` statements for lucide-react icons in `pages/tiptap.tsx` and `components/PluginManager.tsx` with `dynamic(() => import("lucide-react"))` to avoid loading the entire icon set upfront.
+- **Expected Impact:** Moderate (smaller JS bundle)
+- **Effort Required:** Moderate
+- **Breakage Risk:** Moderate (UI icons)
+- **Dependencies:** Bundle analysis results
+- **Priority:** P2
+- ready-for:builder
 
