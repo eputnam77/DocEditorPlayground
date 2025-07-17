@@ -1,4 +1,4 @@
-import React from 'react';
+import React from "react";
 
 export interface TemplateMeta {
   label: string;
@@ -10,6 +10,11 @@ export interface TemplateLoaderProps {
   disabled?: boolean;
   onLoad(filename: string): Promise<void> | void;
   onClear(): void;
+  /**
+   * Optional error handler invoked when onLoad throws.
+   * Allows pages to surface user friendly error messages.
+   */
+  onError?(err: unknown): void;
 }
 
 /**
@@ -21,34 +26,34 @@ export default function TemplateLoader({
   disabled,
   onLoad,
   onClear,
+  onError,
 }: TemplateLoaderProps) {
   if (!Array.isArray(templates)) {
-    console.warn(
-      "TemplateLoader: expected `templates` prop to be an array."
-    );
+    console.warn("TemplateLoader: expected `templates` prop to be an array.");
     return null;
   }
 
   if (typeof onLoad !== "function" || typeof onClear !== "function") {
     console.warn(
-      "TemplateLoader: `onLoad` and `onClear` callbacks are required."
+      "TemplateLoader: `onLoad` and `onClear` callbacks are required.",
     );
     return null;
   }
   const handleChange = async (e: React.ChangeEvent<HTMLSelectElement>) => {
     const val = e.target.value;
-    if (val === '') return;
-    if (val === '__clear__') {
+    if (val === "") return;
+    if (val === "__clear__") {
       onClear();
       return;
     }
     try {
       await onLoad(val);
     } catch (err) {
-      console.error('TemplateLoader failed', err);
+      console.error("TemplateLoader failed", err);
+      onError?.(err);
     } finally {
       // Reset the select so the same template can be chosen again if desired
-      e.target.value = '';
+      e.target.value = "";
     }
   };
 

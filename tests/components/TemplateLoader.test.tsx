@@ -18,4 +18,23 @@ describe("TemplateLoader", () => {
     fireEvent.change(select, { target: { value: "__clear__" } });
     expect(clear).toHaveBeenCalled();
   });
+
+  it("calls onError when load throws", async () => {
+    const load = vi.fn(() => {
+      throw new Error("fail");
+    });
+    const handle = vi.fn();
+    render(
+      <TemplateLoader
+        templates={templates}
+        onLoad={load}
+        onClear={() => {}}
+        onError={handle}
+      />,
+    );
+    fireEvent.change(screen.getByLabelText("Templates"), {
+      target: { value: "one.html" },
+    });
+    expect(handle).toHaveBeenCalled();
+  });
 });
