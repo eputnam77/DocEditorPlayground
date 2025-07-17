@@ -5,6 +5,7 @@ import LexicalPage from "../../pages/lexical";
 describe("LexicalPage", () => {
   it("renders heading", () => {
     render(<LexicalPage />);
-    expect(screen.getByText("Lexical Editor")).toBeInTheDocument();
+    expect(screen.getByText("Lexical")).toBeInTheDocument();
+    expect(screen.getByLabelText("Add Comment")).toBeInTheDocument();
   });
 });

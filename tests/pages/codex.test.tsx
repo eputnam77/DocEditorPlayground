@@ -6,5 +6,6 @@ describe("CodexPage", () => {
   it("renders heading", () => {
     render(<CodexPage />);
     expect(screen.getByText("Editor.js")).toBeInTheDocument();
+    expect(screen.getByLabelText("Add Comment")).toBeInTheDocument();
   });
 });

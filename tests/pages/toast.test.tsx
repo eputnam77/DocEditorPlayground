@@ -6,5 +6,6 @@ describe("ToastPage", () => {
   it("renders heading", () => {
     render(<ToastPage />);
     expect(screen.getByText("Toast UI Editor")).toBeInTheDocument();
+    expect(screen.getByLabelText("Add Comment")).toBeInTheDocument();
   });
 });
