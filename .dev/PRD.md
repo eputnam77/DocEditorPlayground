@@ -27,6 +27,13 @@ Build a minimal, modular web app that allows in-depth side-by-side testing of mo
 
 - `/tiptap`:
   TipTap editor, with extension management, validation, and template support.
+  Additional capabilities include:
+  - Heading 1 and Heading 2 nodes are locked from editing.
+  - Enforced structure disallowing consecutive headings and allowing only paragraphs or lists after a heading.
+  - Indented paragraphs and lists beneath headings.
+  - Customizable watermark overlay.
+  - Sections represented as draggable blocks with a Heading 2 title.
+  - Real-time collaboration via Yjs.
 
 - `/toast`:
   Toast UI Editor, with plugin management, validation, and templates.
@@ -176,7 +183,7 @@ Each editor page includes an **Integration** section:
 
 - User authentication.
 - File save/load to cloud or backend.
-- Collaborative/multi-user features.
+- Collaborative features are limited to TipTap via Yjs; other editors remain single-user.
 
 ---
 
