@@ -1,11 +1,13 @@
 import { describe, it, expect } from "vitest";
 import CommentTrack from "../../components/CommentTrack";
-import { render, screen } from "@testing-library/react";
+import { render, screen, fireEvent } from "@testing-library/react";
 
 describe("CommentTrack", () => {
-  it("should be implemented", () => {
+  it("adds comments", () => {
     render(<CommentTrack />);
-    expect(screen.getByText(/not implemented/i)).toBeInTheDocument();
-    expect(false).toBe(true); // Placeholder failure
+    const input = screen.getByPlaceholderText(/enter comment/i);
+    fireEvent.change(input, { target: { value: "hello" } });
+    fireEvent.click(screen.getByText("Add"));
+    expect(screen.getByText("hello")).toBeInTheDocument();
   });
 });

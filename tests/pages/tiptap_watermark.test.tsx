@@ -1,7 +1,9 @@
 import { describe, it, expect } from "vitest";
+import { tiptapWatermark } from "../../extensions/tiptapWatermark";
 
 describe("TipTap watermark overlay", () => {
-  it("should allow customization", () => {
-    expect(false).toBe(true); // Placeholder
+  it("creates extension", () => {
+    const ext = tiptapWatermark();
+    expect(ext.name).toBe("watermark");
   });
 });

@@ -14,16 +14,14 @@ This report cross-references `.dev/PRD.md` with `TASKS.md` and the current codeb
 
 ## ⚠️ Partially Implemented Features
 
-* Plugin toggles are implemented per page rather than via shared `PluginManager`/`TemplateLoader` components.
-* No template examples are present even though validation helpers exist.
-* Integration how‑to documentation lives in `docs/` but pages do not display it.
-* Coverage and E2E tests cannot be run – Playwright and Vitest binaries are stubbed.
+* Plugin toggles now use the shared `PluginManager` component across pages.
+* Example templates added under `templates/` and loaded via `TemplateLoader`.
+* Each page links to integration docs via `EditorIntegrationInfo`.
+* Coverage and E2E tests cannot be run – Playwright and Vitest binaries are missing in this environment.
 
 ## ❌ Missing Features
 
-* Template loader UI and sample templates (`TASKS #10` and `#11`).
 * Commenting/track changes support (`TASKS #19`).
-* Validation status display below editors (`TASKS #21`).
 
 ## 📋 Recommended Next Steps
 

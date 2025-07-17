@@ -27,6 +27,8 @@ import Underline from "@tiptap/extension-underline";
 import PluginManager from "../components/PluginManager";
 import TemplateLoader from "../components/TemplateLoader";
 import EditorIntegrationInfo from "../components/EditorIntegrationInfo";
+import ValidationStatus from "../components/ValidationStatus";
+import CommentTrack from "../components/CommentTrack";
 
 // Icons
 import {
@@ -188,7 +190,6 @@ function TiptapEditorPage() {
   const [validationRules, setValidationRules] = useState([]);
   const [validationResults, setValidationResults] = useState([]);
   const [loadingValidation, setLoadingValidation] = useState(false);
-  const [showValidationPanel, setShowValidationPanel] = useState(true);
 
   useEffect(() => {
     async function fetchValidations() {
@@ -466,50 +467,19 @@ function TiptapEditorPage() {
         )}
       </header>
 
-      {validationResults.length > 0 &&
-        (showValidationPanel ? (
-          <div className="fixed top-24 right-4 bg-yellow-50 border rounded shadow-md p-4 max-w-sm max-h-[70vh] overflow-y-auto z-40">
-            <div className="flex justify-between mb-2">
-              <span className="font-semibold">Validation Results</span>
-              <div className="space-x-2">
-                <button
-                  className="text-xs"
-                  onClick={() => setValidationResults([])}
-                >
-                  Clear
-                </button>
-                <button
-                  className="text-xs"
-                  onClick={() => setShowValidationPanel(false)}
-                >
-                  Hide
-                </button>
-              </div>
-            </div>
-            <ul className="text-sm">
-              {validationResults.map((r) => (
-                <li
-                  key={r.id}
-                  className={r.passed ? "text-green-700" : "text-red-700"}
-                >
-                  <span className="font-medium">{r.label}:</span>{" "}
-                  {r.passed ? "PASS" : "FAIL"}{" "}
-                  <span className="text-xs">({r.detail})</span>
-                </li>
-              ))}
-            </ul>
-          </div>
-        ) : (
-          <button
-            className="fixed top-24 right-4 bg-yellow-50 border rounded shadow-md px-3 py-1 text-sm z-40"
-            onClick={() => setShowValidationPanel(true)}
-          >
-            Show Validation
-          </button>
-        ))}
+
+      {validationResults.length > 0 && (
+        <div className="fixed top-24 right-4 z-40">
+          <ValidationStatus
+            results={validationResults}
+            onClear={() => setValidationResults([])}
+          />
+        </div>
+      )}
 
       <main className="flex-1 overflow-auto">
         <EditorContent editor={editor} className="tiptap-content" />
+        <CommentTrack />
         <EditorIntegrationInfo editorName="TipTap" />
       </main>
     </div>

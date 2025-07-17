@@ -3,9 +3,12 @@ import ModernLayout from "../../components/ModernLayout";
 import { render, screen } from "@testing-library/react";
 
 describe("ModernLayout", () => {
-  it("should be implemented", () => {
-    render(<ModernLayout />);
-    expect(screen.getByText(/not implemented/i)).toBeInTheDocument();
-    expect(false).toBe(true); // Placeholder failure
+  it("renders children", () => {
+    render(
+      <ModernLayout>
+        <span>child</span>
+      </ModernLayout>,
+    );
+    expect(screen.getByText("child")).toBeInTheDocument();
   });
 });

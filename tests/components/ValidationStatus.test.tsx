@@ -3,9 +3,13 @@ import ValidationStatus from "../../components/ValidationStatus";
 import { render, screen } from "@testing-library/react";
 
 describe("ValidationStatus", () => {
-  it("should be implemented", () => {
-    render(<ValidationStatus />);
-    expect(screen.getByText(/not implemented/i)).toBeInTheDocument();
-    expect(false).toBe(true); // Placeholder failure
+  it("renders results", () => {
+    render(
+      <ValidationStatus
+        results={[{ id: 1, label: "A", passed: true }]}
+        onClear={() => {}}
+      />,
+    );
+    expect(screen.getByText(/A/)).toBeInTheDocument();
   });
 });
