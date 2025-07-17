@@ -1,5 +1,8 @@
 import withBundleAnalyzer from "@next/bundle-analyzer";
 import path from "path";
+import { fileURLToPath } from "url";
+
+const __dirname = path.dirname(fileURLToPath(import.meta.url));
 
 const withAnalyze = withBundleAnalyzer({
   enabled: process.env.ANALYZE === "true",
