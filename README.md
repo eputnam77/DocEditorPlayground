@@ -4,7 +4,7 @@ This project demonstrates multiple rich text editors side by side using **Next.j
 
 ## Features
 
- - Dedicated pages for **TipTap**, **Toast UI**, **CodeX**, **Slate**, **Lexical** and **CKEditor 5**. Removed **Toast UI** and **Quill** as of July 2025 because that repo hasn't been updated since 2023.
+ - Dedicated pages for **TipTap**, **Toast UI**, **CodeX**, **Slate**, **Lexical** and **CKEditor 5**. Removed **Toast UI** and **Quill** as of July 2025 because those repos haven't been active in over a year.
 - Plugin toggles built into each page
 - Quick integration tips for each editor
 - Dark mode switch
