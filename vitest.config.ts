@@ -7,17 +7,16 @@ export default defineConfig({
   test: {
     globals: true,
     environment: "jsdom",
-    include: ["tests/utils/**/*.test.ts", "tests/components/**/*.test.tsx"],
+    // Run every test file under the tests directory
+    include: ["tests/**/*.test.ts?(x)"],
     coverage: {
       provider: "v8",
       reporter: ["text", "json", "html"],
+      // Ignore type declarations and test fixtures but include source under test
       exclude: [
         "node_modules/",
         "dist/",
-        "tests/",
         "**/*.d.ts",
-        "**/*.test.ts",
-        "**/*.spec.ts",
       ],
     },
   },

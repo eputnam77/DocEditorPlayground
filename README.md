@@ -13,6 +13,16 @@ This project demonstrates multiple rich text editors side by side using **Next.j
 - Indentation controls
 - Dark mode switch
 
+### Analyze bundles
+
+Run the Next.js bundle analyzer to inspect bundle sizes:
+
+```bash
+npm run analyze
+```
+
+Set `ANALYZE=true` when running `next build` to generate the report.
+
 ## Installation
 
 ````markdown
