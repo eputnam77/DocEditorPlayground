@@ -42,8 +42,14 @@ export default function TemplateLoader({
       onClear();
       return;
     }
-    await onLoad(val);
-    e.target.value = '';
+    try {
+      await onLoad(val);
+    } catch (err) {
+      console.error('TemplateLoader failed', err);
+    } finally {
+      // Reset the select so the same template can be chosen again if desired
+      e.target.value = '';
+    }
   };
 
   return (
