@@ -5,28 +5,28 @@ This repository implements a Next.js playground for multiple rich text editors. 
 
 ## PRD Coverage
 - **Implemented**: Home page with navigation and dark‑mode toggle, shared components (PluginManager, TemplateLoader, EditorIntegrationInfo). The TipTap page contains an extensive editor with plugin toggles, validation UI and template loader.
-- **Missing/Partial**: Pages for Toast UI, Editor.js, Slate, Lexical and CKEditor are present but only display a placeholder message (no editor integration). Features like heading lock, structure enforcement, watermark, sections, Yjs collaboration and advanced templates are stubbed or absent. Property‑based tests are skipped.
+- **Missing/Partial**: Pages for Toast UI, Editor.js, Slate, Lexical and CKEditor show only a textarea placeholder without real editors【F:pages/ckeditor.tsx†L40-L45】. Planned TipTap extensions (heading lock, structure enforcement, watermark, sections, Yjs collaboration) are stubs. Property-based tests are skipped【F:tests/property/validation.test.ts†L5-L8】.
 
 Overall coverage is partial; only a subset of tasks in `.dev/TASKS.md` are fully implemented.
 
 ## Integration & Maintainability Risks
-- The TipTap page is a single file ~400 lines long. Splitting into smaller components would improve readability and testability.
-- Placeholder pages could confuse users; adding feature flags or TODO notes might help.
-- Validation code directly parses HTML with `DOMParser`. Sanitisation or escaping is not enforced when loading templates, so crafted templates could inject scripts.
-- Typescript compilation currently fails without dependencies; ensure `node_modules` are installed before running CI.
-- Many extensions such as heading lock and Yjs collaboration are only skeletons and not wired into the editor.
+- The TipTap page is nearly 400 lines long; splitting it into focused components would improve readability.
+- Placeholder pages could mislead users; mark them as TODO or implement the actual editors.
+- Template loading parses HTML via `DOMParser` without sanitization, so templates could inject scripts.
+- TypeScript compilation fails because packages like `lucide-react` are missing【d446d7†L1-L11】.
+- Stubbed extensions (heading lock, Yjs collab, etc.) are not wired into the editor.
 
 ## Performance Notes
-- `lucide-react` icons are imported directly in `pages/tiptap.tsx`. Dynamic imports could shrink the bundle as suggested in `PERFORMANCE_REPORT.md`.
-- Caching headers for `templates` and `validation` are already configured in `next.config.js`【F:next.config.js†L7-L27】.
-- `framer-motion` is used only for minor animations in `NavBar` and could be replaced with CSS transitions for a smaller bundle.
-- Lazy‑loading of large editor packages (dynamic import) is recommended but not yet implemented.
+- `lucide-react` icons are dynamically imported in `pages/tiptap.tsx`, but other large editor packages are eagerly loaded.
+- Static templates and validation files are served with cache headers【F:next.config.js†L7-L27】.
+- `framer-motion` is only used for navigation animations and could be replaced with CSS transitions.
+- Consider lazy‑loading editor packages to reduce the initial bundle.
 
 ## Mandatory Fixes
-1. **Install dependencies & pass TypeScript build** – `tsc --noEmit` currently fails due to missing packages and type errors.【038109†L1-L35】
-2. **Ensure prettier formatting** – `npx prettier --check .` reports style issues in multiple files.【d9e88d†L1-L12】【037960†L1-L29】
-3. **Address audit/test failures** – `npm audit`, `vitest`, `playwright`, and `stryker` commands fail because packages cannot be fetched. A proper dependency installation step or offline cache is required.【6f4a01†L1-L12】【0ed5da†L1-L11】【07dd53†L1-L11】【312968†L1-L12】
-4. **Connect planned extensions** – implement or remove stub modules (e.g., heading lock, Yjs collab) to avoid dead code and to meet PRD tasks.
+1. **Install dependencies & pass TypeScript build** – `tsc --noEmit` fails due to missing modules and type errors【d446d7†L1-L11】【4a7ad3†L1-L11】.
+2. **Run Prettier** – `npx prettier --check .` reports style issues in 46 files【8f6032†L1-L43】.
+3. **Fix audit and test scripts** – `npm install` fails with a 403 error【7177b5†L1-L12】 which causes ESLint, Vitest, Playwright and Stryker to fail【071709†L1-L20】【f37df7†L1-L12】【d7d6b7†L1-L12】【9ce200†L1-L12】.
+4. **Connect planned extensions** – implement or remove stub modules (e.g., heading lock, Yjs collab) to avoid dead code.
 
 ## Optional Improvements
 - Refactor `pages/tiptap.tsx` into smaller components for maintainability.
