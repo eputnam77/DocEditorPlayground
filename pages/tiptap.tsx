@@ -29,12 +29,35 @@ import TemplateLoader from "../components/TemplateLoader";
 import EditorIntegrationInfo from "../components/EditorIntegrationInfo";
 import ValidationStatus from "../components/ValidationStatus";
 import CommentTrack from "../components/CommentTrack";
+import { TEMPLATES } from "../utils/templates";
 
 // Icons
-import {
-  Bold, ChevronDown, ChevronUp, Clock, Code, Italic, List, ListOrdered,
-  Quote, Redo2, Strikethrough, Underline as UnderlineIcon, Undo2,
-} from "lucide-react";
+import dynamic from "next/dynamic";
+
+// Dynamically load icons to avoid bundling the entire set
+const Bold = dynamic(() => import("lucide-react").then((m) => m.Bold));
+const ChevronDown = dynamic(() =>
+  import("lucide-react").then((m) => m.ChevronDown)
+);
+const ChevronUp = dynamic(() =>
+  import("lucide-react").then((m) => m.ChevronUp)
+);
+const Clock = dynamic(() => import("lucide-react").then((m) => m.Clock));
+const Code = dynamic(() => import("lucide-react").then((m) => m.Code));
+const Italic = dynamic(() => import("lucide-react").then((m) => m.Italic));
+const List = dynamic(() => import("lucide-react").then((m) => m.List));
+const ListOrdered = dynamic(() =>
+  import("lucide-react").then((m) => m.ListOrdered)
+);
+const Quote = dynamic(() => import("lucide-react").then((m) => m.Quote));
+const Redo2 = dynamic(() => import("lucide-react").then((m) => m.Redo2));
+const Strikethrough = dynamic(() =>
+  import("lucide-react").then((m) => m.Strikethrough)
+);
+const UnderlineIcon = dynamic(() =>
+  import("lucide-react").then((m) => m.Underline)
+);
+const Undo2 = dynamic(() => import("lucide-react").then((m) => m.Undo2));
 
 // ----- Required Extensions: ALWAYS ON, HIDDEN FROM USER -----
 const ALWAYS_ENABLED = [
@@ -75,13 +98,6 @@ const TOGGLEABLE_EXTENSIONS = [
   // { name: "MyMath", extension: MyMathExtension },
 ];
 
-// Template metadata
-const TEMPLATES = [
-  { label: "FAA Advisory Circular", filename: "faa-advisory-circular.html" },
-  { label: "Software Release Notes", filename: "software-release-notes.html" },
-  { label: "Medical Research Article", filename: "medical-research-article.html" },
-  { label: "Legal Contract Template", filename: "legal-contract-template.html" },
-];
 
 function TiptapEditorPage() {
   const [enabledExtensions, setEnabledExtensions] = useState(() => {

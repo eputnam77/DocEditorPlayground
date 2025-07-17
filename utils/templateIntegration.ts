@@ -1,6 +1,22 @@
-/**
- * Placeholder utility for improved template integration with validation feedback.
- */
-export function integrateTemplates() {
-  throw new Error("template integration not implemented");
+import { validateTemplate } from "./validation";
+
+export interface Template {
+  title: string;
+  body: string;
 }
+
+/**
+ * Filter and normalise an array of templates.
+ *
+ * The function validates each template using `validateTemplate` and returns
+ * only those that pass validation. Invalid items are ignored. A TypeError is
+ * thrown if the input is not an array.
+ */
+export function integrateTemplates(templates: unknown[]): Template[] {
+  if (!Array.isArray(templates)) {
+    throw new TypeError("templates must be an array");
+  }
+
+  return templates.filter(validateTemplate) as Template[];
+}
+
