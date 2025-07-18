@@ -16,6 +16,8 @@ This project demonstrates multiple rich text editors side by side using **Next.j
   configured in **next.config.js**.
 - Icons load on demand using dynamic imports so the bundle remains small.
 - Navigation links prefetch their target pages on hover for snappy transitions.
+- In offline environments some editor pages display a simple textarea
+  placeholder because their dependencies cannot be installed.
 
 ### Analyze bundles
 
