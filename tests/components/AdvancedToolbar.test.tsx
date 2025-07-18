@@ -1,12 +1,16 @@
-import { describe, it, expect, vi } from "vitest";
-import AdvancedToolbar from "../../components/AdvancedToolbar";
 import { render, screen, fireEvent } from "@testing-library/react";
+import { describe, it, expect, vi } from "vitest";
+import AdvancedToolbar, {
+  ToolbarAction,
+} from "../../components/AdvancedToolbar";
 
 describe("AdvancedToolbar", () => {
-  it("calls actions", () => {
-    const handler = vi.fn();
-    render(<AdvancedToolbar actions={[{ label: "Bold", onClick: handler }]} />);
-    fireEvent.click(screen.getByLabelText("Bold"));
-    expect(handler).toHaveBeenCalled();
+  it("calls action handler when button clicked", () => {
+    const handle = vi.fn();
+    const actions: ToolbarAction[] = [{ label: "Bold", onClick: handle }];
+    render(<AdvancedToolbar actions={actions} />);
+    const btn = screen.getByLabelText("Bold");
+    fireEvent.click(btn);
+    expect(handle).toHaveBeenCalled();
   });
 });
