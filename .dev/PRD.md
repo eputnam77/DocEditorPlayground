@@ -41,7 +41,6 @@ Build a minimal, modular web app that allows in-depth side-by-side testing of mo
 - `/codex`:
   Editor.js, with block/plugin management, block validation, and templates.
 
-
 - `/slate`:
   Slate editor, demonstrating custom schema/validation, plugin integration, and templates.
 
@@ -76,6 +75,19 @@ Each editor page includes:
 - Minimal external dependencies outside those needed for editors and plugins.
 - Code comments and doc blocks for easy extension.
 - Dark mode toggle (optional).
+
+### 3.5 Template Format Support
+
+Each editor should load templates in the format it natively understands:
+
+- **TipTap:** HTML or ProseMirror-style JSON
+- **Toast UI Editor:** Markdown (preferred) or HTML
+- **CodeX Editor (Editor.js):** Editor.js block JSON
+- **Slate:** Slate node JSON
+- **Lexical:** Lexical node tree JSON (plugins may import/export HTML)
+- **CKEditor 5:** HTML natively, Markdown via plugin
+
+Only TipTap and CKEditor 5 work directly with raw HTML. Toast UI focuses on Markdown, while CodeX, Slate and Lexical use their own JSON structures.
 
 ---
 
