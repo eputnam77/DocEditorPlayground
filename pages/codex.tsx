@@ -1,5 +1,14 @@
 import dynamic from "next/dynamic";
 import { useState } from "react";
+
+/**
+ * Editor.js demo page.
+ *
+ * The real Editor.js packages are omitted in this offline demo.
+ * A textarea placeholder lets us showcase the surrounding UI
+ * (template loader, plugin toggles and validation) without
+ * requiring heavy dependencies.
+ */
 import EditorIntegrationInfo from "../components/EditorIntegrationInfo";
 import PluginManager from "../components/PluginManager";
 import TemplateLoader from "../components/TemplateLoader";

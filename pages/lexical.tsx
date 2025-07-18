@@ -1,5 +1,13 @@
 import dynamic from "next/dynamic";
 import { useState } from "react";
+
+/**
+ * Lexical demo page.
+ *
+ * Lexical's full editor bundle is not included in this repository to
+ * keep the offline demo lightweight. A simple textarea placeholder
+ * is used instead, while the surrounding controls mimic real usage.
+ */
 import EditorIntegrationInfo from "../components/EditorIntegrationInfo";
 import PluginManager from "../components/PluginManager";
 import TemplateLoader from "../components/TemplateLoader";

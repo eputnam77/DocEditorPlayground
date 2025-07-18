@@ -1,5 +1,13 @@
 import dynamic from "next/dynamic";
 import { useState } from "react";
+
+/**
+ * Slate demo page.
+ *
+ * Slate's real editor implementation is excluded here so the
+ * page relies on a textarea placeholder. The UI around it still
+ * mirrors how plugins, templates and validations would work.
+ */
 import EditorIntegrationInfo from "../components/EditorIntegrationInfo";
 import PluginManager from "../components/PluginManager";
 import TemplateLoader from "../components/TemplateLoader";
