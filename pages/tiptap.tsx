@@ -1,5 +1,13 @@
 import React, { useEffect, useMemo, useState } from "react";
 import dynamic from "next/dynamic";
+
+/**
+ * Full TipTap editor page showcasing custom extensions
+ * like heading locking, structure rules, indentation,
+ * watermarks, draggable sections and Yjs collaboration.
+ * This is the only editor fully functional in the offline
+ * playground; other editors are simplified placeholders.
+ */
 import { EditorContent, useEditor } from "@tiptap/react";
 
 import Blockquote from "@tiptap/extension-blockquote";

@@ -1,5 +1,14 @@
 import dynamic from "next/dynamic";
 import { useState } from "react";
+
+/**
+ * Toast UI Editor demo page.
+ *
+ * The actual Toast UI Editor cannot be bundled in this
+ * offline playground. Instead this page uses a textarea
+ * placeholder while still demonstrating how plugins and
+ * templates would hook into the editor.
+ */
 import EditorIntegrationInfo from "../components/EditorIntegrationInfo";
 import PluginManager from "../components/PluginManager";
 import TemplateLoader from "../components/TemplateLoader";

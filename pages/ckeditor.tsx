@@ -1,5 +1,14 @@
 import dynamic from "next/dynamic";
 import { useState } from "react";
+
+/**
+ * CKEditor demo page.
+ *
+ * The real CKEditor package cannot be bundled in this offline
+ * playground so a simple textarea is presented instead. The
+ * surrounding UI still demonstrates plugin toggles, template
+ * loading and validation logic.
+ */
 import EditorIntegrationInfo from "../components/EditorIntegrationInfo";
 import PluginManager from "../components/PluginManager";
 import TemplateLoader from "../components/TemplateLoader";
