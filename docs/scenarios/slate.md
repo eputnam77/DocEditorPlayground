@@ -1,12 +1,11 @@
 # Slate Usage Scenarios
 
-Slate's composable plugins let you build rich behaviour. The sample page uses a placeholder textarea; plug-ins are up to you.
+Slate's composable plugins let you build rich behaviour. Integrate the actual editor package to enable editing functionality.
 
 ## Track changes
 
 1. Head to `/slate`.
-2. Edit the text in the placeholder.
-3. The change summary updates beneath the editor.
+2. The page displays placeholder controls only; integrate Slate to enable editing.
 
 ## Add comments
 

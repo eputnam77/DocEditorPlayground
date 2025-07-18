@@ -5,9 +5,8 @@ import { useState } from "react";
  * Toast UI Editor demo page.
  *
  * The actual Toast UI Editor cannot be bundled in this
- * offline playground. Instead this page uses a textarea
- * placeholder while still demonstrating how plugins and
- * templates would hook into the editor.
+ * offline playground. The page still demonstrates how plugins and
+ * templates would hook into the editor without bundling it.
  */
 import EditorIntegrationInfo from "../components/EditorIntegrationInfo";
 import PluginManager from "../components/PluginManager";
@@ -56,7 +55,7 @@ function ToastPage() {
       <div className="p-4 space-y-2">
         <h1>Toast UI Editor</h1>
         <p className="text-sm text-zinc-600 dark:text-zinc-300">
-          This demo uses a simple textarea placeholder.
+          The editor bundle is omitted in this offline demo.
         </p>
         <p className="text-sm italic text-red-600 dark:text-red-400">
           Full Toast UI Editor integration requires additional dependencies and
@@ -81,11 +80,14 @@ function ToastPage() {
             Validate
           </button>
         </div>
-        <textarea
+        <div
+          contentEditable
+          suppressContentEditableWarning
           className="w-full border rounded p-2 min-h-[200px]"
-          value={content}
-          onChange={(e) => setContent(e.target.value)}
-        />
+          onInput={(e) => setContent((e.target as HTMLElement).innerText)}
+        >
+          {content}
+        </div>
         <TrackChanges content={content} />
         {validationResults.length > 0 && (
           <ValidationStatus

@@ -5,8 +5,8 @@ Editor.js pages share common helpers such as commenting and change tracking. Adv
 ## Track changes
 
 1. Visit `/codex`.
-2. Edit text in the textarea placeholder.
-3. The **Track Changes** component shows a running character diff.
+2. Integrate the Editor.js package to enable editing functionality.
+3. The **Track Changes** component will then show a running character diff.
 
 ## Add comments
 

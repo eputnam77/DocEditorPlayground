@@ -5,8 +5,8 @@ Toast UI Editor was removed from active development but the playground keeps a p
 ## Track changes
 
 1. Visit `/toast`.
-2. Edit the textarea content.
-3. The **Track Changes** component summarizes modifications below.
+2. Integrate the Toast UI Editor package to enable editing.
+3. The **Track Changes** component will then summarize modifications below.
 
 ## Add comments
 

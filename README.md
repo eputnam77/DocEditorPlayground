@@ -16,8 +16,6 @@ This project demonstrates multiple rich text editors side by side using **Next.j
   configured in **next.config.js**.
 - Icons load on demand using dynamic imports so the bundle remains small.
 - Navigation links prefetch their target pages on hover for snappy transitions.
-- In offline environments some editor pages display a simple textarea
-  placeholder because their dependencies cannot be installed.
 
 ### Analyze bundles
 
@@ -156,4 +154,4 @@ See `docs/adr` for architectural decisions.
 
 ## Current Status (July 2025)
 
-All editor pages are available with lightweight placeholder implementations. TipTap demonstrates custom extensions while the other editors currently render a basic textarea to keep the dependency footprint small. Plugin toggles, template loading, validation checks, commenting and track changes widgets are shared across pages so you can compare workflows between editors.
+All editor pages are available with lightweight stub implementations. TipTap demonstrates custom extensions while the other editors omit their heavy bundles. Plugin toggles, template loading, validation checks, commenting and track changes widgets are shared across pages so you can compare workflows between editors.

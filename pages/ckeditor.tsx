@@ -5,9 +5,8 @@ import { useState } from "react";
  * CKEditor demo page.
  *
  * The real CKEditor package cannot be bundled in this offline
- * playground so a simple textarea is presented instead. The
- * surrounding UI still demonstrates plugin toggles, template
- * loading and validation logic.
+ * playground. The surrounding UI still demonstrates plugin toggles,
+ * template loading and validation logic without the editor itself.
  */
 import EditorIntegrationInfo from "../components/EditorIntegrationInfo";
 import PluginManager from "../components/PluginManager";
@@ -56,7 +55,7 @@ function CkeditorPage() {
       <div className="p-4 space-y-2">
         <h1>CKEditor 5</h1>
         <p className="text-sm text-zinc-600 dark:text-zinc-300">
-          This demo uses a simple textarea placeholder.
+          The editor bundle is omitted in this offline demo.
         </p>
         <p className="text-sm italic text-red-600 dark:text-red-400">
           Full CKEditor integration requires additional dependencies and is not
@@ -81,11 +80,14 @@ function CkeditorPage() {
             Validate
           </button>
         </div>
-        <textarea
+        <div
+          contentEditable
+          suppressContentEditableWarning
           className="w-full border rounded p-2 min-h-[200px]"
-          value={content}
-          onChange={(e) => setContent(e.target.value)}
-        />
+          onInput={(e) => setContent((e.target as HTMLElement).innerText)}
+        >
+          {content}
+        </div>
         <TrackChanges content={content} />
         {validationResults.length > 0 && (
           <ValidationStatus
