@@ -156,9 +156,9 @@ function TiptapEditorPage() {
   // Compose the extensions in this order:
   const extensions = useMemo(
     () => [
-      ...ALWAYS_ENABLED,
-      ...CORE_DEFAULTS,
-      ...INTERNALS,
+      ...ALWAYS_ENABLED.map((e) => e.extension),
+      ...CORE_DEFAULTS.map((e) => e.extension),
+      ...INTERNALS.map((e) => e.extension),
       ...TOGGLEABLE_NAMES.filter((n) => enabledExtensions.includes(n)).map(
         (n) => TOGGLEABLE_EXTENSIONS[n](watermarkText),
       ),
