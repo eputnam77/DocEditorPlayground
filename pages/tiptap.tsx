@@ -132,36 +132,38 @@ const INTERNALS = [
 ];
 
 // ----- Only show these in the Extension Dropdown -----
-const TOGGLEABLE_EXTENSIONS = [
-  { name: "Watermark", extension: tiptapWatermark() },
-  { name: "SectionNode", extension: tiptapSectionNode() },
-  { name: "YjsCollab", extension: tiptapYjsCollab() },
-];
+// Each item provides a factory so extensions can be recreated
+// when configuration such as watermark text changes.
+const TOGGLEABLE_EXTENSIONS = {
+  Watermark: (text: string) => tiptapWatermark(text),
+  SectionNode: () => tiptapSectionNode(),
+  YjsCollab: () => tiptapYjsCollab(),
+} as const;
+const TOGGLEABLE_NAMES = Object.keys(TOGGLEABLE_EXTENSIONS);
 
 function TiptapEditorPage() {
   const getInitialExtensions = () => {
     if (typeof window === "undefined") return [] as string[];
     const stored = localStorage.getItem("tiptapToggleableExtensions");
-    return stored
-      ? (JSON.parse(stored) as string[])
-      : TOGGLEABLE_EXTENSIONS.map((e) => e.name);
+    return stored ? (JSON.parse(stored) as string[]) : TOGGLEABLE_NAMES;
   };
   const [enabledExtensions, setEnabledExtensions] = useState<string[]>(
     getInitialExtensions(),
   );
+  // Text used by the Watermark extension when enabled
+  const [watermarkText, setWatermarkText] = useState("Sample");
 
   // Compose the extensions in this order:
   const extensions = useMemo(
-    () =>
-      [
-        ...ALWAYS_ENABLED,
-        ...CORE_DEFAULTS,
-        ...INTERNALS,
-        ...TOGGLEABLE_EXTENSIONS.filter((e) =>
-          enabledExtensions.includes(e.name),
-        ),
-      ].map((e) => e.extension),
-    [enabledExtensions],
+    () => [
+      ...ALWAYS_ENABLED,
+      ...CORE_DEFAULTS,
+      ...INTERNALS,
+      ...TOGGLEABLE_NAMES.filter((n) => enabledExtensions.includes(n)).map(
+        (n) => TOGGLEABLE_EXTENSIONS[n](watermarkText),
+      ),
+    ],
+    [enabledExtensions, watermarkText],
   );
 
   // Store only toggled extensions
@@ -484,11 +486,20 @@ function TiptapEditorPage() {
         <div className="relative">
           {/* Only show toggleable extensions in PluginManager */}
           <PluginManager
-            plugins={TOGGLEABLE_EXTENSIONS.map((e) => ({ name: e.name }))}
+            plugins={TOGGLEABLE_NAMES.map((n) => ({ name: n }))}
             enabled={enabledExtensions}
             locked={[]}
             onChange={(exts) => setEnabledExtensions(exts)}
           />
+          {enabledExtensions.includes("Watermark") && (
+            <input
+              type="text"
+              className="ml-2 px-2 py-1 border rounded"
+              placeholder="Watermark text"
+              value={watermarkText}
+              onChange={(e) => setWatermarkText(e.target.value)}
+            />
+          )}
         </div>
         <div className="relative ml-4">
           <button
