@@ -4,9 +4,9 @@ import { useState } from "react";
 /**
  * Slate demo page.
  *
- * Slate's real editor implementation is excluded here so the
- * page relies on a textarea placeholder. The UI around it still
- * mirrors how plugins, templates and validations would work.
+ * Slate's real editor implementation is excluded here. The page
+ * still mirrors how plugins, templates and validations would work
+ * without bundling the actual editor.
  */
 import EditorIntegrationInfo from "../components/EditorIntegrationInfo";
 import PluginManager from "../components/PluginManager";
@@ -55,7 +55,7 @@ function SlatePage() {
       <div className="p-4 space-y-2">
         <h1>Slate</h1>
         <p className="text-sm text-zinc-600 dark:text-zinc-300">
-          This demo uses a simple textarea placeholder.
+          The editor bundle is omitted in this offline demo.
         </p>
         <p className="text-sm italic text-red-600 dark:text-red-400">
           Full Slate editor integration requires additional dependencies and is
@@ -80,11 +80,14 @@ function SlatePage() {
             Validate
           </button>
         </div>
-        <textarea
+        <div
+          contentEditable
+          suppressContentEditableWarning
           className="w-full border rounded p-2 min-h-[200px]"
-          value={content}
-          onChange={(e) => setContent(e.target.value)}
-        />
+          onInput={(e) => setContent((e.target as HTMLElement).innerText)}
+        >
+          {content}
+        </div>
         <TrackChanges content={content} />
         {validationResults.length > 0 && (
           <ValidationStatus

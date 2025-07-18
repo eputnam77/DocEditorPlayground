@@ -1,12 +1,12 @@
 # Lexical Usage Scenarios
 
-Lexical is extremely modular. The playground integrates only a textarea but you can extend it to match our TipTap demo.
+Lexical is extremely modular. The playground omits the editor bundle but you can integrate it to match our TipTap demo.
 
 ## Track changes
 
 1. Open `/lexical`.
-2. Edit the placeholder text.
-3. The **Track Changes** readout updates immediately.
+2. Integrate the Lexical editor package to enable editing.
+3. The **Track Changes** readout will then update immediately.
 
 ## Add comments
 

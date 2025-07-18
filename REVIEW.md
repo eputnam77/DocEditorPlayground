@@ -7,7 +7,7 @@ This repository provides a Next.js playground with multiple rich text editors. T
 ## PRD Coverage
 
 - **Implemented**: Home page with navigation and dark‑mode toggle. TipTap page demonstrates custom extensions, plugin toggles, template loader and validation panel. The README now explains how validation results appear in a panel【F:README.md†L120-L124】.
-- **Missing/Partial**: Toast UI, Editor.js, Slate, Lexical and CKEditor pages still render only a textarea placeholder without real editors【F:pages/ckeditor.tsx†L40-L45】. Planned TipTap features like heading locking, structure enforcement and Yjs collaboration exist as stubs but are not fully wired up. Property-based tests exist but cannot run due to missing dependencies【817af9†L1-L24】.
+- **Missing/Partial**: Toast UI, Editor.js, Slate, Lexical and CKEditor pages now show a simple contentEditable container instead of a textarea but still lack the real editors. Planned TipTap features like heading locking, structure enforcement and Yjs collaboration exist as stubs but are not fully wired up. Property-based tests exist but cannot run due to missing dependencies【817af9†L1-L24】.
 
 Overall only part of `.dev/TASKS.md` is complete; remaining editor implementations and advanced TipTap features are pending.
 
