@@ -25,7 +25,7 @@ This file tracks planned tasks for implementing the **Document Editor Playground
 
 - **Priority:** High
 - **Estimate:** 4h
-- **Acceptance Criteria:** `/tiptap` shows TipTap editor with toolbar, plugin toggles, validation display, template loader and integration info section.
+- **Acceptance Criteria:** `/tiptap` shows TipTap editor with toolbar, plugin toggles, validation display, template loader and integration info section. Templates use HTML or ProseMirror JSON.
 - **Labels:** `feature`, `editor`, `tiptap`
 - **Tests:** `tests/e2e/features/tiptap_page.feature`
 
@@ -33,7 +33,7 @@ This file tracks planned tasks for implementing the **Document Editor Playground
 
 - **Priority:** Medium
 - **Estimate:** 4h
-- **Acceptance Criteria:** `/toast` includes Toast UI Editor with plugin management, validation display, template loader and integration info section.
+- **Acceptance Criteria:** `/toast` includes Toast UI Editor with plugin management, validation display, template loader and integration info section. Templates use Markdown (preferred) or HTML.
 - **Labels:** `feature`, `editor`, `toast`
 - **Tests:** `tests/e2e/features/toast_page.feature`
 
@@ -41,16 +41,15 @@ This file tracks planned tasks for implementing the **Document Editor Playground
 
 - **Priority:** Medium
 - **Estimate:** 4h
-- **Acceptance Criteria:** `/codex` loads Editor.js with block/plugin controls, validation area, template loader and integration info section.
+- **Acceptance Criteria:** `/codex` loads Editor.js with block/plugin controls, validation area, template loader and integration info section. Templates use Editor.js block JSON.
 - **Labels:** `feature`, `editor`, `codex`
 - **Tests:** `tests/e2e/features/codex_page.feature`
-
 
 ### 7. Implement Slate page
 
 - **Priority:** Medium
 - **Estimate:** 4h
-- **Acceptance Criteria:** `/slate` demonstrates Slate editor with custom schema example, plugin integration, validations, template loader and integration info section.
+- **Acceptance Criteria:** `/slate` demonstrates Slate editor with custom schema example, plugin integration, validations, template loader and integration info section. Templates use Slate JSON.
 - **Labels:** `feature`, `editor`, `slate`
 - **Tests:** `tests/e2e/features/slate_page.feature`
 
@@ -58,7 +57,7 @@ This file tracks planned tasks for implementing the **Document Editor Playground
 
 - **Priority:** Medium
 - **Estimate:** 4h
-- **Acceptance Criteria:** `/lexical` displays Lexical editor with extension management, custom nodes example, validations, template loader and integration info section.
+- **Acceptance Criteria:** `/lexical` displays Lexical editor with extension management, custom nodes example, validations, template loader and integration info section. Templates use Lexical JSON and may import/export HTML via plugins.
 - **Labels:** `feature`, `editor`, `lexical`
 - **Tests:** `tests/e2e/features/lexical_page.feature`
 
@@ -66,7 +65,7 @@ This file tracks planned tasks for implementing the **Document Editor Playground
 
 - **Priority:** Medium
 - **Estimate:** 4h
-- **Acceptance Criteria:** `/ckeditor` provides CKEditor 5 with plugin management, toolbar customization, validation area, template loader and integration info section, and demonstrates the DXPR AI Agent plugin.
+- **Acceptance Criteria:** `/ckeditor` provides CKEditor 5 with plugin management, toolbar customization, validation area, template loader and integration info section, and demonstrates the DXPR AI Agent plugin. Templates load from HTML or Markdown via plugin.
 - **Labels:** `feature`, `editor`, `ckeditor`
 - **Tests:** `tests/e2e/features/ckeditor_page.feature`
 
@@ -81,7 +80,7 @@ This file tracks planned tasks for implementing the **Document Editor Playground
 
 - **Priority:** Medium
 - **Estimate:** 2h
-- **Acceptance Criteria:** `templates/` directory contains sample templates; utility functions handle basic validation logic shared across editors.
+- **Acceptance Criteria:** `templates/` directory contains sample templates; utility functions handle basic validation logic shared across editors. Each editor uses templates in its native format.
 - **Labels:** `feature`, `templates`, `validation`
 - **Tests:** `tests/property/validation.test.ts`
 
