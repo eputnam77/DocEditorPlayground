@@ -12,11 +12,9 @@ export default function DarkModeToggle() {
   const [enabled, setEnabled] = useState<boolean>(initial);
 
   function toggle() {
-    setEnabled((prev) => {
-      const next = !prev;
-      document.documentElement.classList.toggle("dark", next);
-      return next;
-    });
+    const next = !enabled;
+    document.documentElement.classList.toggle("dark", next);
+    setEnabled(next);
   }
 
   // Optional: keep state in sync with manual theme change

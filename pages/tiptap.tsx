@@ -41,6 +41,25 @@ import TrackChanges from "../components/TrackChanges";
 import HeadingStylePresets from "../components/HeadingStylePresets";
 import { TEMPLATES } from "../utils/templates";
 
+interface ValidationRule {
+  id: string;
+  label: string;
+  type: string;
+  level?: number;
+  text?: string;
+}
+
+interface ValidationSet {
+  name: string;
+  filename: string;
+  rules: ValidationRule[];
+}
+
+interface ValidationResultItem extends ValidationRule {
+  passed: boolean;
+  detail?: string;
+}
+
 // Icons
 // Dynamically load icons to avoid bundling the entire set
 const Bold = dynamic(() => import("lucide-react").then((m) => m.Bold));
@@ -110,14 +129,16 @@ const TOGGLEABLE_EXTENSIONS = [
 ];
 
 function TiptapEditorPage() {
-  const [enabledExtensions, setEnabledExtensions] = useState(() => {
-    if (typeof window === "undefined") return [];
-    // Only remember toggleable extensions, always-on ones never get toggled.
+  const getInitialExtensions = () => {
+    if (typeof window === "undefined") return [] as string[];
     const stored = localStorage.getItem("tiptapToggleableExtensions");
     return stored
-      ? JSON.parse(stored)
+      ? (JSON.parse(stored) as string[])
       : TOGGLEABLE_EXTENSIONS.map((e) => e.name);
-  });
+  };
+  const [enabledExtensions, setEnabledExtensions] = useState<string[]>(
+    getInitialExtensions(),
+  );
 
   // Compose the extensions in this order:
   const extensions = useMemo(
@@ -216,10 +237,12 @@ function TiptapEditorPage() {
   ];
 
   // Validation state (unchanged)
-  const [validationSets, setValidationSets] = useState([]);
+  const [validationSets, setValidationSets] = useState<ValidationSet[]>([]);
   const [selectedValidation, setSelectedValidation] = useState("");
-  const [validationRules, setValidationRules] = useState([]);
-  const [validationResults, setValidationResults] = useState([]);
+  const [validationRules, setValidationRules] = useState<ValidationRule[]>([]);
+  const [validationResults, setValidationResults] = useState<
+    ValidationResultItem[]
+  >([]);
   const [loadingValidation, setLoadingValidation] = useState(false);
 
   useEffect(() => {
@@ -277,14 +300,14 @@ function TiptapEditorPage() {
           ).find(
             (el) =>
               el.textContent?.trim().toLowerCase() ===
-              rule.text.trim().toLowerCase(),
+              (rule.text ?? "").trim().toLowerCase(),
           );
           return {
             ...rule,
             passed: !!found,
             detail: found
               ? `Found section: ${found.textContent}`
-              : `Section '${rule.text}' not found`,
+              : `Section '${rule.text ?? ""}' not found`,
           };
         } else if (rule.type === "footer") {
           const blocks = Array.from(
@@ -294,7 +317,9 @@ function TiptapEditorPage() {
           );
           const last = blocks[blocks.length - 1];
           const found =
-            last && rule.text ? last.textContent?.includes(rule.text) : !!last;
+            last && rule.text
+              ? !!last.textContent?.includes(rule.text)
+              : !!last;
           return {
             ...rule,
             passed: found,

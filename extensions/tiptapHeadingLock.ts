@@ -2,7 +2,6 @@
  * TipTap extension enforcing locked heading levels.
  */
 import { Extension } from "@tiptap/core";
-import { TextSelection } from "prosemirror-state";
 
 /**
  * Extension skeleton for locking heading levels 1 and 2.
@@ -19,7 +18,7 @@ export function tiptapHeadingLock() {
     name: "heading-lock",
     addKeyboardShortcuts() {
       const isLocked = (editor: any) => {
-        const { $from } = editor.state.selection as TextSelection;
+        const { $from } = editor.state.selection as any;
         const node = $from.node($from.depth);
         return (
           node.type.name === "heading" && [1, 2].includes(node.attrs.level)
