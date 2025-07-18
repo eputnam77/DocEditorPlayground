@@ -4,20 +4,20 @@ This report cross-references `.dev/PRD.md` with `TASKS.md` and the current codeb
 
 ## ✅ Implemented Features
 
-* **Project skeleton** with Next.js + TypeScript and Tailwind CSS. See `package.json` and `tailwind.config.js`.
-* **Home page with navigation** and dark mode toggle – `pages/index.tsx` and `components/DarkModeToggle.tsx`.
-* **Rich editor pages** for TipTap, Toast UI, CodeX, Slate, Lexical and CKEditor 5. Example implementation in `pages/tiptap.tsx` shows extension management and toolbar.
-* **Validation utility** `utils/validation.ts`.
-* **Unit tests** for pages and components (e.g. `tests/pages/index.test.tsx`).
-* **CI workflow** `.github/workflows/ci.yml`.
-* **Documentation** including README, ADRs and `docs/integration-guides.md`.
+- **Project skeleton** with Next.js + TypeScript and Tailwind CSS. See `package.json` and `tailwind.config.js`.
+- **Home page with navigation** and dark mode toggle – `pages/index.tsx` and `components/DarkModeToggle.tsx`.
+- **Rich editor pages** for TipTap, Toast UI, CodeX, Slate, Lexical and CKEditor 5. Example implementation in `pages/tiptap.tsx` shows extension management and toolbar.
+- **Validation utility** `utils/validation.ts`.
+- **Unit tests** for pages and components (e.g. `tests/pages/index.test.tsx`).
+- **CI workflow** `.github/workflows/ci.yml`.
+- **Documentation** including README, ADRs and `docs/integration-guides.md`.
 
 ## ⚠️ Partially Implemented Features
 
-* Plugin toggles now use the shared `PluginManager` component across pages.
-* Example templates added under `templates/` and loaded via `TemplateLoader`.
-* Each page links to integration docs via `EditorIntegrationInfo`.
-* Coverage and E2E tests cannot be run – Playwright and Vitest binaries are missing in this environment.
+- Plugin toggles now use the shared `PluginManager` component across pages.
+- Example templates added under `templates/` and loaded via `TemplateLoader`.
+- Each page links to integration docs via `EditorIntegrationInfo`.
+- Coverage and E2E tests cannot be run – Playwright and Vitest binaries are missing in this environment.
 
 ## ❌ Missing Features
 
@@ -31,4 +31,4 @@ This report cross-references `.dev/PRD.md` with `TASKS.md` and the current codeb
 
 ---
 
-Next agent: `ready-for:builder`
+Next agent: `ready-for:verifier`
