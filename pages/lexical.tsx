@@ -3,6 +3,7 @@ import { useState } from "react";
 import EditorIntegrationInfo from "../components/EditorIntegrationInfo";
 import PluginManager from "../components/PluginManager";
 import TemplateLoader from "../components/TemplateLoader";
+import sanitizeHtml from "../utils/sanitize";
 import ValidationStatus, {
   ValidationResult,
 } from "../components/ValidationStatus";
@@ -25,7 +26,8 @@ function LexicalPage() {
     try {
       const res = await fetch(`/templates/${filename}`);
       if (!res.ok) throw new Error("fetch failed");
-      setContent(await res.text());
+      const html = await res.text();
+      setContent(sanitizeHtml(html));
     } catch {
       alert("Failed to load template: " + filename);
     }

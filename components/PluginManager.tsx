@@ -3,10 +3,10 @@ import dynamic from "next/dynamic";
 
 // Dynamically import icons so the entire lucide-react bundle isn't loaded
 const ChevronDown = dynamic(() =>
-  import("lucide-react").then((m) => m.ChevronDown)
+  import("lucide-react").then((m) => m.ChevronDown),
 );
 const ChevronUp = dynamic(() =>
-  import("lucide-react").then((m) => m.ChevronUp)
+  import("lucide-react").then((m) => m.ChevronUp),
 );
 
 export interface PluginItem {
@@ -38,15 +38,11 @@ export default function PluginManager({
   onChange,
 }: PluginManagerProps) {
   if (!Array.isArray(plugins)) {
-    console.warn(
-      "PluginManager: expected `plugins` prop to be an array."
-    );
+    console.warn("PluginManager: expected `plugins` prop to be an array.");
     return null;
   }
   if (!Array.isArray(enabled)) {
-    console.warn(
-      "PluginManager: expected `enabled` prop to be an array."
-    );
+    console.warn("PluginManager: expected `enabled` prop to be an array.");
     return null;
   }
   const [open, setOpen] = useState(false);

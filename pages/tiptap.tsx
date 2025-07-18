@@ -34,11 +34,13 @@ import { tiptapYjsCollab } from "../extensions/tiptapYjsCollab";
 // Plug in your own
 import PluginManager from "../components/PluginManager";
 import TemplateLoader from "../components/TemplateLoader";
+import sanitizeHtml from "../utils/sanitize";
 import EditorIntegrationInfo from "../components/EditorIntegrationInfo";
 import ValidationStatus from "../components/ValidationStatus";
 import CommentTrack from "../components/CommentTrack";
 import TrackChanges from "../components/TrackChanges";
 import HeadingStylePresets from "../components/HeadingStylePresets";
+import AdvancedToolbar from "../components/AdvancedToolbar";
 import { TEMPLATES } from "../utils/templates";
 
 interface ValidationRule {
@@ -208,7 +210,7 @@ function TiptapEditorPage() {
     try {
       const res = await fetch(`/templates/${filename}`);
       const html = await res.text();
-      editor.commands.setContent(html);
+      editor.commands.setContent(sanitizeHtml(html));
     } catch {
       alert("Failed to load template: " + filename);
     } finally {
@@ -226,6 +228,24 @@ function TiptapEditorPage() {
     >
       {icon}
     </button>
+  );
+
+  const advancedActions = useMemo(
+    () => [
+      {
+        label: "Bold",
+        onClick: () => editor?.chain().focus().toggleBold().run(),
+      },
+      {
+        label: "Italic",
+        onClick: () => editor?.chain().focus().toggleItalic().run(),
+      },
+      {
+        label: "Underline",
+        onClick: () => editor?.chain().focus().toggleUnderline?.().run(),
+      },
+    ],
+    [editor],
   );
 
   // Dummy history
@@ -344,6 +364,7 @@ function TiptapEditorPage() {
       <header className="flex items-center gap-2 bg-gray-100 px-6 py-3 border-b w-full">
         <span className="text-xl font-bold mr-6">TipTap Editor</span>
         <HeadingStylePresets onSelect={setHeading} />
+        <AdvancedToolbar actions={advancedActions} />
         <div className="flex items-center gap-1">
           <select
             value={
