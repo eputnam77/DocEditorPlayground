@@ -1,4 +1,3 @@
-import { motion } from "framer-motion";
 import dynamic from "next/dynamic";
 import DarkModeToggle from "../components/DarkModeToggle";
 import NavBar from "../components/NavBar";
@@ -17,12 +16,7 @@ function HomePage() {
       </div>
 
       {/* glass card */}
-      <motion.section
-        initial={{ y: 30, opacity: 0 }}
-        animate={{ y: 0, opacity: 1 }}
-        transition={{ duration: 0.6, ease: "easeOut" }}
-        className="relative z-10 w-[95%] max-w-2xl px-10 py-12 flex flex-col items-center rounded-3xl backdrop-blur-md bg-white/70 dark:bg-zinc-800/80 ring-1 ring-slate-200/60 dark:ring-zinc-700 shadow-xl"
-      >
+      <section className="relative z-10 w-[95%] max-w-2xl px-10 py-12 flex flex-col items-center rounded-3xl backdrop-blur-md bg-white/70 dark:bg-zinc-800/80 ring-1 ring-slate-200/60 dark:ring-zinc-700 shadow-xl opacity-0 translate-y-8 animate-fade-slide-up">
         <h1 className="text-center text-4xl md:text-5xl font-extrabold tracking-tight mb-4 bg-gradient-to-r from-blue-500 via-violet-500 to-emerald-500 text-transparent bg-clip-text drop-shadow-sm">
           Document Editor Playground
         </h1>
@@ -35,9 +29,9 @@ function HomePage() {
         <NavBar />
 
         <footer className="mt-10 text-xs text-zinc-500 dark:text-zinc-400 text-center">
-          Built with&nbsp;Next.js, Tailwind&nbsp;CSS, Framer&nbsp;Motion, and OSS editors.
+          Built with&nbsp;Next.js, Tailwind&nbsp;CSS, and OSS editors.
         </footer>
-      </motion.section>
+      </section>
     </main>
   );
 }

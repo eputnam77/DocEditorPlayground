@@ -31,7 +31,6 @@
     "autoprefixer": "^10.4.18",
     "@tiptap/react": "^2.1.10",
     "@tiptap/starter-kit": "^2.1.10",
-    "framer-motion": "^10.16.4",
     "@tiptap/extension-blockquote": "^2.1.2",
     "@tiptap/extension-bold": "^2.1.2",
     "@tiptap/extension-bullet-list": "^2.1.2",

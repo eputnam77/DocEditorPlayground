@@ -1,4 +1,3 @@
-import { motion } from "framer-motion";
 import Link from "next/link";
 import { useRouter } from "next/router";
 
@@ -20,10 +19,9 @@ export default function NavBar() {
       {editors.map(({ name, path }) => {
         const isActive = pathname === path;
         return (
-          <motion.div
+          <div
             key={name}
-            whileHover={{ scale: 1.05 }}
-            transition={{ type: "spring", stiffness: 300, damping: 20 }}
+            className="transform-gpu transition-transform hover:scale-105"
           >
             <Link
               href={path}
@@ -41,7 +39,7 @@ export default function NavBar() {
               </span>
               <span className="relative z-10">{name}</span>
             </Link>
-          </motion.div>
+          </div>
         );
       })}
     </nav>

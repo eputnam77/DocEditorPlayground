@@ -19,7 +19,8 @@
     "paths": {
       "yjs": ["stubs/yjs.ts"],
       "y-webrtc": ["stubs/y-webrtc.ts"],
-      "y-protocols/awareness": ["stubs/y-protocols-awareness.ts"]
+      "y-protocols/awareness": ["stubs/y-protocols-awareness.ts"],
+      "fast-check": ["stubs/fast-check.ts"]
     }
   },
   "include": [
