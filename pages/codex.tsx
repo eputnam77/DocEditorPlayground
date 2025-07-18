@@ -49,6 +49,10 @@ function CodexPage() {
         <p className="text-sm text-zinc-600 dark:text-zinc-300">
           This demo uses a basic textarea placeholder.
         </p>
+        <p className="text-sm italic text-red-600 dark:text-red-400">
+          Full Editor.js integration requires additional dependencies and is not
+          available in this offline demo.
+        </p>
         <div className="flex gap-2">
           <TemplateLoader
             templates={TEMPLATES}
