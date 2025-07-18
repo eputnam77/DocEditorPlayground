@@ -14,12 +14,6 @@ export default withAnalyze({
     config.resolve = config.resolve || {};
     config.resolve.alias = {
       ...(config.resolve.alias || {}),
-      yjs: path.resolve(__dirname, "stubs/yjs.ts"),
-      "y-webrtc": path.resolve(__dirname, "stubs/y-webrtc.ts"),
-      "y-protocols/awareness": path.resolve(
-        __dirname,
-        "stubs/y-protocols-awareness.ts",
-      ),
     };
     return config;
   },
