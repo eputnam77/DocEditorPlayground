@@ -55,8 +55,8 @@ nvm use lts
 _or specify a version:_
 
 ```cmd
-nvm install 22.17.0
-nvm use 22.17.0
+nvm install 20
+nvm use 20
 ```
 
 ### 1. Install project dependencies
