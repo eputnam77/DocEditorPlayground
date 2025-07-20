@@ -15,6 +15,9 @@ else
   echo "nvm not found. Using system Node $(node -v)"
 fi
 
+echo "Installing Semgrep..."
+python3 -m pip install semgrep
+
 echo "Installing dependencies..."
 npm install
 
