@@ -70,6 +70,6 @@
     "@testing-library/react": "^14.1.0",
     "@playwright/test": "^1.46.0",
     "@next/bundle-analyzer": "^13.5.0",
-    "fast-check": "^4.5.0"
+    "fast-check": "^3.22.0"
   }
 }
