@@ -54,7 +54,7 @@
     "lucide-react": "^0.263.0",
     "yjs": "^13.6.10",
     "y-webrtc": "^10.6.6",
-    "y-protocols": "^1.0.7"
+    "y-protocols": "^1.0.6"
   },
   "devDependencies": {
     "typescript": "^5.4.2",
