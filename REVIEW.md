@@ -1,46 +1,35 @@
 # Code Review: Document Editor Playground
 
-## Summary
-
-This repository provides a Next.js playground with multiple rich text editors. The PRD in `.dev/PRD.md` requires individual pages for TipTap, Toast UI, CodeX (Editor.js), Slate, Lexical and CKEditor 5 along with plugin toggles, template loading and validation features.
-
 ## PRD Coverage
 
-- **Implemented**: Home page with navigation and dark‑mode toggle. TipTap page demonstrates custom extensions, plugin toggles, template loader and validation panel. The README now explains how validation results appear in a panel【F:README.md†L120-L124】.
-- **Missing/Partial**: Toast UI, Editor.js, Slate, Lexical and CKEditor pages now show a simple contentEditable container instead of a textarea but still lack the real editors. Planned TipTap features like heading locking, structure enforcement and Yjs collaboration exist as stubs but are not fully wired up. Property-based tests exist but cannot run due to missing dependencies【817af9†L1-L24】.
+- The PRD outlines pages for six editors with plugin toggles, validation and template loaders【F:.dev/PRD.md†L23-L61】.
+- Current implementation still uses placeholder `contentEditable` elements for most editor pages. TipTap page implements extensions but Yjs collaboration is stubbed.
 
-Overall only part of `.dev/TASKS.md` is complete; remaining editor implementations and advanced TipTap features are pending.
+## Integration & Maintainability
 
-## Integration & Maintainability Risks
-
-- TipTap page is over 400 lines and mixes UI logic with state management—extract smaller components for readability.
-- Placeholder pages could confuse users; consider implementing the actual editors or marking them clearly as TODO.
-- Template loading uses `DOMParser` without sanitizing HTML, allowing script injection from templates.
-- TypeScript build fails because packages such as `lucide-react` and `prosemirror-*` are missing【a1cdf2†L1-L18】.
-- Stub extensions (heading lock, Yjs collab, watermark) increase bundle size but provide no functionality until integrated.
+- `package-lock.json` adds Yjs-related deps and `@next/bundle-analyzer`【F:package-lock.json†L42-L46】【F:package-lock.json†L46-L47】.
+- `next.config.js` sets long-term caching headers for templates and validation files【F:next.config.js†L20-L40】.
+- TypeScript compilation fails due to an invalid command type in `tiptapIndentation`【d29eb2†L1-L8】.
+- Vitest and Playwright suites fail with "React is not defined" errors and Playwright misconfiguration【0c2f66†L1-L5】.
 
 ## Performance Notes
 
-- `lucide-react` icons are dynamically imported in TipTap but large editor packages are eagerly loaded.
-- Static templates and validation JSON are served with long‑term cache headers【F:next.config.js†L27-L45】.
-- Navigation animations rely on `framer-motion`; simple CSS transitions might suffice.
-- Consider code‑splitting optional extensions and editor libraries to reduce initial bundle size.
+- Bundle analyzer is configured, enabling size inspections.
+- Static assets are aggressively cached.
 
-## Mandatory Fixes
+## Blocking Issues 🔴
 
-1. **Install dependencies and fix TypeScript errors.** `tsc --noEmit` reports missing modules and type errors【a1cdf2†L1-L18】.
-2. **Run Prettier.** Formatting check lists many files with style issues【d3d06d†L1-L30】.
-3. **Resolve failing npm scripts.** `npm install` and subsequent lint/test commands fail due to 403 errors fetching packages【64a5ab†L1-L21】【c93578†L1-L27】.
-4. **Hook up or remove stub extensions** so dead code does not linger.
+1. `tsc --noEmit` reports type errors in `extensions/tiptapIndentation.ts` which must be resolved before merging.
+2. Unit and E2E test suites fail; Playwright tests are misconfigured and multiple React imports are missing.
+3. `.coverage` and `.venv` directories appear in the working tree; ensure they are ignored and not committed.
+4. Editor pages lack real editor integrations contrary to PRD requirements.
 
-## Optional Improvements
+## Info 🟢
 
-- Break `pages/tiptap.tsx` into smaller components.
-- Provide functional implementations for the other editor pages.
-- Lazy‑load editor packages and optional extensions.
-- Replace `framer-motion` with CSS transitions if animation needs are simple.
-- Enable property‑based tests once dependencies are installed.
+- Prettier and ESLint checks pass.
+- The new dependencies will allow Yjs collaboration and property-based tests.
+- Cache-control headers follow the performance report.
 
 ---
 
-Next agent: `ready-for:verifier`
+Next agent: `ready-for:builder`
