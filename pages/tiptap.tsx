@@ -14,8 +14,8 @@ import TableHeader from "@tiptap/extension-table-header";
 import Image from "@tiptap/extension-image";
 import Collaboration from "@tiptap/extension-collaboration";
 import CollaborationCursor from "@tiptap/extension-collaboration-cursor";
-import SlashCommand from "@tiptap/extension-slash-command";
-import Lint from "@tiptap/extension-lint";
+import SlashCommand from './extensions/slash-command';
+import Lint from './extensions/lint';
 
 // Yjs for collaboration
 import * as Y from "yjs";
