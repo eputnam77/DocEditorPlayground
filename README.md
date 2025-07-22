@@ -79,6 +79,7 @@ npm install \
 @tiptap/extension-image@2 \
 @tiptap/extension-collaboration@2 \
 @tiptap/extension-collaboration-cursor@2 \
+@tiptap/suggestion@2 \
 yjs y-webrtc lucide-react \
 --legacy-peer-deps
 ```
