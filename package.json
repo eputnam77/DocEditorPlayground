@@ -58,6 +58,7 @@
     "@tiptap/extension-table-header": "^2.1.2",
     "@tiptap/extension-collaboration": "^2.1.2",
     "@tiptap/extension-collaboration-cursor": "^2.1.2",
+    "@tiptap/suggestion": "^2.1.2",
     "lucide-react": "^0.263.0",
     "yjs": "^13.6.10",
     "y-webrtc": "yjs/y-webrtc",
