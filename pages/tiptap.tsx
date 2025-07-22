@@ -304,7 +304,7 @@ export default function TipTapEditorPage() {
       if (!yDoc) {
         const doc = new Y.Doc();
         const webrtcProvider = new WebrtcProvider("tiptap-demo-room", doc);
-        s  etYDoc(doc);
+        setYDoc(doc);
         setProvider(webrtcProvider);
         base.push(
           Collaboration.configure({ document: doc }),
