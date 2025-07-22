@@ -333,13 +333,66 @@ export default function TipTapEditorPage() {
   }
 
   function handleTemplateLoad(name: string) {
-    if (!editor) return;
-    if (name === "sample") {
-      editor.commands.setContent(
-        "<h1>Sample Template</h1><p>This is a loaded template.</p>",
-      );
-    }
+  if (!editor) return;
+  if (name === "sample") {
+    editor.commands.setContent(`
+1. Purpose.
+
+1.1 This advisory circular (AC) provides guidance for the certification of widget operators under Part 27.
+
+2. Applicability.
+
+2.1 This AC applies to all applicants seeking approval to operate widgets as defined in 14 CFR part 27.
+
+3. Definitions.
+
+3.1 “Widget” means a device as described in AC 27-1B.
+
+Standard widget
+
+4. Related Material.
+
+4.1 See AC 27-1B and FAA Order 8110.37 for background information.
+
+Operator qualification
+
+Maintenance requirements
+
+5. Implementation.
+
+6. Implementation.
+
+5.1 DRAFT — Do not distribute. [Purpose goes here]
+
+Table 1. Widget Types (caption is in italics)
+
+Type Description Standard Basic widget.
+
+7. Signature Block.
+
+Signed,
+Jane Smith
+Manager, Widget Office
+
+What to expect in validation:
+
+“DRAFT” and “[Purpose goes here]” should be flagged.
+
+Lists (the first list) have only one item—should trigger a warning.
+
+Duplicate heading: “6. Implementation.”
+
+Heading numbers skip from 5 to 7 (should be consecutive).
+
+All main headings end with periods and are numbered, as required.
+
+Document titles are italicized.
+
+Signature block is present at the end.
+    `);
   }
+}
+
 
   function handleToggleLint() {
     setLintEnabled((prev) => !prev);
