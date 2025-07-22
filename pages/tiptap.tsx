@@ -1,5 +1,3 @@
-// TipTapEditorPage.tsx
-
 import React, { useEffect, useMemo, useState } from "react";
 import dynamic from "next/dynamic";
 import { EditorContent, useEditor } from "@tiptap/react";
@@ -14,8 +12,8 @@ import TableHeader from "@tiptap/extension-table-header";
 import Image from "@tiptap/extension-image";
 import Collaboration from "@tiptap/extension-collaboration";
 import CollaborationCursor from "@tiptap/extension-collaboration-cursor";
-import SlashCommand from './extensions/slash-command';
-import Lint from './extensions/lint';
+import SlashCommand from "./extensions/slash-command";
+import Lint from "./extensions/lint";
 
 // Yjs for collaboration
 import * as Y from "yjs";
@@ -50,7 +48,6 @@ const MenuIcon = dynamic(() =>
 const XIcon = dynamic(() => import("lucide-react").then((m) => m.X));
 const Loader2 = dynamic(() => import("lucide-react").then((m) => m.Loader2));
 
-/** ---- AI Suggest Button Component ---- */
 function AiSuggestButton({ editor }: { editor: any }) {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
@@ -71,7 +68,6 @@ function AiSuggestButton({ editor }: { editor: any }) {
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
           text: selectedText,
-          // Optionally pass style context, doc type, rules, etc.
         }),
       });
       if (!res.ok) throw new Error(await res.text());
@@ -113,7 +109,6 @@ function AiSuggestButton({ editor }: { editor: any }) {
   );
 }
 
-/** ---- Sidebar Controls ---- */
 function Sidebar({
   show,
   onClose,
@@ -187,7 +182,7 @@ function Sidebar({
 }
 
 export default function TipTapEditorPage() {
-  // Yjs Setup (for demo purposes)
+  // Yjs Setup
   const [collabEnabled, setCollabEnabled] = useState(false);
   const [yDoc, setYDoc] = useState<Y.Doc | null>(null);
   const [provider, setProvider] = useState<any>(null);
@@ -223,17 +218,18 @@ export default function TipTapEditorPage() {
           rule: {
             match: ({ tr }) => {
               const text = tr.doc.textContent;
-              // Example: flag "foo"
               const issues = [];
-              if (text.includes("foo")) {
+              let index = text.indexOf("foo");
+              while (index > -1) {
                 issues.push({
                   message: "Please avoid the word 'foo'.",
-                  from: text.indexOf("foo"),
-                  to: text.indexOf("foo") + 3,
+                  from: index,
+                  to: index + 3,
                   fix: (view: any, from: number, to: number) => {
                     view.dispatch(view.state.tr.insertText("bar", from, to));
                   },
                 });
+                index = text.indexOf("foo", index + 1);
               }
               return issues;
             },
@@ -283,7 +279,6 @@ export default function TipTapEditorPage() {
     onUpdate: ({ editor }) => setContent(editor.getHTML()),
   });
 
-  // Toolbar Helpers
   function getCurrentBlock(editor: any) {
     if (editor.isActive("heading", { level: 1 })) return "h1";
     if (editor.isActive("heading", { level: 2 })) return "h2";
@@ -317,7 +312,6 @@ export default function TipTapEditorPage() {
     );
   }
 
-  // Template loading (dummy)
   function handleTemplateLoad(name: string) {
     if (!editor) return;
     if (name === "sample") {
@@ -327,11 +321,9 @@ export default function TipTapEditorPage() {
     }
   }
 
-  // Lint/validation toggle
   function handleToggleLint() {
     setLintEnabled((prev) => !prev);
   }
-  // Collab toggle
   function handleToggleCollab() {
     setCollabEnabled((prev) => !prev);
     if (!collabEnabled && yDoc && provider) {
@@ -341,7 +333,6 @@ export default function TipTapEditorPage() {
     }
   }
 
-  // Table/image actions
   function insertTable() {
     editor?.chain()
       .focus()
