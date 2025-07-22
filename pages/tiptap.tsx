@@ -120,56 +120,122 @@ function Sidebar({
       }`}
       style={{ minWidth: "18rem" }}
     >
-      <div className="flex justify-between items-center px-4 py-3 border-b">
-        <span className="font-bold">Tools & Extensions</span>
+      <div className="flex justify-between items-center px-4 py-3 border-b bg-white">
+        <span className="font-bold text-lg">Tools & Extensions</span>
         <button
           onClick={onClose}
-          className="hover:bg-gray-300 rounded p-1"
-          aria-label="Close"
+          className="hover:bg-gray-200 rounded p-1"
+          aria-label="Close sidebar"
         >
           <XIcon className="w-5 h-5" />
         </button>
       </div>
-      <div className="px-4 py-2">
-        <div className="mb-4">
+      
+      <div className="px-4 py-2 space-y-5">
+        {/* Templates */}
+        <section>
           <div className="font-semibold mb-1">Templates</div>
           <button
-            className="text-indigo-700 underline"
+            className="text-indigo-700 underline text-sm"
             onClick={() => onTemplateLoad("sample")}
           >
             Load Sample Template
           </button>
-        </div>
-        <div className="mb-4">
+        </section>
+      
+        {/* Validation (Lint) */}
+        <section>
           <div className="font-semibold mb-1">Validation (Lint)</div>
           <button
-            className={`px-2 py-1 rounded ${
+            className={`px-2 py-1 rounded w-full ${
               lintEnabled ? "bg-green-500 text-white" : "bg-gray-200"
             }`}
             onClick={onToggleLint}
           >
-            {lintEnabled ? "Disable" : "Enable"} Lint
+            {lintEnabled ? "Disable Lint" : "Enable Lint"}
           </button>
-        </div>
-        <div className="mb-4">
+        </section>
+      
+        {/* AI Suggest */}
+        <section>
+          <div className="font-semibold mb-1 flex items-center gap-1">
+            AI Suggest
+            {/* Optional info icon, if you have one */}
+            {/* <InfoIcon className="w-4 h-4 text-blue-500" /> */}
+          </div>
+          <button
+            className={`px-2 py-1 rounded w-full ${
+              aiSuggestEnabled ? "bg-blue-500 text-white" : "bg-gray-200"
+            }`}
+            onClick={onToggleAiSuggest}
+          >
+            {aiSuggestEnabled ? "Disable AI Suggest" : "Enable AI Suggest"}
+          </button>
+          {aiSuggestEnabled && (
+            <div className="mt-2 space-y-2">
+              <div className="text-xs text-gray-500 mb-1">
+                Select text in the editor and press "AI Suggest" in the toolbar to get suggestions.
+              </div>
+              {suggestions.length === 0 ? (
+                <div className="text-xs text-gray-400">No AI suggestions yet.</div>
+              ) : (
+                <div className="space-y-2">
+                  {suggestions.map((s) => (
+                    <div key={s.id} className="border rounded bg-white px-2 py-1 text-sm">
+                      <div className="mb-1 text-xs text-gray-600">
+                        For: <em>{s.original.slice(0, 40)}...</em>
+                      </div>
+                      <div className="mb-2">{s.suggestion}</div>
+                      <div className="flex gap-2">
+                        <button
+                          onClick={() => acceptSuggestion(s.id)}
+                          className="px-2 py-1 rounded bg-green-500 text-white text-xs"
+                        >
+                          Accept
+                        </button>
+                        <button
+                          onClick={() => rejectSuggestion(s.id)}
+                          className="px-2 py-1 rounded bg-red-500 text-white text-xs"
+                        >
+                          Reject
+                        </button>
+                      </div>
+                    </div>
+                  ))}
+                  <button
+                    onClick={clearSuggestions}
+                    className="mt-2 text-xs underline text-gray-500"
+                  >
+                    Clear all suggestions
+                  </button>
+                </div>
+              )}
+            </div>
+          )}
+        </section>
+      
+        {/* Collaboration */}
+        <section>
           <div className="font-semibold mb-1">Collaboration</div>
           <button
-            className={`px-2 py-1 rounded ${
+            className={`px-2 py-1 rounded w-full ${
               collabEnabled ? "bg-green-500 text-white" : "bg-gray-200"
             }`}
             onClick={onToggleCollab}
           >
             {collabEnabled ? "Disconnect" : "Connect"}
           </button>
-        </div>
-        <div>
+        </section>
+      
+        {/* History */}
+        <section>
           <div className="font-semibold mb-1">History</div>
-          <ul className="text-xs">
+          <ul className="text-xs text-gray-700 space-y-1">
             {history.map((h: any) => (
               <li key={h.id}>{h.label}</li>
             ))}
           </ul>
-        </div>
+        </section>
       </div>
     </aside>
   );
