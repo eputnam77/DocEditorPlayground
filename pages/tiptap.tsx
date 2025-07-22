@@ -1,592 +1,366 @@
+// TipTapEditorPage.tsx
+
 import React, { useEffect, useMemo, useState } from "react";
 import dynamic from "next/dynamic";
-
-/**
- * Full TipTap editor page showcasing custom extensions
- * like heading locking, structure rules, indentation,
- * watermarks, draggable sections and Yjs collaboration.
- * This is the only editor fully functional in the offline
- * playground; other editors are simplified placeholders.
- */
 import { EditorContent, useEditor } from "@tiptap/react";
 
-import Blockquote from "@tiptap/extension-blockquote";
-import BoldExtension from "@tiptap/extension-bold";
-import BulletList from "@tiptap/extension-bullet-list";
-import CodeExtension from "@tiptap/extension-code";
-import CodeBlock from "@tiptap/extension-code-block";
-import DocumentExtension from "@tiptap/extension-document";
-import Dropcursor from "@tiptap/extension-dropcursor";
-import Gapcursor from "@tiptap/extension-gapcursor";
-import HardBreak from "@tiptap/extension-hard-break";
-import Heading from "@tiptap/extension-heading";
-import History from "@tiptap/extension-history";
-import HorizontalRule from "@tiptap/extension-horizontal-rule";
-import ItalicExtension from "@tiptap/extension-italic";
-import ListItem from "@tiptap/extension-list-item";
-import OrderedList from "@tiptap/extension-ordered-list";
-import Paragraph from "@tiptap/extension-paragraph";
-import StrikeExtension from "@tiptap/extension-strike";
-import TextExtension from "@tiptap/extension-text";
-import TextStyle from "@tiptap/extension-text-style";
+// Core Extensions
+import StarterKit from "@tiptap/starter-kit";
 import Underline from "@tiptap/extension-underline";
+import Table from "@tiptap/extension-table";
+import TableRow from "@tiptap/extension-table-row";
+import TableCell from "@tiptap/extension-table-cell";
+import TableHeader from "@tiptap/extension-table-header";
+import Image from "@tiptap/extension-image";
+import Collaboration from "@tiptap/extension-collaboration";
+import CollaborationCursor from "@tiptap/extension-collaboration-cursor";
 
-// Custom extensions implementing playground tasks
-import { tiptapHeadingLock } from "../extensions/tiptapHeadingLock";
-import { tiptapStructure } from "../extensions/tiptapStructure";
-import { tiptapIndentation } from "../extensions/tiptapIndentation";
-import { tiptapWatermark } from "../extensions/tiptapWatermark";
-import { tiptapSectionNode } from "../extensions/tiptapSectionNode";
-import { tiptapYjsCollab } from "../extensions/tiptapYjsCollab";
+// Slash command & Linting (Validation)
+import SlashCommand from "@tiptap/extension-slash-command";
+import Lint from "@tiptap/extension-lint";
 
-// Plug in your own
-import PluginManager from "../components/PluginManager";
-import TemplateLoader from "../components/TemplateLoader";
-import sanitizeHtml from "../utils/sanitize";
-import EditorIntegrationInfo from "../components/EditorIntegrationInfo";
-import ValidationStatus from "../components/ValidationStatus";
-import CommentTrack from "../components/CommentTrack";
-import TrackChanges from "../components/TrackChanges";
-import HeadingStylePresets from "../components/HeadingStylePresets";
-import AdvancedToolbar from "../components/AdvancedToolbar";
-import { TEMPLATES } from "../utils/templates";
+// Yjs for collaboration
+import * as Y from "yjs";
+import { WebrtcProvider } from "y-webrtc";
 
-interface ValidationRule {
-  id: string;
-  label: string;
-  type: string;
-  level?: number;
-  text?: string;
-}
-
-interface ValidationSet {
-  name: string;
-  filename: string;
-  rules: ValidationRule[];
-}
-
-interface ValidationResultItem extends ValidationRule {
-  passed: boolean;
-  detail?: string;
-}
-
-// Icons
-// Dynamically load icons to avoid bundling the entire set
+// Icons (lucide-react)
 const Bold = dynamic(() => import("lucide-react").then((m) => m.Bold));
-const ChevronDown = dynamic(() =>
-  import("lucide-react").then((m) => m.ChevronDown),
-);
-const ChevronUp = dynamic(() =>
-  import("lucide-react").then((m) => m.ChevronUp),
-);
-const Clock = dynamic(() => import("lucide-react").then((m) => m.Clock));
-const Code = dynamic(() => import("lucide-react").then((m) => m.Code));
 const Italic = dynamic(() => import("lucide-react").then((m) => m.Italic));
+const UnderlineIcon = dynamic(() =>
+  import("lucide-react").then((m) => m.Underline),
+);
+const Strikethrough = dynamic(() =>
+  import("lucide-react").then((m) => m.Strikethrough),
+);
+const Code = dynamic(() => import("lucide-react").then((m) => m.Code));
+const Quote = dynamic(() => import("lucide-react").then((m) => m.Quote));
 const List = dynamic(() => import("lucide-react").then((m) => m.List));
 const ListOrdered = dynamic(() =>
   import("lucide-react").then((m) => m.ListOrdered),
 );
-const Quote = dynamic(() => import("lucide-react").then((m) => m.Quote));
-const Redo2 = dynamic(() => import("lucide-react").then((m) => m.Redo2));
-const Strikethrough = dynamic(() =>
-  import("lucide-react").then((m) => m.Strikethrough),
-);
-const UnderlineIcon = dynamic(() =>
-  import("lucide-react").then((m) => m.Underline),
-);
 const Undo2 = dynamic(() => import("lucide-react").then((m) => m.Undo2));
+const Redo2 = dynamic(() => import("lucide-react").then((m) => m.Redo2));
+const ImageIcon = dynamic(() => import("lucide-react").then((m) => m.Image));
+const TableIcon = dynamic(() => import("lucide-react").then((m) => m.Table));
+const MenuIcon = dynamic(() => import("lucide-react").then((m) => m.Menu));
+const XIcon = dynamic(() => import("lucide-react").then((m) => m.X));
 
-// ----- Required Extensions: ALWAYS ON, HIDDEN FROM USER -----
-const ALWAYS_ENABLED = [
-  { name: "Document", extension: DocumentExtension },
-  { name: "Paragraph", extension: Paragraph },
-  { name: "Text", extension: TextExtension },
-  { name: "HeadingLock", extension: tiptapHeadingLock() },
-  { name: "Structure", extension: tiptapStructure() },
-];
-
-// ----- Core Editing Features: ALWAYS ON, HIDDEN FROM USER -----
-const CORE_DEFAULTS = [
-  { name: "History", extension: History },
-  { name: "Bold", extension: BoldExtension },
-  { name: "Italic", extension: ItalicExtension },
-  { name: "Strike", extension: StrikeExtension },
-  { name: "Underline", extension: Underline },
-  { name: "Heading", extension: Heading },
-  { name: "Code", extension: CodeExtension },
-  { name: "CodeBlock", extension: CodeBlock },
-  { name: "Blockquote", extension: Blockquote },
-  { name: "BulletList", extension: BulletList },
-  { name: "OrderedList", extension: OrderedList },
-  { name: "ListItem", extension: ListItem },
-  { name: "Indentation", extension: tiptapIndentation() },
-];
-
-// ----- "Internals": Loaded but not user-toggleable -----
-const INTERNALS = [
-  { name: "HardBreak", extension: HardBreak },
-  { name: "HorizontalRule", extension: HorizontalRule },
-  { name: "Dropcursor", extension: Dropcursor },
-  { name: "Gapcursor", extension: Gapcursor },
-  { name: "TextStyle", extension: TextStyle },
-];
-
-// ----- Only show these in the Extension Dropdown -----
-// Each item provides a factory so extensions can be recreated
-// when configuration such as watermark text changes.
-const TOGGLEABLE_EXTENSIONS = {
-  Watermark: (text: string) => tiptapWatermark(text),
-  SectionNode: () => tiptapSectionNode(),
-  YjsCollab: () => tiptapYjsCollab(),
-} as const;
-const TOGGLEABLE_NAMES = Object.keys(TOGGLEABLE_EXTENSIONS);
-
-function TiptapEditorPage() {
-  const getInitialExtensions = () => {
-    if (typeof window === "undefined") return [] as string[];
-    const stored = localStorage.getItem("tiptapToggleableExtensions");
-    return stored ? (JSON.parse(stored) as string[]) : TOGGLEABLE_NAMES;
-  };
-  const [enabledExtensions, setEnabledExtensions] = useState<string[]>(
-    getInitialExtensions(),
-  );
-  // Text used by the Watermark extension when enabled
-  const [watermarkText, setWatermarkText] = useState("Sample");
-
-  // Compose the extensions in this order:
-  const extensions = useMemo(
-    () => [
-      ...ALWAYS_ENABLED.map((e) => e.extension),
-      ...CORE_DEFAULTS.map((e) => e.extension),
-      ...INTERNALS.map((e) => e.extension),
-      ...TOGGLEABLE_NAMES.filter((n) => enabledExtensions.includes(n)).map(
-        (n) => TOGGLEABLE_EXTENSIONS[n](watermarkText),
-      ),
-    ],
-    [enabledExtensions, watermarkText],
-  );
-
-  // Store only toggled extensions
-  useEffect(() => {
-    if (typeof window !== "undefined") {
-      localStorage.setItem(
-        "tiptapToggleableExtensions",
-        JSON.stringify(enabledExtensions),
-      );
-    }
-  }, [enabledExtensions]);
-
-  const initialContent = "";
-
-  const [content, setContent] = useState(initialContent);
-  const editor = useEditor(
-    {
-      extensions,
-      content,
-      autofocus: true,
-      editorProps: {
-        attributes: {
-          class: "tiptap-content focus:outline-none w-full h-full",
-        },
-      },
-    },
-    [extensions],
-  );
-
-  // Update content state on every editor change
-  useEffect(() => {
-    if (!editor) return;
-    const updateHandler = () => setContent(editor.getHTML());
-    editor.on("update", updateHandler);
-    return () => editor.off("update", updateHandler);
-  }, [editor]);
-
-  const setHeading = (level) => {
-    editor?.chain().focus().toggleHeading({ level }).run();
-  };
-
-  const handleSave = () => {
-    if (editor) {
-      alert(editor.getHTML());
-      // Save logic
-    }
-  };
-
-  const [loadingTemplate, setLoadingTemplate] = useState(false);
-
-  const handleTemplateLoad = async (filename) => {
-    if (!editor) return;
-    setLoadingTemplate(true);
-    try {
-      const res = await fetch(`/templates/${filename}`);
-      const html = await res.text();
-      editor.commands.setContent(sanitizeHtml(html));
-    } catch {
-      alert("Failed to load template: " + filename);
-    } finally {
-      setLoadingTemplate(false);
-    }
-  };
-
-  // Toolbar helper
-  const toolbarButton = (icon, command, active, title = "") => (
-    <button
-      type="button"
-      className={`px-2 py-1 rounded ${active ? "bg-indigo-100" : ""}`}
-      onClick={command}
-      title={title}
+// Sidebar controls example (replace with your own as needed)
+function Sidebar({
+  show,
+  onClose,
+  onTemplateLoad,
+  onToggleLint,
+  lintEnabled,
+  onToggleCollab,
+  collabEnabled,
+  history,
+}) {
+  return (
+    <aside
+      className={`fixed top-0 right-0 h-full w-80 bg-gray-100 border-l z-50 shadow-lg transform transition-transform duration-200 ${
+        show ? "translate-x-0" : "translate-x-full"
+      }`}
+      style={{ minWidth: "18rem" }}
     >
-      {icon}
-    </button>
+      <div className="flex justify-between items-center px-4 py-3 border-b">
+        <span className="font-bold">Tools & Extensions</span>
+        <button
+          onClick={onClose}
+          className="hover:bg-gray-300 rounded p-1"
+          aria-label="Close"
+        >
+          <XIcon className="w-5 h-5" />
+        </button>
+      </div>
+      <div className="px-4 py-2">
+        <div className="mb-4">
+          <div className="font-semibold mb-1">Templates</div>
+          <button
+            className="text-indigo-700 underline"
+            onClick={() => onTemplateLoad("sample")}
+          >
+            Load Sample Template
+          </button>
+        </div>
+        <div className="mb-4">
+          <div className="font-semibold mb-1">Validation (Lint)</div>
+          <button
+            className={`px-2 py-1 rounded ${lintEnabled ? "bg-green-500 text-white" : "bg-gray-200"}`}
+            onClick={onToggleLint}
+          >
+            {lintEnabled ? "Disable" : "Enable"} Lint
+          </button>
+        </div>
+        <div className="mb-4">
+          <div className="font-semibold mb-1">Collaboration</div>
+          <button
+            className={`px-2 py-1 rounded ${collabEnabled ? "bg-green-500 text-white" : "bg-gray-200"}`}
+            onClick={onToggleCollab}
+          >
+            {collabEnabled ? "Disconnect" : "Connect"}
+          </button>
+        </div>
+        <div>
+          <div className="font-semibold mb-1">History</div>
+          <ul className="text-xs">
+            {history.map((h) => (
+              <li key={h.id}>{h.label}</li>
+            ))}
+          </ul>
+        </div>
+      </div>
+    </aside>
   );
+}
 
-  const advancedActions = useMemo(
-    () => [
-      {
-        label: "Bold",
-        onClick: () => editor?.chain().focus().toggleBold().run(),
-      },
-      {
-        label: "Italic",
-        onClick: () => editor?.chain().focus().toggleItalic().run(),
-      },
-      {
-        label: "Underline",
-        onClick: () => editor?.chain().focus().toggleUnderline?.().run(),
-      },
-    ],
-    [editor],
-  );
+export default function TipTapEditorPage() {
+  // Yjs Setup (for demo purposes)
+  const [collabEnabled, setCollabEnabled] = useState(false);
+  const [yDoc, setYDoc] = useState(null as null | Y.Doc);
+  const [provider, setProvider] = useState<any>(null);
 
-  // Dummy history
-  const [showHistory, setShowHistory] = useState(false);
+  // Lint (validation)
+  const [lintEnabled, setLintEnabled] = useState(false);
+
+  // Sidebar
+  const [sidebarOpen, setSidebarOpen] = useState(false);
+
+  // Version History (dummy)
   const DUMMY_HISTORY = [
     { id: 1, label: "Draft - Jul 9, 8:00 am" },
     { id: 2, label: "AutoSave - Jul 8, 3:30 pm" },
     { id: 3, label: "Submitted - Jul 7, 12:15 pm" },
   ];
 
-  // Validation state (unchanged)
-  const [validationSets, setValidationSets] = useState<ValidationSet[]>([]);
-  const [selectedValidation, setSelectedValidation] = useState("");
-  const [validationRules, setValidationRules] = useState<ValidationRule[]>([]);
-  const [validationResults, setValidationResults] = useState<
-    ValidationResultItem[]
-  >([]);
-  const [loadingValidation, setLoadingValidation] = useState(false);
-
-  useEffect(() => {
-    async function fetchValidations() {
-      try {
-        const files = [
-          "faa-advisory-circular.json",
-          "software-release-notes.json",
-          "medical-research-article.json",
-          "legal-contract-template.json",
-        ];
-        const sets = await Promise.all(
-          files.map(async (f) => {
-            const res = await fetch(`/validation/${f}`);
-            if (!res.ok) return null;
-            const data = await res.json();
-            return { ...data, filename: f };
-          }),
+  // Editor Extensions
+  const extensions = useMemo(() => {
+    const base = [
+      StarterKit,
+      Underline,
+      Table.configure({ resizable: true }),
+      TableRow,
+      TableCell,
+      TableHeader,
+      Image,
+      SlashCommand,
+    ];
+    if (lintEnabled) {
+      base.push(
+        Lint.configure({
+          // Linting rules per https://tiptap.dev/docs/examples/experiments/linting
+          rule: {
+            match: ({ tr }) => {
+              const text = tr.doc.textContent;
+              // Simple example: flag "foo"
+              const issues = [];
+              if (text.includes("foo")) {
+                issues.push({
+                  message: "Please avoid the word 'foo'.",
+                  from: text.indexOf("foo"),
+                  to: text.indexOf("foo") + 3,
+                  fix: (view, from, to) => {
+                    view.dispatch(
+                      view.state.tr.insertText("bar", from, to)
+                    );
+                  },
+                });
+              }
+              return issues;
+            },
+          },
+        })
+      );
+    }
+    if (collabEnabled) {
+      // Ensure Yjs provider is ready
+      if (!yDoc) {
+        const doc = new Y.Doc();
+        const webrtcProvider = new WebrtcProvider("tiptap-demo-room", doc);
+        setYDoc(doc);
+        setProvider(webrtcProvider);
+        base.push(
+          Collaboration.configure({ document: doc }),
+          CollaborationCursor.configure({
+            provider: webrtcProvider,
+            user: { name: "You", color: "#3b82f6" },
+          })
         );
-        setValidationSets(sets.filter(Boolean));
-      } catch {
-        setValidationSets([]);
+      } else if (yDoc && provider) {
+        base.push(
+          Collaboration.configure({ document: yDoc }),
+          CollaborationCursor.configure({
+            provider: provider,
+            user: { name: "You", color: "#3b82f6" },
+          })
+        );
       }
     }
-    fetchValidations();
-  }, []);
+    return base;
+    // eslint-disable-next-line
+  }, [lintEnabled, collabEnabled, yDoc, provider]);
 
-  useEffect(() => {
-    if (!selectedValidation) return;
-    const set = validationSets.find((v) => v.filename === selectedValidation);
-    setValidationRules(set ? set.rules : []);
-    setValidationResults([]);
-  }, [selectedValidation, validationSets]);
+  // TipTap Editor
+  const [content, setContent] = useState("<p>Hello world!</p>");
+  const editor = useEditor({
+    extensions,
+    content,
+    autofocus: true,
+    editorProps: {
+      attributes: {
+        class: "tiptap-content focus:outline-none w-full h-full min-h-[400px] max-w-[860px] mx-auto",
+      },
+    },
+    onUpdate: ({ editor }) => setContent(editor.getHTML()),
+  });
 
-  function runValidation() {
+  // Toolbar Helpers
+  function getCurrentBlock(editor) {
+    if (editor.isActive("heading", { level: 1 })) return "h1";
+    if (editor.isActive("heading", { level: 2 })) return "h2";
+    if (editor.isActive("heading", { level: 3 })) return "h3";
+    return "p";
+  }
+  function setBlock(editor, val) {
+    if (val === "p") editor.chain().focus().setParagraph().run();
+    else if (val === "h1") editor.chain().focus().toggleHeading({ level: 1 }).run();
+    else if (val === "h2") editor.chain().focus().toggleHeading({ level: 2 }).run();
+    else if (val === "h3") editor.chain().focus().toggleHeading({ level: 3 }).run();
+  }
+  function toolbarButton(icon, command, active, title = "") {
+    return (
+      <button
+        type="button"
+        className={`p-2 rounded ${active ? "bg-indigo-100" : ""}`}
+        onClick={command}
+        title={title}
+      >
+        {icon}
+      </button>
+    );
+  }
+
+  // Template loading (dummy)
+  function handleTemplateLoad(name: string) {
     if (!editor) return;
-    try {
-      const html = editor.getHTML();
-      const parser = new window.DOMParser();
-      const doc = parser.parseFromString(html, "text/html");
-      const results = validationRules.map((rule) => {
-        if (rule.type === "header") {
-          const tag = `h${rule.level}`;
-          const found = doc.body.querySelector(tag);
-          return {
-            ...rule,
-            passed: !!found,
-            detail: found
-              ? `Found <${tag}>: ${found.textContent}`
-              : `No <${tag}> found`,
-          };
-        } else if (rule.type === "section") {
-          const found = Array.from(
-            doc.body.querySelectorAll("h1, h2, h3, h4, h5, h6"),
-          ).find(
-            (el) =>
-              el.textContent?.trim().toLowerCase() ===
-              (rule.text ?? "").trim().toLowerCase(),
-          );
-          return {
-            ...rule,
-            passed: !!found,
-            detail: found
-              ? `Found section: ${found.textContent}`
-              : `Section '${rule.text ?? ""}' not found`,
-          };
-        } else if (rule.type === "footer") {
-          const blocks = Array.from(
-            doc.body.querySelectorAll(
-              "p, div, footer, section, h1, h2, h3, h4, h5, h6",
-            ),
-          );
-          const last = blocks[blocks.length - 1];
-          const found =
-            last && rule.text
-              ? !!last.textContent?.includes(rule.text)
-              : !!last;
-          return {
-            ...rule,
-            passed: found,
-            detail: found
-              ? `Footer contains required info.`
-              : `Footer requirement not met`,
-          };
-        }
-        return { ...rule, passed: false, detail: "Unknown rule type" };
-      });
-      setValidationResults(results);
-    } catch {
-      alert("Validation failed");
+    if (name === "sample") {
+      editor.commands.setContent(
+        "<h1>Sample Template</h1><p>This is a loaded template.</p>"
+      );
     }
   }
 
-  if (!editor) return <div>Loading TipTap…</div>;
+  // Lint/validation toggle
+  function handleToggleLint() {
+    setLintEnabled((prev) => !prev);
+  }
+  // Collab toggle
+  function handleToggleCollab() {
+    setCollabEnabled((prev) => !prev);
+    if (!collabEnabled && yDoc && provider) {
+      // Clean up Yjs on disconnect
+      provider.disconnect();
+      setYDoc(null);
+      setProvider(null);
+    }
+  }
+
+  // Table/image actions
+  function insertTable() {
+    editor?.chain().focus().insertTable({ rows: 3, cols: 3, withHeaderRow: true }).run();
+  }
+  function insertImage() {
+    const url = prompt("Image URL?");
+    if (url) {
+      editor?.chain().focus().setImage({ src: url }).run();
+    }
+  }
+
+  if (!editor)
+    return <div className="flex items-center justify-center h-full">Loading TipTap…</div>;
 
   return (
-    <div className="fixed inset-0 z-30 bg-white flex flex-col">
-      <h1 className="sr-only">TipTap Editor</h1>
+    <div className="flex flex-col h-screen w-full bg-white">
+      {/* Header Toolbar */}
       <header className="flex items-center gap-2 bg-gray-100 px-6 py-3 border-b w-full">
-        <span className="text-xl font-bold mr-6">TipTap Editor</span>
-        <HeadingStylePresets onSelect={setHeading} />
-        <AdvancedToolbar actions={advancedActions} />
-        <div className="flex items-center gap-1">
-          <select
-            value={
-              editor.isActive("heading", { level: 1 })
-                ? "h1"
-                : editor.isActive("heading", { level: 2 })
-                  ? "h2"
-                  : editor.isActive("heading", { level: 3 })
-                    ? "h3"
-                    : "p"
-            }
-            onChange={(e) => {
-              const val = e.target.value;
-              if (val === "p") editor.chain().focus().setParagraph().run();
-              else if (val === "h1") setHeading(1);
-              else if (val === "h2") setHeading(2);
-              else if (val === "h3") setHeading(3);
-            }}
-            className="rounded border px-2 py-1"
-            aria-label="Formatting"
-          >
-            <option value="p">Paragraph</option>
-            <option value="h1">Heading 1</option>
-            <option value="h2">Heading 2</option>
-            <option value="h3">Heading 3</option>
-          </select>
-          {toolbarButton(
-            <Bold className="w-4 h-4" />,
-            () => editor.chain().focus().toggleBold().run(),
-            editor.isActive("bold"),
-            "Bold",
-          )}
-          {toolbarButton(
-            <Italic className="w-4 h-4" />,
-            () => editor.chain().focus().toggleItalic().run(),
-            editor.isActive("italic"),
-            "Italic",
-          )}
-          {toolbarButton(
-            <UnderlineIcon className="w-4 h-4" />,
-            () => {
-              const chain = editor.chain().focus();
-              if (typeof chain.toggleUnderline === "function") {
-                chain.toggleUnderline().run();
-              }
-            },
-            editor.isActive("underline"),
-            "Underline",
-          )}
-          {toolbarButton(
-            <Strikethrough className="w-4 h-4" />,
-            () => editor.chain().focus().toggleStrike().run(),
-            editor.isActive("strike"),
-            "Strikethrough",
-          )}
-          {toolbarButton(
-            <Code className="w-4 h-4" />,
-            () => editor.chain().focus().toggleCode().run(),
-            editor.isActive("code"),
-            "Inline Code",
-          )}
-          {toolbarButton(
-            <Quote className="w-4 h-4" />,
-            () => editor.chain().focus().toggleBlockquote().run(),
-            editor.isActive("blockquote"),
-            "Blockquote",
-          )}
-          {toolbarButton(
-            <List className="w-4 h-4" />,
-            () => editor.chain().focus().toggleBulletList().run(),
-            editor.isActive("bulletList"),
-            "Bullet List",
-          )}
-          {toolbarButton(
-            <ListOrdered className="w-4 h-4" />,
-            () => editor.chain().focus().toggleOrderedList().run(),
-            editor.isActive("orderedList"),
-            "Numbered List",
-          )}
-          {toolbarButton(
-            <Undo2 className="w-4 h-4" />,
-            () => editor.chain().focus().undo().run(),
-            false,
-            "Undo",
-          )}
-          {toolbarButton(
-            <Redo2 className="w-4 h-4" />,
-            () => editor.chain().focus().redo().run(),
-            false,
-            "Redo",
-          )}
-          <button
-            onClick={handleSave}
-            className="ml-2 px-4 py-2 bg-indigo-600 text-white rounded hover:bg-indigo-700"
-          >
-            Save
-          </button>
-        </div>
-        <div className="flex-1"></div>
-        <div className="relative mr-2">
-          <TemplateLoader
-            templates={TEMPLATES}
-            disabled={loadingTemplate}
-            onLoad={handleTemplateLoad}
-            onClear={() => editor?.commands.clearContent()}
-            onError={(e) => alert(String(e))}
-          />
-        </div>
-        <div className="relative">
-          {/* Only show toggleable extensions in PluginManager */}
-          <PluginManager
-            plugins={TOGGLEABLE_NAMES.map((n) => ({ name: n }))}
-            enabled={enabledExtensions}
-            locked={[]}
-            onChange={(exts) => setEnabledExtensions(exts)}
-          />
-          {enabledExtensions.includes("Watermark") && (
-            <input
-              type="text"
-              className="ml-2 px-2 py-1 border rounded"
-              placeholder="Watermark text"
-              value={watermarkText}
-              onChange={(e) => setWatermarkText(e.target.value)}
-            />
-          )}
-        </div>
-        <div className="relative ml-4">
-          <button
-            onClick={() => setShowHistory(!showHistory)}
-            className="px-3 py-1 border rounded bg-gray-50 hover:bg-gray-200 flex items-center gap-1"
-            title="Version History"
-            aria-label="History"
-          >
-            <Clock className="w-4 h-4" />
-            History
-            {showHistory ? (
-              <ChevronUp className="w-4 h-4" />
-            ) : (
-              <ChevronDown className="w-4 h-4" />
-            )}
-          </button>
-          {showHistory && (
-            <div className="absolute right-0 mt-2 bg-white shadow-lg border rounded p-2 z-50 w-56">
-              <div className="mb-2 font-semibold">Version History</div>
-              <ul>
-                {DUMMY_HISTORY.map((v) => (
-                  <li
-                    key={v.id}
-                    className="py-1 border-b last:border-none text-xs"
-                  >
-                    {v.label}
-                  </li>
-                ))}
-              </ul>
-              <button
-                className="mt-2 text-xs px-2 py-1 rounded bg-gray-200"
-                onClick={() => setShowHistory(false)}
-                aria-label="Close"
-              >
-                Close
-              </button>
-            </div>
-          )}
-        </div>
-        <div className="relative ml-2">
-          <select
-            className="px-3 py-1 border rounded bg-gray-50 hover:bg-gray-200"
-            title="Select Validation"
-            aria-label="Validation"
-            value={selectedValidation}
-            onChange={(e) => setSelectedValidation(e.target.value)}
-            disabled={loadingValidation || validationSets.length === 0}
-          >
-            <option value="" disabled>
-              Validation
-            </option>
-            {validationSets.map((v) => (
-              <option key={v.filename} value={v.filename}>
-                {v.name}
-              </option>
-            ))}
-          </select>
-        </div>
-        {selectedValidation && (
-          <button
-            className="ml-2 px-3 py-1 border rounded bg-green-600 text-white hover:bg-green-700"
-            onClick={runValidation}
-            disabled={validationRules.length === 0}
-          >
-            Run Validation
-          </button>
-        )}
+        <button
+          onClick={() => setSidebarOpen(true)}
+          className="p-2 rounded bg-gray-200 mr-2"
+          aria-label="Open sidebar"
+        >
+          <MenuIcon className="w-5 h-5" />
+        </button>
+        <span className="text-xl font-bold">TipTap Editor</span>
+        <select
+          value={getCurrentBlock(editor)}
+          onChange={(e) => setBlock(editor, e.target.value)}
+          className="rounded border px-2 py-1 ml-4"
+          aria-label="Block style"
+        >
+          <option value="p">Paragraph</option>
+          <option value="h1">Heading 1</option>
+          <option value="h2">Heading 2</option>
+          <option value="h3">Heading 3</option>
+        </select>
+        {toolbarButton(<Bold className="w-4 h-4" />, () => editor.chain().focus().toggleBold().run(), editor.isActive("bold"), "Bold")}
+        {toolbarButton(<Italic className="w-4 h-4" />, () => editor.chain().focus().toggleItalic().run(), editor.isActive("italic"), "Italic")}
+        {toolbarButton(<UnderlineIcon className="w-4 h-4" />, () => editor.chain().focus().toggleUnderline?.().run(), editor.isActive("underline"), "Underline")}
+        {toolbarButton(<Strikethrough className="w-4 h-4" />, () => editor.chain().focus().toggleStrike().run(), editor.isActive("strike"), "Strikethrough")}
+        {toolbarButton(<Code className="w-4 h-4" />, () => editor.chain().focus().toggleCode().run(), editor.isActive("code"), "Inline Code")}
+        {toolbarButton(<Quote className="w-4 h-4" />, () => editor.chain().focus().toggleBlockquote().run(), editor.isActive("blockquote"), "Blockquote")}
+        {toolbarButton(<List className="w-4 h-4" />, () => editor.chain().focus().toggleBulletList().run(), editor.isActive("bulletList"), "Bullet List")}
+        {toolbarButton(<ListOrdered className="w-4 h-4" />, () => editor.chain().focus().toggleOrderedList().run(), editor.isActive("orderedList"), "Numbered List")}
+        {toolbarButton(<Undo2 className="w-4 h-4" />, () => editor.chain().focus().undo().run(), false, "Undo")}
+        {toolbarButton(<Redo2 className="w-4 h-4" />, () => editor.chain().focus().redo().run(), false, "Redo")}
+        <button
+          onClick={insertTable}
+          className="ml-2 p-2 rounded bg-gray-200"
+          title="Insert Table"
+        >
+          <TableIcon className="w-4 h-4" />
+        </button>
+        <button
+          onClick={insertImage}
+          className="ml-1 p-2 rounded bg-gray-200"
+          title="Insert Image"
+        >
+          <ImageIcon className="w-4 h-4" />
+        </button>
+        <button
+          onClick={() => alert(editor.getHTML())}
+          className="ml-4 px-4 py-2 bg-indigo-600 text-white rounded hover:bg-indigo-700"
+        >
+          Save
+        </button>
+        <div className="flex-1" />
+        {/* Optionally, more header controls */}
       </header>
 
-      {validationResults.length > 0 && (
-        <div className="fixed top-24 right-4 z-40">
-          <ValidationStatus
-            results={validationResults}
-            onClear={() => setValidationResults([])}
-          />
+      {/* Lint (Validation) Overlay */}
+      {lintEnabled && (
+        <div className="fixed bottom-6 left-1/2 transform -translate-x-1/2 bg-red-50 border border-red-300 px-6 py-2 rounded z-40 shadow">
+          <span className="text-red-600 font-semibold">Linting enabled — Issues will be highlighted inline.</span>
         </div>
       )}
 
-      <main className="flex-1 overflow-auto">
-        <EditorContent editor={editor} className="tiptap-content" />
-        <TrackChanges content={content} />
-        <CommentTrack />
-        <EditorIntegrationInfo editorName="TipTap" />
+      {/* Main Editor */}
+      <main className="flex-1 overflow-auto flex justify-center items-start bg-white">
+        <div className="w-full max-w-[860px] p-8">
+          <EditorContent editor={editor} />
+        </div>
       </main>
+
+      {/* Sidebar for templates, validation, collab, history */}
+      <Sidebar
+        show={sidebarOpen}
+        onClose={() => setSidebarOpen(false)}
+        onTemplateLoad={handleTemplateLoad}
+        onToggleLint={handleToggleLint}
+        lintEnabled={lintEnabled}
+        onToggleCollab={handleToggleCollab}
+        collabEnabled={collabEnabled}
+        history={DUMMY_HISTORY}
+      />
     </div>
   );
 }
-
-// Disable SSR for Next.js hydration issues
-export default dynamic(() => Promise.resolve(TiptapEditorPage), { ssr: false });
