@@ -42,7 +42,22 @@ const MenuIcon = dynamic(() => import("lucide-react").then((m) => m.Menu));
 const XIcon = dynamic(() => import("lucide-react").then((m) => m.X));
 const Loader2 = dynamic(() => import("lucide-react").then((m) => m.Loader2));
 
-function AiSuggestButton({ editor }: { editor: any }) {
+interface NewSuggestion {
+  from: number;
+  to: number;
+  original: string;
+  suggestion: string;
+}
+
+function AiSuggestButton({
+  editor,
+  aiSuggestEnabled,
+  onNewSuggestion,
+}: {
+  editor: any;
+  aiSuggestEnabled: boolean;
+  onNewSuggestion?: (data: NewSuggestion) => void;
+}) {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
@@ -67,11 +82,15 @@ function AiSuggestButton({ editor }: { editor: any }) {
       if (!res.ok) throw new Error(await res.text());
       const { suggestion } = await res.json();
 
-      editor.chain().focus();
-      if (empty) {
-        editor.commands.setContent(suggestion);
+      if (aiSuggestEnabled && onNewSuggestion) {
+        onNewSuggestion({ from, to, original: selectedText, suggestion });
       } else {
-        editor.commands.insertContentAt({ from, to }, suggestion);
+        editor.chain().focus();
+        if (empty) {
+          editor.commands.setContent(suggestion);
+        } else {
+          editor.commands.insertContentAt({ from, to }, suggestion);
+        }
       }
     } catch (err: any) {
       setError(err.message || "AI Suggest failed");
@@ -111,6 +130,12 @@ function Sidebar({
   lintEnabled,
   onToggleCollab,
   collabEnabled,
+  onToggleAiSuggest,
+  aiSuggestEnabled,
+  suggestions,
+  acceptSuggestion,
+  rejectSuggestion,
+  clearSuggestions,
   history,
 }: any) {
   return (
@@ -130,7 +155,7 @@ function Sidebar({
           <XIcon className="w-5 h-5" />
         </button>
       </div>
-      
+
       <div className="px-4 py-2 space-y-5">
         {/* Templates */}
         <section>
@@ -142,7 +167,7 @@ function Sidebar({
             Load Sample Template
           </button>
         </section>
-      
+
         {/* Validation (Lint) */}
         <section>
           <div className="font-semibold mb-1">Validation (Lint)</div>
@@ -155,7 +180,7 @@ function Sidebar({
             {lintEnabled ? "Disable Lint" : "Enable Lint"}
           </button>
         </section>
-      
+
         {/* AI Suggest */}
         <section>
           <div className="font-semibold mb-1 flex items-center gap-1">
@@ -174,14 +199,20 @@ function Sidebar({
           {aiSuggestEnabled && (
             <div className="mt-2 space-y-2">
               <div className="text-xs text-gray-500 mb-1">
-                Select text in the editor and press "AI Suggest" in the toolbar to get suggestions.
+                Select text in the editor and press "AI Suggest" in the toolbar
+                to get suggestions.
               </div>
               {suggestions.length === 0 ? (
-                <div className="text-xs text-gray-400">No AI suggestions yet.</div>
+                <div className="text-xs text-gray-400">
+                  No AI suggestions yet.
+                </div>
               ) : (
                 <div className="space-y-2">
                   {suggestions.map((s) => (
-                    <div key={s.id} className="border rounded bg-white px-2 py-1 text-sm">
+                    <div
+                      key={s.id}
+                      className="border rounded bg-white px-2 py-1 text-sm"
+                    >
                       <div className="mb-1 text-xs text-gray-600">
                         For: <em>{s.original.slice(0, 40)}...</em>
                       </div>
@@ -213,7 +244,7 @@ function Sidebar({
             </div>
           )}
         </section>
-      
+
         {/* Collaboration */}
         <section>
           <div className="font-semibold mb-1">Collaboration</div>
@@ -226,7 +257,7 @@ function Sidebar({
             {collabEnabled ? "Disconnect" : "Connect"}
           </button>
         </section>
-      
+
         {/* History */}
         <section>
           <div className="font-semibold mb-1">History</div>
@@ -252,6 +283,12 @@ export default function TipTapEditorPage() {
 
   // Sidebar
   const [sidebarOpen, setSidebarOpen] = useState(false);
+
+  const [aiSuggestEnabled, setAiSuggestEnabled] = useState(false);
+  interface Suggestion extends NewSuggestion {
+    id: number;
+  }
+  const [suggestions, setSuggestions] = useState<Suggestion[]>([]);
 
   // Version History (dummy)
   const DUMMY_HISTORY = [
@@ -294,7 +331,8 @@ export default function TipTapEditorPage() {
                 if (node.textContent && node.textContent.includes("DRAFT")) {
                   const start = node.textContent.indexOf("DRAFT");
                   issues.push({
-                    message: '"DRAFT" must not appear in the finalized document.',
+                    message:
+                      '"DRAFT" must not appear in the finalized document.',
                     from: pos + 1 + start,
                     to: pos + 1 + start + 5,
                   });
@@ -399,9 +437,9 @@ export default function TipTapEditorPage() {
   }
 
   function handleTemplateLoad(name: string) {
-  if (!editor) return;
-  if (name === "sample") {
-    editor.commands.setContent(`
+    if (!editor) return;
+    if (name === "sample") {
+      editor.commands.setContent(`
 1. Purpose.
 
 1.1 This advisory circular (AC) provides guidance for the certification of widget operators under Part 27.
@@ -456,9 +494,8 @@ Document titles are italicized.
 
 Signature block is present at the end.
     `);
+    }
   }
-}
-
 
   function handleToggleLint() {
     setLintEnabled((prev) => !prev);
@@ -470,6 +507,37 @@ Signature block is present at the end.
       setYDoc(null);
       setProvider(null);
     }
+  }
+
+  function handleToggleAiSuggest() {
+    setAiSuggestEnabled((prev) => !prev);
+  }
+
+  function handleNewSuggestion(data: NewSuggestion) {
+    setSuggestions((prev) => [
+      ...prev,
+      { ...data, id: Date.now() + Math.random() },
+    ]);
+  }
+
+  function acceptSuggestion(id: number) {
+    const s = suggestions.find((x) => x.id === id);
+    if (s && editor) {
+      editor
+        .chain()
+        .focus()
+        .insertContentAt({ from: s.from, to: s.to }, s.suggestion)
+        .run();
+    }
+    setSuggestions((prev) => prev.filter((x) => x.id !== id));
+  }
+
+  function rejectSuggestion(id: number) {
+    setSuggestions((prev) => prev.filter((x) => x.id !== id));
+  }
+
+  function clearSuggestions() {
+    setSuggestions([]);
   }
 
   function insertTable() {
@@ -596,7 +664,11 @@ Signature block is present at the end.
         >
           Save
         </button>
-        <AiSuggestButton editor={editor} />
+        <AiSuggestButton
+          editor={editor}
+          aiSuggestEnabled={aiSuggestEnabled}
+          onNewSuggestion={handleNewSuggestion}
+        />
         <div className="flex-1" />
       </header>
 
@@ -625,6 +697,12 @@ Signature block is present at the end.
         lintEnabled={lintEnabled}
         onToggleCollab={handleToggleCollab}
         collabEnabled={collabEnabled}
+        onToggleAiSuggest={handleToggleAiSuggest}
+        aiSuggestEnabled={aiSuggestEnabled}
+        suggestions={suggestions}
+        acceptSuggestion={acceptSuggestion}
+        rejectSuggestion={rejectSuggestion}
+        clearSuggestions={clearSuggestions}
         history={DUMMY_HISTORY}
       />
     </div>
