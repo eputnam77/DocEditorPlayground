@@ -14,8 +14,6 @@ import TableHeader from "@tiptap/extension-table-header";
 import Image from "@tiptap/extension-image";
 import Collaboration from "@tiptap/extension-collaboration";
 import CollaborationCursor from "@tiptap/extension-collaboration-cursor";
-
-// Slash command & Linting (Validation)
 import SlashCommand from "@tiptap/extension-slash-command";
 import Lint from "@tiptap/extension-lint";
 
@@ -23,29 +21,99 @@ import Lint from "@tiptap/extension-lint";
 import * as Y from "yjs";
 import { WebrtcProvider } from "y-webrtc";
 
-// Icons (lucide-react)
+// Icons
 const Bold = dynamic(() => import("lucide-react").then((m) => m.Bold));
 const Italic = dynamic(() => import("lucide-react").then((m) => m.Italic));
 const UnderlineIcon = dynamic(() =>
-  import("lucide-react").then((m) => m.Underline),
+  import("lucide-react").then((m) => m.Underline)
 );
 const Strikethrough = dynamic(() =>
-  import("lucide-react").then((m) => m.Strikethrough),
+  import("lucide-react").then((m) => m.Strikethrough)
 );
 const Code = dynamic(() => import("lucide-react").then((m) => m.Code));
 const Quote = dynamic(() => import("lucide-react").then((m) => m.Quote));
 const List = dynamic(() => import("lucide-react").then((m) => m.List));
 const ListOrdered = dynamic(() =>
-  import("lucide-react").then((m) => m.ListOrdered),
+  import("lucide-react").then((m) => m.ListOrdered)
 );
 const Undo2 = dynamic(() => import("lucide-react").then((m) => m.Undo2));
 const Redo2 = dynamic(() => import("lucide-react").then((m) => m.Redo2));
-const ImageIcon = dynamic(() => import("lucide-react").then((m) => m.Image));
-const TableIcon = dynamic(() => import("lucide-react").then((m) => m.Table));
-const MenuIcon = dynamic(() => import("lucide-react").then((m) => m.Menu));
+const ImageIcon = dynamic(() =>
+  import("lucide-react").then((m) => m.Image)
+);
+const TableIcon = dynamic(() =>
+  import("lucide-react").then((m) => m.Table)
+);
+const MenuIcon = dynamic(() =>
+  import("lucide-react").then((m) => m.Menu)
+);
 const XIcon = dynamic(() => import("lucide-react").then((m) => m.X));
+const Loader2 = dynamic(() => import("lucide-react").then((m) => m.Loader2));
 
-// Sidebar controls example (replace with your own as needed)
+/** ---- AI Suggest Button Component ---- */
+function AiSuggestButton({ editor }: { editor: any }) {
+  const [loading, setLoading] = useState(false);
+  const [error, setError] = useState<string | null>(null);
+
+  async function handleSuggest() {
+    setError(null);
+    if (!editor) return;
+    setLoading(true);
+
+    const { from, to, empty } = editor.state.selection;
+    const selectedText = empty
+      ? editor.state.doc.textContent
+      : editor.state.doc.textBetween(from, to, " ");
+
+    try {
+      const res = await fetch("/api/ai-suggest", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          text: selectedText,
+          // Optionally pass style context, doc type, rules, etc.
+        }),
+      });
+      if (!res.ok) throw new Error(await res.text());
+      const { suggestion } = await res.json();
+
+      editor.chain().focus();
+      if (empty) {
+        editor.commands.setContent(suggestion);
+      } else {
+        editor.commands.insertContentAt({ from, to }, suggestion);
+      }
+    } catch (err: any) {
+      setError(err.message || "AI Suggest failed");
+    } finally {
+      setLoading(false);
+    }
+  }
+
+  return (
+    <span className="ml-2 relative">
+      <button
+        onClick={handleSuggest}
+        disabled={loading}
+        className="px-3 py-2 bg-blue-600 text-white rounded hover:bg-blue-700 flex items-center gap-1"
+        title="AI Suggest (rewrite selection)"
+      >
+        {loading ? (
+          <Loader2 className="animate-spin w-4 h-4" />
+        ) : (
+          <span>AI Suggest</span>
+        )}
+      </button>
+      {error && (
+        <div className="absolute left-0 mt-2 bg-red-50 text-red-800 px-2 py-1 text-xs rounded shadow z-50">
+          {error}
+        </div>
+      )}
+    </span>
+  );
+}
+
+/** ---- Sidebar Controls ---- */
 function Sidebar({
   show,
   onClose,
@@ -55,7 +123,7 @@ function Sidebar({
   onToggleCollab,
   collabEnabled,
   history,
-}) {
+}: any) {
   return (
     <aside
       className={`fixed top-0 right-0 h-full w-80 bg-gray-100 border-l z-50 shadow-lg transform transition-transform duration-200 ${
@@ -86,7 +154,9 @@ function Sidebar({
         <div className="mb-4">
           <div className="font-semibold mb-1">Validation (Lint)</div>
           <button
-            className={`px-2 py-1 rounded ${lintEnabled ? "bg-green-500 text-white" : "bg-gray-200"}`}
+            className={`px-2 py-1 rounded ${
+              lintEnabled ? "bg-green-500 text-white" : "bg-gray-200"
+            }`}
             onClick={onToggleLint}
           >
             {lintEnabled ? "Disable" : "Enable"} Lint
@@ -95,7 +165,9 @@ function Sidebar({
         <div className="mb-4">
           <div className="font-semibold mb-1">Collaboration</div>
           <button
-            className={`px-2 py-1 rounded ${collabEnabled ? "bg-green-500 text-white" : "bg-gray-200"}`}
+            className={`px-2 py-1 rounded ${
+              collabEnabled ? "bg-green-500 text-white" : "bg-gray-200"
+            }`}
             onClick={onToggleCollab}
           >
             {collabEnabled ? "Disconnect" : "Connect"}
@@ -104,7 +176,7 @@ function Sidebar({
         <div>
           <div className="font-semibold mb-1">History</div>
           <ul className="text-xs">
-            {history.map((h) => (
+            {history.map((h: any) => (
               <li key={h.id}>{h.label}</li>
             ))}
           </ul>
@@ -117,7 +189,7 @@ function Sidebar({
 export default function TipTapEditorPage() {
   // Yjs Setup (for demo purposes)
   const [collabEnabled, setCollabEnabled] = useState(false);
-  const [yDoc, setYDoc] = useState(null as null | Y.Doc);
+  const [yDoc, setYDoc] = useState<Y.Doc | null>(null);
   const [provider, setProvider] = useState<any>(null);
 
   // Lint (validation)
@@ -148,21 +220,18 @@ export default function TipTapEditorPage() {
     if (lintEnabled) {
       base.push(
         Lint.configure({
-          // Linting rules per https://tiptap.dev/docs/examples/experiments/linting
           rule: {
             match: ({ tr }) => {
               const text = tr.doc.textContent;
-              // Simple example: flag "foo"
+              // Example: flag "foo"
               const issues = [];
               if (text.includes("foo")) {
                 issues.push({
                   message: "Please avoid the word 'foo'.",
                   from: text.indexOf("foo"),
                   to: text.indexOf("foo") + 3,
-                  fix: (view, from, to) => {
-                    view.dispatch(
-                      view.state.tr.insertText("bar", from, to)
-                    );
+                  fix: (view: any, from: number, to: number) => {
+                    view.dispatch(view.state.tr.insertText("bar", from, to));
                   },
                 });
               }
@@ -173,7 +242,6 @@ export default function TipTapEditorPage() {
       );
     }
     if (collabEnabled) {
-      // Ensure Yjs provider is ready
       if (!yDoc) {
         const doc = new Y.Doc();
         const webrtcProvider = new WebrtcProvider("tiptap-demo-room", doc);
@@ -208,26 +276,35 @@ export default function TipTapEditorPage() {
     autofocus: true,
     editorProps: {
       attributes: {
-        class: "tiptap-content focus:outline-none w-full h-full min-h-[400px] max-w-[860px] mx-auto",
+        class:
+          "tiptap-content focus:outline-none w-full h-full min-h-[400px] max-w-[860px] mx-auto",
       },
     },
     onUpdate: ({ editor }) => setContent(editor.getHTML()),
   });
 
   // Toolbar Helpers
-  function getCurrentBlock(editor) {
+  function getCurrentBlock(editor: any) {
     if (editor.isActive("heading", { level: 1 })) return "h1";
     if (editor.isActive("heading", { level: 2 })) return "h2";
     if (editor.isActive("heading", { level: 3 })) return "h3";
     return "p";
   }
-  function setBlock(editor, val) {
+  function setBlock(editor: any, val: string) {
     if (val === "p") editor.chain().focus().setParagraph().run();
-    else if (val === "h1") editor.chain().focus().toggleHeading({ level: 1 }).run();
-    else if (val === "h2") editor.chain().focus().toggleHeading({ level: 2 }).run();
-    else if (val === "h3") editor.chain().focus().toggleHeading({ level: 3 }).run();
+    else if (val === "h1")
+      editor.chain().focus().toggleHeading({ level: 1 }).run();
+    else if (val === "h2")
+      editor.chain().focus().toggleHeading({ level: 2 }).run();
+    else if (val === "h3")
+      editor.chain().focus().toggleHeading({ level: 3 }).run();
   }
-  function toolbarButton(icon, command, active, title = "") {
+  function toolbarButton(
+    icon: React.ReactNode,
+    command: () => void,
+    active: boolean,
+    title = ""
+  ) {
     return (
       <button
         type="button"
@@ -258,7 +335,6 @@ export default function TipTapEditorPage() {
   function handleToggleCollab() {
     setCollabEnabled((prev) => !prev);
     if (!collabEnabled && yDoc && provider) {
-      // Clean up Yjs on disconnect
       provider.disconnect();
       setYDoc(null);
       setProvider(null);
@@ -267,7 +343,10 @@ export default function TipTapEditorPage() {
 
   // Table/image actions
   function insertTable() {
-    editor?.chain().focus().insertTable({ rows: 3, cols: 3, withHeaderRow: true }).run();
+    editor?.chain()
+      .focus()
+      .insertTable({ rows: 3, cols: 3, withHeaderRow: true })
+      .run();
   }
   function insertImage() {
     const url = prompt("Image URL?");
@@ -277,7 +356,11 @@ export default function TipTapEditorPage() {
   }
 
   if (!editor)
-    return <div className="flex items-center justify-center h-full">Loading TipTap…</div>;
+    return (
+      <div className="flex items-center justify-center h-full">
+        Loading TipTap…
+      </div>
+    );
 
   return (
     <div className="flex flex-col h-screen w-full bg-white">
@@ -302,16 +385,66 @@ export default function TipTapEditorPage() {
           <option value="h2">Heading 2</option>
           <option value="h3">Heading 3</option>
         </select>
-        {toolbarButton(<Bold className="w-4 h-4" />, () => editor.chain().focus().toggleBold().run(), editor.isActive("bold"), "Bold")}
-        {toolbarButton(<Italic className="w-4 h-4" />, () => editor.chain().focus().toggleItalic().run(), editor.isActive("italic"), "Italic")}
-        {toolbarButton(<UnderlineIcon className="w-4 h-4" />, () => editor.chain().focus().toggleUnderline?.().run(), editor.isActive("underline"), "Underline")}
-        {toolbarButton(<Strikethrough className="w-4 h-4" />, () => editor.chain().focus().toggleStrike().run(), editor.isActive("strike"), "Strikethrough")}
-        {toolbarButton(<Code className="w-4 h-4" />, () => editor.chain().focus().toggleCode().run(), editor.isActive("code"), "Inline Code")}
-        {toolbarButton(<Quote className="w-4 h-4" />, () => editor.chain().focus().toggleBlockquote().run(), editor.isActive("blockquote"), "Blockquote")}
-        {toolbarButton(<List className="w-4 h-4" />, () => editor.chain().focus().toggleBulletList().run(), editor.isActive("bulletList"), "Bullet List")}
-        {toolbarButton(<ListOrdered className="w-4 h-4" />, () => editor.chain().focus().toggleOrderedList().run(), editor.isActive("orderedList"), "Numbered List")}
-        {toolbarButton(<Undo2 className="w-4 h-4" />, () => editor.chain().focus().undo().run(), false, "Undo")}
-        {toolbarButton(<Redo2 className="w-4 h-4" />, () => editor.chain().focus().redo().run(), false, "Redo")}
+        {toolbarButton(
+          <Bold className="w-4 h-4" />,
+          () => editor.chain().focus().toggleBold().run(),
+          editor.isActive("bold"),
+          "Bold"
+        )}
+        {toolbarButton(
+          <Italic className="w-4 h-4" />,
+          () => editor.chain().focus().toggleItalic().run(),
+          editor.isActive("italic"),
+          "Italic"
+        )}
+        {toolbarButton(
+          <UnderlineIcon className="w-4 h-4" />,
+          () => editor.chain().focus().toggleUnderline?.().run(),
+          editor.isActive("underline"),
+          "Underline"
+        )}
+        {toolbarButton(
+          <Strikethrough className="w-4 h-4" />,
+          () => editor.chain().focus().toggleStrike().run(),
+          editor.isActive("strike"),
+          "Strikethrough"
+        )}
+        {toolbarButton(
+          <Code className="w-4 h-4" />,
+          () => editor.chain().focus().toggleCode().run(),
+          editor.isActive("code"),
+          "Inline Code"
+        )}
+        {toolbarButton(
+          <Quote className="w-4 h-4" />,
+          () => editor.chain().focus().toggleBlockquote().run(),
+          editor.isActive("blockquote"),
+          "Blockquote"
+        )}
+        {toolbarButton(
+          <List className="w-4 h-4" />,
+          () => editor.chain().focus().toggleBulletList().run(),
+          editor.isActive("bulletList"),
+          "Bullet List"
+        )}
+        {toolbarButton(
+          <ListOrdered className="w-4 h-4" />,
+          () => editor.chain().focus().toggleOrderedList().run(),
+          editor.isActive("orderedList"),
+          "Numbered List"
+        )}
+        {toolbarButton(
+          <Undo2 className="w-4 h-4" />,
+          () => editor.chain().focus().undo().run(),
+          false,
+          "Undo"
+        )}
+        {toolbarButton(
+          <Redo2 className="w-4 h-4" />,
+          () => editor.chain().focus().redo().run(),
+          false,
+          "Redo"
+        )}
         <button
           onClick={insertTable}
           className="ml-2 p-2 rounded bg-gray-200"
@@ -332,14 +465,16 @@ export default function TipTapEditorPage() {
         >
           Save
         </button>
+        <AiSuggestButton editor={editor} />
         <div className="flex-1" />
-        {/* Optionally, more header controls */}
       </header>
 
       {/* Lint (Validation) Overlay */}
       {lintEnabled && (
         <div className="fixed bottom-6 left-1/2 transform -translate-x-1/2 bg-red-50 border border-red-300 px-6 py-2 rounded z-40 shadow">
-          <span className="text-red-600 font-semibold">Linting enabled — Issues will be highlighted inline.</span>
+          <span className="text-red-600 font-semibold">
+            Linting enabled — Issues will be highlighted inline.
+          </span>
         </div>
       )}
 
