@@ -65,6 +65,25 @@ nvm use 20
 npm install
 ```
 
+TBD. I had to do this for issues
+
+```bash
+npm install \
+@tiptap/react@2 \
+@tiptap/starter-kit@2 \
+@tiptap/extension-underline@2 \
+@tiptap/extension-table@2 \
+@tiptap/extension-table-row@2 \
+@tiptap/extension-table-cell@2 \
+@tiptap/extension-table-header@2 \
+@tiptap/extension-image@2 \
+@tiptap/extension-collaboration@2 \
+@tiptap/extension-collaboration-cursor@2 \
+yjs y-webrtc lucide-react \
+--legacy-peer-deps
+```
+
+
 ### 2. Run setup script (optional)
 
 If your setup script is bash-based and you are on Windows, use **Git Bash** or **WSL** (Windows Subsystem for Linux).
