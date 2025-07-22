@@ -212,19 +212,88 @@ export default function TipTapEditorPage() {
           rule: {
             match: ({ tr }) => {
               const text = tr.doc.textContent;
-              const issues = [];
-              let index = text.indexOf("foo");
-              while (index > -1) {
+              const issues: any[] = [];
+    
+              // Rule 1: Prohibited content: DRAFT
+              let idx = text.indexOf("DRAFT");
+              if (idx > -1) {
                 issues.push({
-                  message: "Please avoid the word 'foo'.",
-                  from: index,
-                  to: index + 3,
-                  fix: (view: any, from: number, to: number) => {
-                    view.dispatch(view.state.tr.insertText("bar", from, to));
-                  },
+                  message: '"DRAFT" must not appear in the finalized document.',
+                  from: idx,
+                  to: idx + 5,
                 });
-                index = text.indexOf("foo", index + 1);
               }
+    
+              // Rule 2: Prohibited placeholder [Purpose goes here]
+              let phIdx = text.indexOf("[Purpose goes here]");
+              if (phIdx > -1) {
+                issues.push({
+                  message: 'Placeholder "[Purpose goes here]" must be removed.',
+                  from: phIdx,
+                  to: phIdx + 20,
+                });
+              }
+    
+              // Rule 3: Must have "1. Purpose." heading
+              if (!text.match(/1\. Purpose\./)) {
+                issues.push({
+                  message: 'Missing required heading: "1. Purpose."',
+                  from: 0,
+                  to: 1,
+                });
+              }
+    
+              // Rule 4: Must have "2. Applicability." heading
+              if (!text.match(/2\. Applicability\./)) {
+                issues.push({
+                  message: 'Missing required heading: "2. Applicability."',
+                  from: 0,
+                  to: 1,
+                });
+              }
+    
+              // Rule 5: Must have "4. Related Material." heading
+              if (!text.match(/4\. Related Material\./)) {
+                issues.push({
+                  message: 'Missing required heading: "4. Related Material."',
+                  from: 0,
+                  to: 1,
+                });
+              }
+    
+              // Rule 6: Headings must end with a period (very basic check)
+              // (For more accuracy, you'd walk the doc’s node tree!)
+              const headingRegex = /(\d+\..+?)(\n|$)/g;
+              let match;
+              while ((match = headingRegex.exec(text)) !== null) {
+                if (!match[1].trim().endsWith(".")) {
+                  issues.push({
+                    message: "Heading must end with a period.",
+                    from: match.index,
+                    to: match.index + match[1].length,
+                  });
+                }
+              }
+    
+              // Rule 7: Prohibited: <ac no.> and <ac title.>
+              let acnoIdx = text.indexOf("<ac no.>");
+              if (acnoIdx > -1) {
+                issues.push({
+                  message: "Remove all <ac no.> placeholders.",
+                  from: acnoIdx,
+                  to: acnoIdx + 9,
+                });
+              }
+              let actitleIdx = text.indexOf("<ac title.>");
+              if (actitleIdx > -1) {
+                issues.push({
+                  message: "Remove all <ac title.> placeholders.",
+                  from: actitleIdx,
+                  to: actitleIdx + 12,
+                });
+              }
+    
+              // Add more rules as needed...
               return issues;
             },
           },
@@ -235,7 +304,7 @@ export default function TipTapEditorPage() {
       if (!yDoc) {
         const doc = new Y.Doc();
         const webrtcProvider = new WebrtcProvider("tiptap-demo-room", doc);
-        setYDoc(doc);
+        s  etYDoc(doc);
         setProvider(webrtcProvider);
         base.push(
           Collaboration.configure({ document: doc }),
