@@ -15,7 +15,15 @@
     "isolatedModules": true,
     "jsx": "preserve",
     "incremental": true,
-    "baseUrl": "."
+    "baseUrl": ".",
+    "paths": {
+      "@tiptap/extension-table": ["stubs/tiptap-extension-table.ts"],
+      "@tiptap/extension-table-row": ["stubs/tiptap-extension-table-row.ts"],
+      "@tiptap/extension-table-cell": ["stubs/tiptap-extension-table-cell.ts"],
+      "@tiptap/extension-table-header": [
+        "stubs/tiptap-extension-table-header.ts"
+      ]
+    }
   },
   "include": [
     "next-env.d.ts",

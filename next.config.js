@@ -14,6 +14,22 @@ export default withAnalyze({
     config.resolve = config.resolve || {};
     config.resolve.alias = {
       ...(config.resolve.alias || {}),
+      "@tiptap/extension-table": path.resolve(
+        __dirname,
+        "stubs/tiptap-extension-table.ts",
+      ),
+      "@tiptap/extension-table-row": path.resolve(
+        __dirname,
+        "stubs/tiptap-extension-table-row.ts",
+      ),
+      "@tiptap/extension-table-cell": path.resolve(
+        __dirname,
+        "stubs/tiptap-extension-table-cell.ts",
+      ),
+      "@tiptap/extension-table-header": path.resolve(
+        __dirname,
+        "stubs/tiptap-extension-table-header.ts",
+      ),
     };
     return config;
   },
