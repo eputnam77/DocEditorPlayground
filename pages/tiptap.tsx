@@ -12,8 +12,8 @@ import TableHeader from "@tiptap/extension-table-header";
 import Image from "@tiptap/extension-image";
 import Collaboration from "@tiptap/extension-collaboration";
 import CollaborationCursor from "@tiptap/extension-collaboration-cursor";
-import SlashCommand from "./extensions/slash-command";
-import Lint from "./extensions/lint";
+import SlashCommand from "../extensions/slash-command";
+import Lint from "../extensions/lint";
 
 // Yjs for collaboration
 import * as Y from "yjs";
@@ -23,28 +23,22 @@ import { WebrtcProvider } from "y-webrtc";
 const Bold = dynamic(() => import("lucide-react").then((m) => m.Bold));
 const Italic = dynamic(() => import("lucide-react").then((m) => m.Italic));
 const UnderlineIcon = dynamic(() =>
-  import("lucide-react").then((m) => m.Underline)
+  import("lucide-react").then((m) => m.Underline),
 );
 const Strikethrough = dynamic(() =>
-  import("lucide-react").then((m) => m.Strikethrough)
+  import("lucide-react").then((m) => m.Strikethrough),
 );
 const Code = dynamic(() => import("lucide-react").then((m) => m.Code));
 const Quote = dynamic(() => import("lucide-react").then((m) => m.Quote));
 const List = dynamic(() => import("lucide-react").then((m) => m.List));
 const ListOrdered = dynamic(() =>
-  import("lucide-react").then((m) => m.ListOrdered)
+  import("lucide-react").then((m) => m.ListOrdered),
 );
 const Undo2 = dynamic(() => import("lucide-react").then((m) => m.Undo2));
 const Redo2 = dynamic(() => import("lucide-react").then((m) => m.Redo2));
-const ImageIcon = dynamic(() =>
-  import("lucide-react").then((m) => m.Image)
-);
-const TableIcon = dynamic(() =>
-  import("lucide-react").then((m) => m.Table)
-);
-const MenuIcon = dynamic(() =>
-  import("lucide-react").then((m) => m.Menu)
-);
+const ImageIcon = dynamic(() => import("lucide-react").then((m) => m.Image));
+const TableIcon = dynamic(() => import("lucide-react").then((m) => m.Table));
+const MenuIcon = dynamic(() => import("lucide-react").then((m) => m.Menu));
 const XIcon = dynamic(() => import("lucide-react").then((m) => m.X));
 const Loader2 = dynamic(() => import("lucide-react").then((m) => m.Loader2));
 
@@ -234,7 +228,7 @@ export default function TipTapEditorPage() {
               return issues;
             },
           },
-        })
+        }),
       );
     }
     if (collabEnabled) {
@@ -248,7 +242,7 @@ export default function TipTapEditorPage() {
           CollaborationCursor.configure({
             provider: webrtcProvider,
             user: { name: "You", color: "#3b82f6" },
-          })
+          }),
         );
       } else if (yDoc && provider) {
         base.push(
@@ -256,7 +250,7 @@ export default function TipTapEditorPage() {
           CollaborationCursor.configure({
             provider: provider,
             user: { name: "You", color: "#3b82f6" },
-          })
+          }),
         );
       }
     }
@@ -298,7 +292,7 @@ export default function TipTapEditorPage() {
     icon: React.ReactNode,
     command: () => void,
     active: boolean,
-    title = ""
+    title = "",
   ) {
     return (
       <button
@@ -316,7 +310,7 @@ export default function TipTapEditorPage() {
     if (!editor) return;
     if (name === "sample") {
       editor.commands.setContent(
-        "<h1>Sample Template</h1><p>This is a loaded template.</p>"
+        "<h1>Sample Template</h1><p>This is a loaded template.</p>",
       );
     }
   }
@@ -334,7 +328,8 @@ export default function TipTapEditorPage() {
   }
 
   function insertTable() {
-    editor?.chain()
+    editor
+      ?.chain()
       .focus()
       .insertTable({ rows: 3, cols: 3, withHeaderRow: true })
       .run();
@@ -380,61 +375,61 @@ export default function TipTapEditorPage() {
           <Bold className="w-4 h-4" />,
           () => editor.chain().focus().toggleBold().run(),
           editor.isActive("bold"),
-          "Bold"
+          "Bold",
         )}
         {toolbarButton(
           <Italic className="w-4 h-4" />,
           () => editor.chain().focus().toggleItalic().run(),
           editor.isActive("italic"),
-          "Italic"
+          "Italic",
         )}
         {toolbarButton(
           <UnderlineIcon className="w-4 h-4" />,
           () => editor.chain().focus().toggleUnderline?.().run(),
           editor.isActive("underline"),
-          "Underline"
+          "Underline",
         )}
         {toolbarButton(
           <Strikethrough className="w-4 h-4" />,
           () => editor.chain().focus().toggleStrike().run(),
           editor.isActive("strike"),
-          "Strikethrough"
+          "Strikethrough",
         )}
         {toolbarButton(
           <Code className="w-4 h-4" />,
           () => editor.chain().focus().toggleCode().run(),
           editor.isActive("code"),
-          "Inline Code"
+          "Inline Code",
         )}
         {toolbarButton(
           <Quote className="w-4 h-4" />,
           () => editor.chain().focus().toggleBlockquote().run(),
           editor.isActive("blockquote"),
-          "Blockquote"
+          "Blockquote",
         )}
         {toolbarButton(
           <List className="w-4 h-4" />,
           () => editor.chain().focus().toggleBulletList().run(),
           editor.isActive("bulletList"),
-          "Bullet List"
+          "Bullet List",
         )}
         {toolbarButton(
           <ListOrdered className="w-4 h-4" />,
           () => editor.chain().focus().toggleOrderedList().run(),
           editor.isActive("orderedList"),
-          "Numbered List"
+          "Numbered List",
         )}
         {toolbarButton(
           <Undo2 className="w-4 h-4" />,
           () => editor.chain().focus().undo().run(),
           false,
-          "Undo"
+          "Undo",
         )}
         {toolbarButton(
           <Redo2 className="w-4 h-4" />,
           () => editor.chain().focus().redo().run(),
           false,
-          "Redo"
+          "Redo",
         )}
         <button
           onClick={insertTable}
