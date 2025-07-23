@@ -471,7 +471,9 @@ export default function TipTapEditorPage() {
       const res = await fetch(`/templates/${filename}`);
       if (!res.ok) throw new Error("fetch failed");
       const html = await res.text();
-      editor.commands.setContent(sanitizeHtml(html));
+      const sanitized = sanitizeHtml(html);
+      editor.commands.setContent(sanitized);
+      setContent(sanitized);
     } catch {
       alert("Failed to load template: " + filename);
     }
