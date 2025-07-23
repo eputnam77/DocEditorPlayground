@@ -84,7 +84,6 @@ yjs y-webrtc lucide-react \
 --legacy-peer-deps
 ```
 
-
 ### 2. Run setup script (optional)
 
 If your setup script is bash-based and you are on Windows, use **Git Bash** or **WSL** (Windows Subsystem for Linux).
@@ -175,3 +174,7 @@ See `docs/adr` for architectural decisions.
 ## Current Status (July 2025)
 
 All editor pages are available with lightweight stub implementations. TipTap demonstrates custom extensions while the other editors omit their heavy bundles. Plugin toggles, template loading, validation checks, commenting and track changes widgets are shared across pages so you can compare workflows between editors.
+
+## Troubleshooting
+
+In development mode, the first time you open pages like /tiptap can be sluggish. Next.js compiles each page on demand, and the TipTap page imports many extensions. Prefetching only downloads the built chunk—it cannot skip this initial build. Once the dev server finishes compiling, further navigations are fast. Running a production build (`npm run build && npm start`) also avoids this delay.
