@@ -16,3 +16,7 @@ Thumbs.db
 .idea/
 *.swp
 *.local
+
+# local dev artifacts
+.coverage
+.venv/
