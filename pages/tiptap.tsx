@@ -124,22 +124,40 @@ function AiSuggestButton({
   );
 }
 
-function Sidebar({
-  show,
-  onClose,
-  onTemplateLoad,
-  onToggleLint,
-  lintEnabled,
-  onToggleCollab,
-  collabEnabled,
-  onToggleAiSuggest,
-  aiSuggestEnabled,
-  suggestions,
-  acceptSuggestion,
-  rejectSuggestion,
-  clearSuggestions,
-  history,
-}: any) {
+interface SidebarProps {
+  show: boolean;
+  onClose: () => void;
+  onTemplateLoad: (filename: string) => void;
+  onToggleLint: () => void;
+  lintEnabled: boolean;
+  onToggleCollab: () => void;
+  collabEnabled: boolean;
+  onToggleAiSuggest: () => void;
+  aiSuggestEnabled: boolean;
+  suggestions: any[];
+  acceptSuggestion: (id: number) => void;
+  rejectSuggestion: (id: number) => void;
+  clearSuggestions: () => void;
+  history: any[];
+}
+
+function Sidebar(props: SidebarProps) {
+  const {
+    show,
+    onClose,
+    onTemplateLoad,
+    onToggleLint,
+    lintEnabled,
+    onToggleCollab,
+    collabEnabled,
+    onToggleAiSuggest,
+    aiSuggestEnabled,
+    suggestions,
+    acceptSuggestion,
+    rejectSuggestion,
+    clearSuggestions,
+    history,
+  } = props;
   return (
     <aside
       className={`fixed top-0 right-0 h-full w-80 bg-gray-100 border-l z-50 shadow-lg transform transition-transform duration-200 ${
