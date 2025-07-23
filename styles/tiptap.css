@@ -104,3 +104,8 @@
 .tiptap-content s {
   text-decoration: line-through;
 }
+
+.lint-highlight {
+  background-color: #fef3c7; /* Tailwind amber-100 */
+  border-bottom: 2px solid #f59e0b; /* Tailwind amber-500 */
+}

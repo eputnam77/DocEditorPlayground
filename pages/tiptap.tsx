@@ -390,18 +390,21 @@ export default function TipTapEditorPage() {
 
   // TipTap Editor
   const [content, setContent] = useState("<p>Hello world!</p>");
-  const editor = useEditor({
-    extensions,
-    content,
-    autofocus: true,
-    editorProps: {
-      attributes: {
-        class:
-          "tiptap-content focus:outline-none w-full h-full min-h-[400px] max-w-[860px] mx-auto",
+  const editor = useEditor(
+    {
+      extensions,
+      content,
+      autofocus: true,
+      editorProps: {
+        attributes: {
+          class:
+            "tiptap-content focus:outline-none w-full h-full min-h-[400px] max-w-[860px] mx-auto",
+        },
       },
+      onUpdate: ({ editor }) => setContent(editor.getHTML()),
     },
-    onUpdate: ({ editor }) => setContent(editor.getHTML()),
-  });
+    [extensions],
+  );
 
   function getCurrentBlock(editor: any) {
     if (editor.isActive("heading", { level: 1 })) return "h1";
