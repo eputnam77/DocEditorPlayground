@@ -17,6 +17,12 @@ import Lint from "../extensions/lint";
 import sanitizeHtml from "../utils/sanitize";
 import { TEMPLATES } from "../utils/templates";
 
+// Custom TipTap extensions
+import { tiptapHeadingLock } from "../extensions/tiptapHeadingLock";
+import { tiptapIndentation } from "../extensions/tiptapIndentation";
+import { tiptapSectionNode } from "../extensions/tiptapSectionNode";
+import { tiptapWatermark } from "../extensions/tiptapWatermark";
+
 // Yjs for collaboration
 import * as Y from "yjs";
 import { WebrtcProvider } from "y-webrtc";
@@ -134,6 +140,16 @@ interface SidebarProps {
   collabEnabled: boolean;
   onToggleAiSuggest: () => void;
   aiSuggestEnabled: boolean;
+  onToggleHeadingLock: () => void;
+  headingLockEnabled: boolean;
+  onToggleIndentation: () => void;
+  indentationEnabled: boolean;
+  onToggleSectionNode: () => void;
+  sectionNodeEnabled: boolean;
+  onToggleWatermark: () => void;
+  watermarkEnabled: boolean;
+  watermarkText: string;
+  onWatermarkText: (text: string) => void;
   suggestions: any[];
   acceptSuggestion: (id: number) => void;
   rejectSuggestion: (id: number) => void;
@@ -152,6 +168,16 @@ function Sidebar(props: SidebarProps) {
     collabEnabled,
     onToggleAiSuggest,
     aiSuggestEnabled,
+    onToggleHeadingLock,
+    headingLockEnabled,
+    onToggleIndentation,
+    indentationEnabled,
+    onToggleSectionNode,
+    sectionNodeEnabled,
+    onToggleWatermark,
+    watermarkEnabled,
+    watermarkText,
+    onWatermarkText,
     suggestions,
     acceptSuggestion,
     rejectSuggestion,
@@ -271,6 +297,66 @@ function Sidebar(props: SidebarProps) {
           )}
         </section>
 
+        {/* Heading Lock */}
+        <section>
+          <div className="font-semibold mb-1">Heading Lock</div>
+          <button
+            className={`px-2 py-1 rounded w-full ${
+              headingLockEnabled ? "bg-green-500 text-white" : "bg-gray-200"
+            }`}
+            onClick={onToggleHeadingLock}
+          >
+            {headingLockEnabled ? "Disable" : "Enable"} Heading Lock
+          </button>
+        </section>
+
+        {/* Indentation */}
+        <section>
+          <div className="font-semibold mb-1">Indentation</div>
+          <button
+            className={`px-2 py-1 rounded w-full ${
+              indentationEnabled ? "bg-green-500 text-white" : "bg-gray-200"
+            }`}
+            onClick={onToggleIndentation}
+          >
+            {indentationEnabled ? "Disable" : "Enable"} Indentation
+          </button>
+        </section>
+
+        {/* Section Node */}
+        <section>
+          <div className="font-semibold mb-1">Section Node</div>
+          <button
+            className={`px-2 py-1 rounded w-full ${
+              sectionNodeEnabled ? "bg-green-500 text-white" : "bg-gray-200"
+            }`}
+            onClick={onToggleSectionNode}
+          >
+            {sectionNodeEnabled ? "Disable" : "Enable"} Section Node
+          </button>
+        </section>
+
+        {/* Watermark */}
+        <section>
+          <div className="font-semibold mb-1">Watermark</div>
+          <button
+            className={`px-2 py-1 rounded w-full ${
+              watermarkEnabled ? "bg-green-500 text-white" : "bg-gray-200"
+            }`}
+            onClick={onToggleWatermark}
+          >
+            {watermarkEnabled ? "Disable" : "Enable"} Watermark
+          </button>
+          {watermarkEnabled && (
+            <input
+              className="mt-2 w-full border rounded px-2 py-1 text-sm"
+              value={watermarkText}
+              onChange={(e) => onWatermarkText(e.target.value)}
+              placeholder="Watermark text"
+            />
+          )}
+        </section>
+
         {/* Collaboration */}
         <section>
           <div className="font-semibold mb-1">Collaboration</div>
@@ -306,6 +392,13 @@ export default function TipTapEditorPage() {
 
   // Lint (validation)
   const [lintEnabled, setLintEnabled] = useState(false);
+
+  // Optional extensions
+  const [headingLockEnabled, setHeadingLockEnabled] = useState(false);
+  const [indentationEnabled, setIndentationEnabled] = useState(false);
+  const [sectionNodeEnabled, setSectionNodeEnabled] = useState(false);
+  const [watermarkEnabled, setWatermarkEnabled] = useState(false);
+  const [watermarkText, setWatermarkText] = useState("Sample");
 
   // Sidebar
   const [sidebarOpen, setSidebarOpen] = useState(false);
@@ -410,9 +503,21 @@ export default function TipTapEditorPage() {
         );
       }
     }
+    if (headingLockEnabled) {
+      base.push(tiptapHeadingLock());
+    }
+    if (indentationEnabled) {
+      base.push(tiptapIndentation());
+    }
+    if (sectionNodeEnabled) {
+      base.push(tiptapSectionNode());
+    }
+    if (watermarkEnabled) {
+      base.push(tiptapWatermark(watermarkText));
+    }
     return base;
     // eslint-disable-next-line
-  }, [lintEnabled, collabEnabled, yDoc, provider]);
+  }, [lintEnabled, collabEnabled, yDoc, provider, headingLockEnabled, indentationEnabled, sectionNodeEnabled, watermarkEnabled, watermarkText]);
 
   // TipTap Editor
   const [content, setContent] = useState("<p>Hello world!</p>");
@@ -493,6 +598,19 @@ export default function TipTapEditorPage() {
 
   function handleToggleAiSuggest() {
     setAiSuggestEnabled((prev) => !prev);
+  }
+
+  function handleToggleHeadingLock() {
+    setHeadingLockEnabled((prev) => !prev);
+  }
+  function handleToggleIndentation() {
+    setIndentationEnabled((prev) => !prev);
+  }
+  function handleToggleSectionNode() {
+    setSectionNodeEnabled((prev) => !prev);
+  }
+  function handleToggleWatermark() {
+    setWatermarkEnabled((prev) => !prev);
   }
 
   function handleNewSuggestion(data: NewSuggestion) {
@@ -681,6 +799,16 @@ export default function TipTapEditorPage() {
         collabEnabled={collabEnabled}
         onToggleAiSuggest={handleToggleAiSuggest}
         aiSuggestEnabled={aiSuggestEnabled}
+        onToggleHeadingLock={handleToggleHeadingLock}
+        headingLockEnabled={headingLockEnabled}
+        onToggleIndentation={handleToggleIndentation}
+        indentationEnabled={indentationEnabled}
+        onToggleSectionNode={handleToggleSectionNode}
+        sectionNodeEnabled={sectionNodeEnabled}
+        onToggleWatermark={handleToggleWatermark}
+        watermarkEnabled={watermarkEnabled}
+        watermarkText={watermarkText}
+        onWatermarkText={setWatermarkText}
         suggestions={suggestions}
         acceptSuggestion={acceptSuggestion}
         rejectSuggestion={rejectSuggestion}
