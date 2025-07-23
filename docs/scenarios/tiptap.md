@@ -53,6 +53,10 @@ Enable **Watermark** and edit the overlay text in the side panel.
 
 Paragraphs and lists support basic indentation via the `Indentation` extension.
 
+## AI Suggest
+
+Enable **AI Suggest** in the sidebar to rewrite selected text. Highlight a sentence and press **AI Suggest** in the toolbar. The default API just uppercases your text; customize `pages/api/ai-suggest.ts` to call your language model with a federal writing prompt.
+
 ## Structure enforcement
 
 The `tiptapStructure` extension prevents consecutive headings and ensures paragraphs follow each heading.
