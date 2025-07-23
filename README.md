@@ -11,6 +11,7 @@ This project demonstrates multiple rich text editors side by side using **Next.j
 - Heading locking and structure enforcement
 - Optional Yjs collaboration, section nodes and watermark
 - Indentation controls
+- Optional AI Suggest sidebar for rewriting selected text
 - Dark mode switch
 - Caches templates and validation files for a year via \`Cache-Control\` headers
   configured in **next.config.js**.
@@ -138,7 +139,7 @@ npx playwright test --reporter=line
 
 ## Adding or Removing Plugins
 
-See [Integration Guides](docs/integration-guides.md) for quick notes on how to manage plugins or extensions in each editor.
+See [Integration Guides](docs/integration-guides.md) for quick notes on how to manage plugins or extensions in each editor. For tips on customizing the rewrite service, read [AI Suggest Workflow](docs/ai-suggest.md).
 
 Each editor page also features a **Template Loader** for quickly inserting example
 documents. Comments can be added using the built-in comment tracker below the
