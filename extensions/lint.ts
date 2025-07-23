@@ -1,7 +1,7 @@
 // lint.ts
-import { Extension } from '@tiptap/core';
-import { Decoration, DecorationSet } from 'prosemirror-view';
-import { Plugin, PluginKey } from 'prosemirror-state';
+import { Extension } from "@tiptap/core";
+import { Decoration, DecorationSet } from "prosemirror-view";
+import { Plugin, PluginKey } from "prosemirror-state";
 
 export interface LintRule {
   match: (props: { tr: any }) => Array<{
@@ -13,7 +13,7 @@ export interface LintRule {
 }
 
 export default Extension.create<{ rule: LintRule }>({
-  name: 'lint',
+  name: "lint",
   addOptions() {
     return {
       rule: {
@@ -22,18 +22,22 @@ export default Extension.create<{ rule: LintRule }>({
     };
   },
   addProseMirrorPlugins() {
+    const { rule } = this.options;
     return [
       new Plugin({
-        key: new PluginKey('lint'),
+        key: new PluginKey("lint"),
         state: {
-          init: (_, { doc }) => DecorationSet.empty,
+          init: () => DecorationSet.empty,
           apply(tr, old) {
             if (!tr.docChanged) return old;
             const decorations: any[] = [];
-            const issues = this.spec.props.rule.match({ tr });
-            issues.forEach(issue => {
+            const issues = rule.match({ tr });
+            issues.forEach((issue) => {
               decorations.push(
-                Decoration.inline(issue.from, issue.to, { class: 'lint-highlight', title: issue.message })
+                Decoration.inline(issue.from, issue.to, {
+                  class: "lint-highlight",
+                  title: issue.message,
+                }),
               );
             });
             return DecorationSet.create(tr.doc, decorations);
