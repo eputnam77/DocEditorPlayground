@@ -28,79 +28,87 @@ npm run analyze
 
 Set `ANALYZE=true` when running `next build` to generate the report.
 
-## Installation
+---
 
-````markdown
-## Prerequisites
+# DocEditorPlayground (TypeScript)
 
-- **Node.js 18.18+ required** (Recommended: Node.js LTS 22.x)
-- [npm](https://www.npmjs.com/) is bundled with Node.js
+Real‑time TipTap editor with Yjs collaboration—ready to hack locally.
 
-### Install Node.js (choose your environment)
+**DocEditorPlayground** is a React / TypeScript workspace that showcases TipTap v2 with tables, images, underline, suggestions, and full Yjs‑based live‑collaboration (WebRTC cursors included). The project uses Vite for dev‑server speed and ships with sensible ESLint + Prettier rules.
 
-#### On Codespaces, Mac, or Linux (using nvm)
+---
+
+## ✨ Quick install (recommended)
+
+We follow the same pattern as our Python CLIs: keep global tooling isolated (via **nvm** / **nvm‑windows**), then rely on your project‑local `node_modules`.
 
 ```bash
+# 0 Install Node.js LTS (v22.x recommended) ─────────────────────────────
+# macOS / Linux / Codespaces
 nvm install --lts
 nvm use --lts
-```
-````
 
-#### On Windows (using nvm-windows)
-
-```cmd
+# Windows PowerShell (nvm-windows)
 nvm install lts
 nvm use lts
 ```
 
-_or specify a version:_
+*(Need a specific runtime? Replace `lts` with `20`, `22.1.0`, etc.)*
 
-```cmd
-nvm install 20
-nvm use 20
-```
+---
 
-### 1. Install project dependencies
+## 1  Install dependencies
 
 ```bash
+# Standard install
 npm install
 ```
 
-TBD. I had to do this for issues
+### If you hit TipTap peer‑dep issues
+
+Run the pinned install (one‑time) to satisfy unmet ranges:
 
 ```bash
 npm install \
-@tiptap/react@2 \
-@tiptap/starter-kit@2 \
-@tiptap/extension-underline@2 \
-@tiptap/extension-table@2 \
-@tiptap/extension-table-row@2 \
-@tiptap/extension-table-cell@2 \
-@tiptap/extension-table-header@2 \
-@tiptap/extension-image@2 \
-@tiptap/extension-collaboration@2 \
-@tiptap/extension-collaboration-cursor@2 \
-@tiptap/suggestion@2 \
-yjs y-webrtc lucide-react \
---legacy-peer-deps
+  @tiptap/react@2 @tiptap/starter-kit@2 @tiptap/extension-underline@2 \
+  @tiptap/extension-table@2 @tiptap/extension-table-row@2 \
+  @tiptap/extension-table-cell@2 @tiptap/extension-table-header@2 \
+  @tiptap/extension-image@2 @tiptap/extension-collaboration@2 \
+  @tiptap/extension-collaboration-cursor@2 @tiptap/suggestion@2 \
+  yjs y-webrtc lucide-react \
+  --legacy-peer-deps
 ```
 
-### 2. Run setup script (optional)
+*(The `--legacy-peer-deps` flag skips npm’s strict peer-resolution—handy until TipTap publishes v3 react bindings.)*
 
-If your setup script is bash-based and you are on Windows, use **Git Bash** or **WSL** (Windows Subsystem for Linux).
-Otherwise, run:
+---
+
+## 2  (Optional) project setup script
 
 ```bash
+# Unix / macOS / Codespaces
 bash scripts/setup.sh
+
+# Windows users
+# • Use Git Bash or WSL for shell scripts
+# • Or create a PowerShell (.ps1) equivalent
 ```
 
-If you need a Windows-native script, consider creating a `.ps1` (PowerShell) or `.cmd` alternative.
+---
 
-### 3. Start development server
+## 3  Start the development server
 
 ```bash
 npm run dev
 ```
+
+Vite prints a local URL—open it in your browser and start typing. Edits hot‑reload instantly; open a second tab to see Yjs collaboration cursors in action.
+
+---
+
+### About lock files
+
+The repo ships **`package-lock.json`**. Commit changes after dependency bumps so teammates (and CI) get identical installs.
 
 ---
 
