@@ -22,6 +22,7 @@ import { tiptapHeadingLock } from "../extensions/tiptapHeadingLock";
 import { tiptapIndentation } from "../extensions/tiptapIndentation";
 import { tiptapSectionNode } from "../extensions/tiptapSectionNode";
 import { tiptapWatermark } from "../extensions/tiptapWatermark";
+import { tiptapMarkReview } from "../extensions/tiptapMarkReview";
 
 // Yjs for collaboration
 import * as Y from "yjs";
@@ -146,6 +147,8 @@ interface SidebarProps {
   indentationEnabled: boolean;
   onToggleSectionNode: () => void;
   sectionNodeEnabled: boolean;
+  onToggleMarkReview: () => void;
+  markReviewEnabled: boolean;
   onToggleWatermark: () => void;
   watermarkEnabled: boolean;
   watermarkText: string;
@@ -174,6 +177,8 @@ function Sidebar(props: SidebarProps) {
     indentationEnabled,
     onToggleSectionNode,
     sectionNodeEnabled,
+    onToggleMarkReview,
+    markReviewEnabled,
     onToggleWatermark,
     watermarkEnabled,
     watermarkText,
@@ -336,6 +341,19 @@ function Sidebar(props: SidebarProps) {
           </button>
         </section>
 
+        {/* Mark Review */}
+        <section>
+          <div className="font-semibold mb-1">Mark Review</div>
+          <button
+            className={`px-2 py-1 rounded w-full ${
+              markReviewEnabled ? "bg-green-500 text-white" : "bg-gray-200"
+            }`}
+            onClick={onToggleMarkReview}
+          >
+            {markReviewEnabled ? "Disable" : "Enable"} Mark Review
+          </button>
+        </section>
+
         {/* Watermark */}
         <section>
           <div className="font-semibold mb-1">Watermark</div>
@@ -397,6 +415,7 @@ export default function TipTapEditorPage() {
   const [headingLockEnabled, setHeadingLockEnabled] = useState(false);
   const [indentationEnabled, setIndentationEnabled] = useState(false);
   const [sectionNodeEnabled, setSectionNodeEnabled] = useState(false);
+  const [markReviewEnabled, setMarkReviewEnabled] = useState(false);
   const [watermarkEnabled, setWatermarkEnabled] = useState(false);
   const [watermarkText, setWatermarkText] = useState("Sample");
 
@@ -512,12 +531,26 @@ export default function TipTapEditorPage() {
     if (sectionNodeEnabled) {
       base.push(tiptapSectionNode());
     }
+    if (markReviewEnabled) {
+      base.push(tiptapMarkReview());
+    }
     if (watermarkEnabled) {
       base.push(tiptapWatermark(watermarkText));
     }
     return base;
     // eslint-disable-next-line
-  }, [lintEnabled, collabEnabled, yDoc, provider, headingLockEnabled, indentationEnabled, sectionNodeEnabled, watermarkEnabled, watermarkText]);
+  }, [
+    lintEnabled,
+    collabEnabled,
+    yDoc,
+    provider,
+    headingLockEnabled,
+    indentationEnabled,
+    sectionNodeEnabled,
+    markReviewEnabled,
+    watermarkEnabled,
+    watermarkText,
+  ]);
 
   // TipTap Editor
   const [content, setContent] = useState("<p>Hello world!</p>");
@@ -608,6 +641,9 @@ export default function TipTapEditorPage() {
   }
   function handleToggleSectionNode() {
     setSectionNodeEnabled((prev) => !prev);
+  }
+  function handleToggleMarkReview() {
+    setMarkReviewEnabled((prev) => !prev);
   }
   function handleToggleWatermark() {
     setWatermarkEnabled((prev) => !prev);
@@ -805,6 +841,8 @@ export default function TipTapEditorPage() {
         indentationEnabled={indentationEnabled}
         onToggleSectionNode={handleToggleSectionNode}
         sectionNodeEnabled={sectionNodeEnabled}
+        onToggleMarkReview={handleToggleMarkReview}
+        markReviewEnabled={markReviewEnabled}
         onToggleWatermark={handleToggleWatermark}
         watermarkEnabled={watermarkEnabled}
         watermarkText={watermarkText}
