@@ -206,6 +206,27 @@ This file tracks planned tasks for implementing the **Document Editor Playground
 - **Acceptance Criteria:** TipTap page supports real-time collaboration via Yjs.
 - **Labels:** `feature`, `tiptap`, `collaboration`
 
+### 29. Add AI Suggest feature for TipTap
+
+- **Priority:** Medium
+- **Estimate:** 3h
+- **Acceptance Criteria:** `/tiptap` exposes an **AI Suggest** button that posts selections to `/api/ai-suggest` and displays results in the sidebar. Documented in `docs/ai-suggest.md`.
+- **Labels:** `feature`, `tiptap`, `ai`
+
+### 30. Load TipTap templates from directory
+
+- **Priority:** Low
+- **Estimate:** 1h
+- **Acceptance Criteria:** Template loader reads available examples from `public/templates` so new files appear automatically.
+- **Labels:** `enhancement`, `templates`, `tiptap`
+
+### 31. Provide FAA Advisory Circular template
+
+- **Priority:** Low
+- **Estimate:** 1h
+- **Acceptance Criteria:** Repository includes `faa-advisory-circular.html` accessible via the template loader.
+- **Labels:** `documentation`, `templates`
+
 ---
 
 **Next agent:** ready-for:scenario-gen
