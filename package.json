@@ -62,7 +62,8 @@
     "lucide-react": "^0.263.0",
     "yjs": "^13.6.10",
     "y-webrtc": "yjs/y-webrtc",
-    "y-protocols": "^1.0.6"
+    "y-protocols": "^1.0.6",
+    "mark-review": "github:eputnam77/MarkReview"
   },
   "devDependencies": {
     "typescript": "^5.4.2",
