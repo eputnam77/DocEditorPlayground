@@ -187,3 +187,7 @@ All editor pages are available with lightweight stub implementations. TipTap dem
 ## Troubleshooting
 
 In development mode, the first time you open pages like /tiptap can be sluggish. Next.js compiles each page on demand, and the TipTap page imports many extensions. Prefetching only downloads the built chunk—it cannot skip this initial build. Once the dev server finishes compiling, further navigations are fast. Running a production build (`npm run build && npm start`) also avoids this delay.
+
+## License
+
+This project is licensed under the GNU General Public License v3.0. See the [LICENSE](LICENSE) file for details.
