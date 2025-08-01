@@ -209,3 +209,7 @@ Each editor page includes an **Integration** section:
 - [CKEditor 5](https://ckeditor.com/docs/)
 - [Awesome Rich Text Editors](https://github.com/jaredreich/awesome-rich-text-editors)
 - [Next.js Docs](https://nextjs.org/docs/pages)
+
+## 10. License
+
+The project is distributed under the GNU General Public License v3.0. See the [LICENSE](../LICENSE) file for details.

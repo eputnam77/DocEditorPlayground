@@ -80,5 +80,6 @@
     "@playwright/test": "^1.46.0",
     "@next/bundle-analyzer": "^13.5.0",
     "fast-check": "^3.22.0"
-  }
+  },
+  "license": "GPL-3.0-only"
 }
