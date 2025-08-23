@@ -1,7 +1,7 @@
 /**
  * TipTap extension adding indentation controls.
  */
-import { Extension } from "@tiptap/core";
+import { Extension, RawCommands } from "@tiptap/core";
 import { Node as PMNode } from "prosemirror-model";
 
 /**
@@ -16,19 +16,25 @@ export function tiptapIndentation() {
     name: "indentation",
     addCommands() {
       return {
-        indent: () => ({ commands }) => {
-          return commands.updateAttributes("paragraph", (attrs: any) => ({
-            ...attrs,
-            "data-indent": ((attrs["data-indent"] as number) || 0) + 1,
-          }));
-        },
-        outdent: () => ({ commands }) => {
-          return commands.updateAttributes("paragraph", (attrs: any) => {
-            const level = ((attrs["data-indent"] as number) || 0) - 1;
-            return { ...attrs, "data-indent": Math.max(0, level) };
-          });
-        },
-      };
+        indent:
+          () =>
+          ({ editor, commands }: { editor: any; commands: any }) => {
+            const level =
+              (editor.getAttributes("paragraph")["data-indent"] as number) || 0;
+            return commands.updateAttributes("paragraph", {
+              "data-indent": level + 1,
+            });
+          },
+        outdent:
+          () =>
+          ({ editor, commands }: { editor: any; commands: any }) => {
+            const level =
+              (editor.getAttributes("paragraph")["data-indent"] as number) || 0;
+            return commands.updateAttributes("paragraph", {
+              "data-indent": Math.max(0, level - 1),
+            });
+          },
+      } as Partial<RawCommands>;
     },
     addGlobalAttributes() {
       return [
@@ -37,7 +43,8 @@ export function tiptapIndentation() {
           attributes: {
             "data-indent": {
               default: 0,
-              parseHTML: (el: HTMLElement) => Number(el.getAttribute("data-indent")) || 0,
+              parseHTML: (el: HTMLElement) =>
+                Number(el.getAttribute("data-indent")) || 0,
               renderHTML: (attrs: any) => {
                 if (!attrs["data-indent"]) return {};
                 return { "data-indent": attrs["data-indent"] };
