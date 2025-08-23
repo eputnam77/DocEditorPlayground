@@ -538,7 +538,6 @@ export default function TipTapEditorPage() {
       base.push(tiptapWatermark(watermarkText));
     }
     return base;
-    // eslint-disable-next-line
   }, [
     lintEnabled,
     collabEnabled,
