@@ -10,7 +10,15 @@ export function sanitizeHtml(html: string): string {
   // Remove event handler attributes like onclick
   doc.querySelectorAll("*").forEach((el) => {
     for (const attr of Array.from(el.attributes)) {
-      if (attr.name.startsWith("on")) {
+      const name = attr.name.toLowerCase();
+      if (name.startsWith("on")) {
+        el.removeAttribute(attr.name);
+        continue;
+      }
+      if (
+        (name === "href" || name === "src") &&
+        /^(javascript|data):/i.test(attr.value.trim())
+      ) {
         el.removeAttribute(attr.name);
       }
     }

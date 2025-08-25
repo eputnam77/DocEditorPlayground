@@ -7,4 +7,11 @@ describe("sanitizeHtml", () => {
     const clean = sanitizeHtml(dirty);
     expect(clean).toBe("<div>Hi</div>");
   });
+
+  it("strips javascript and data URLs", () => {
+    const dirty =
+      '<a href="javascript:alert(1)" src="data:text/html;base64,AAAA">link</a>';
+    const clean = sanitizeHtml(dirty);
+    expect(clean).toBe("<a>link</a>");
+  });
 });
