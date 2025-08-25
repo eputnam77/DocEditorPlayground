@@ -9,6 +9,9 @@ describe("validateDocument", () => {
   it("returns false otherwise", () => {
     expect(validateDocument({})).toBe(false);
     expect(validateDocument(null)).toBe(false);
+    const arr: any = [];
+    arr.content = "x";
+    expect(validateDocument(arr)).toBe(false);
   });
 });
 
@@ -20,5 +23,9 @@ describe("validateTemplate", () => {
   it("returns false otherwise", () => {
     expect(validateTemplate({ title: "t" })).toBe(false);
     expect(validateTemplate(null)).toBe(false);
+    const arr: any = [];
+    arr.title = "t";
+    arr.body = "b";
+    expect(validateTemplate(arr)).toBe(false);
   });
 });

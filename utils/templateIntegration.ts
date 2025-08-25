@@ -17,6 +17,11 @@ export function integrateTemplates(templates: unknown[]): Template[] {
     throw new TypeError("templates must be an array");
   }
 
-  return templates.filter(validateTemplate) as Template[];
+  return templates
+    .filter(validateTemplate)
+    .map((t) => {
+      const rec = t as Record<string, unknown>;
+      return { title: String(rec.title), body: String(rec.body) };
+    });
 }
 

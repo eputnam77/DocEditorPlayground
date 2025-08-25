@@ -4,7 +4,7 @@
  * @returns `true` if the document has a `content` string field, `false` otherwise.
  */
 export function validateDocument(doc: unknown): boolean {
-  if (typeof doc !== "object" || doc === null) {
+  if (typeof doc !== "object" || doc === null || Array.isArray(doc)) {
     return false;
   }
   return typeof (doc as Record<string, unknown>).content === "string";
@@ -16,7 +16,7 @@ export function validateDocument(doc: unknown): boolean {
  * @returns `true` if both fields exist and are strings.
  */
 export function validateTemplate(tpl: unknown): boolean {
-  if (typeof tpl !== "object" || tpl === null) {
+  if (typeof tpl !== "object" || tpl === null || Array.isArray(tpl)) {
     return false;
   }
   const rec = tpl as Record<string, unknown>;

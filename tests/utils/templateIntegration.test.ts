@@ -12,4 +12,11 @@ describe("integrateTemplates", () => {
     // invalid input passed intentionally
     expect(() => integrateTemplates(null as any)).toThrow(TypeError);
   });
+
+  it("strips extraneous fields and returns new objects", () => {
+    const tpl: any = { title: "A", body: "b", evil: "x" };
+    const [result] = integrateTemplates([tpl]);
+    expect(result).toEqual({ title: "A", body: "b" });
+    expect(result).not.toBe(tpl);
+  });
 });
