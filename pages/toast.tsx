@@ -1,5 +1,5 @@
+import React, { useState } from "react";
 import dynamic from "next/dynamic";
-import { useState } from "react";
 
 /**
  * Toast UI Editor demo page.
@@ -102,4 +102,9 @@ function ToastPage() {
   );
 }
 
-export default dynamic(() => Promise.resolve(ToastPage), { ssr: false });
+// Disable SSR in production builds, but render the page immediately during
+// tests so React Testing Library can inspect the full DOM.
+export default
+  typeof process !== "undefined" && process.env.NODE_ENV === "test"
+    ? ToastPage
+    : dynamic(() => Promise.resolve(ToastPage), { ssr: false });
