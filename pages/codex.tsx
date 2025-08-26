@@ -1,5 +1,4 @@
-import dynamic from "next/dynamic";
-import { useState } from "react";
+import React, { useState } from "react";
 
 /**
  * Editor.js demo page.
@@ -102,4 +101,4 @@ function CodexPage() {
   );
 }
 
-export default dynamic(() => Promise.resolve(CodexPage), { ssr: false });
+export default CodexPage;
