@@ -1,6 +1,6 @@
 import fc from "fast-check";
 import { validateDocument, validateTemplate } from "../../utils/validation.js";
-import { describe, it } from "node:test";
+import { describe, it } from "vitest";
 
 // Property: validators should return boolean for any input without throwing
 

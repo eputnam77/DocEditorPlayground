@@ -1,9 +1,9 @@
 import React from "react";
 import { describe, it, expect, vi } from "vitest";
-import HeadingStylePresets from "../../components/HeadingStylePresets";
 import { render, screen, fireEvent } from "@testing-library/react";
+import HeadingStylePresets from "../../components/HeadingStylePresets";
 
-describe.skip("HeadingStylePresets", () => {
+describe("HeadingStylePresets", () => {
   it("invokes callback", () => {
     const cb = vi.fn();
     render(<HeadingStylePresets onSelect={cb} />);

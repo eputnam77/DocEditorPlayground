@@ -1,4 +1,4 @@
-import { describe, it } from "node:test";
+import { describe, it, expect } from "vitest";
 import assert from "node:assert/strict";
 import { sanitizeHtml } from "../../utils/sanitize.js";
 
@@ -20,5 +20,12 @@ describe("sanitizeHtml", () => {
     const dirty = '<a href="vbscript:evil">x</a>';
     const clean = sanitizeHtml(dirty);
     assert.strictEqual(clean, "<a>x</a>");
+  });
+
+  it("removes dangerous CSS expressions", () => {
+    const dirty =
+      '<div style="color:red; width:expression(alert(1)); background:url(javascript:evil)">x</div>';
+    const clean = sanitizeHtml(dirty);
+    assert.strictEqual(clean, "<div>x</div>");
   });
 });

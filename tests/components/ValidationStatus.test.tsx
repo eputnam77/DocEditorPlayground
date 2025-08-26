@@ -1,9 +1,9 @@
 import React from "react";
 import { describe, it, expect } from "vitest";
-import ValidationStatus from "../../components/ValidationStatus";
 import { render, screen } from "@testing-library/react";
+import ValidationStatus from "../../components/ValidationStatus";
 
-describe.skip("ValidationStatus", () => {
+describe("ValidationStatus", () => {
   it("renders results", () => {
     render(
       <ValidationStatus
@@ -11,6 +11,6 @@ describe.skip("ValidationStatus", () => {
         onClear={() => {}}
       />,
     );
-    expect(screen.getByText(/A/)).toBeInTheDocument();
+    expect(screen.getByText(/A:/).textContent).toContain("A:");
   });
 });
