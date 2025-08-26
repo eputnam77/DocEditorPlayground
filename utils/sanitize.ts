@@ -18,6 +18,16 @@ export function sanitizeHtml(html: string): string {
         el.removeAttribute(attribute.name);
         continue;
       }
+      if (name === "style") {
+        const val = attribute.value.toLowerCase();
+        if (
+          /expression\s*\(/i.test(val) ||
+          /url\s*\(\s*(javascript|data|vbscript):/i.test(val)
+        ) {
+          el.removeAttribute(attribute.name);
+          continue;
+        }
+      }
       if (
         (name === "href" || name === "src") &&
         /^(javascript|data|vbscript):/i.test(attribute.value.trim())

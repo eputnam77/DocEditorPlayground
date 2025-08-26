@@ -10,7 +10,8 @@ export function validateDocument(doc: unknown): boolean {
   const rec = doc as Record<string, unknown>;
   return (
     Object.prototype.hasOwnProperty.call(rec, "content") &&
-    typeof rec.content === "string"
+    typeof rec.content === "string" &&
+    rec.content.trim().length > 0
   );
 }
 
@@ -28,6 +29,8 @@ export function validateTemplate(tpl: unknown): boolean {
     Object.prototype.hasOwnProperty.call(rec, "title") &&
     Object.prototype.hasOwnProperty.call(rec, "body") &&
     typeof rec.title === "string" &&
-    typeof rec.body === "string"
+    rec.title.trim().length > 0 &&
+    typeof rec.body === "string" &&
+    rec.body.trim().length > 0
   );
 }

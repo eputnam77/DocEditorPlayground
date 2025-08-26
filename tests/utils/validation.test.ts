@@ -1,4 +1,4 @@
-import { describe, it } from "node:test";
+import { describe, it } from "vitest";
 import assert from "node:assert/strict";
 import { validateDocument, validateTemplate } from "../../utils/validation.js";
 
@@ -17,6 +17,11 @@ describe("validateDocument", () => {
     const protoDoc = Object.create({ content: "p" });
     assert.strictEqual(validateDocument(protoDoc), false);
   });
+
+  it("rejects empty content", () => {
+    assert.strictEqual(validateDocument({ content: "" }), false);
+    assert.strictEqual(validateDocument({ content: "   " }), false);
+  });
 });
 
 describe("validateTemplate", () => {
@@ -33,5 +38,12 @@ describe("validateTemplate", () => {
     assert.strictEqual(validateTemplate(arr), false);
     const protoTpl = Object.create({ title: "t", body: "b" });
     assert.strictEqual(validateTemplate(protoTpl), false);
+  });
+
+  it("rejects empty strings", () => {
+    assert.strictEqual(validateTemplate({ title: "", body: "b" }), false);
+    assert.strictEqual(validateTemplate({ title: "t", body: "" }), false);
+    assert.strictEqual(validateTemplate({ title: " ", body: "b" }), false);
+    assert.strictEqual(validateTemplate({ title: "t", body: "   " }), false);
   });
 });
