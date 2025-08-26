@@ -1,5 +1,4 @@
-import dynamic from "next/dynamic";
-import { useState } from "react";
+import React, { useState } from "react";
 
 /**
  * Slate demo page.
@@ -102,4 +101,4 @@ function SlatePage() {
   );
 }
 
-export default dynamic(() => Promise.resolve(SlatePage), { ssr: false });
+export default SlatePage;
