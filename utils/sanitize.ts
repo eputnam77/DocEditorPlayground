@@ -28,9 +28,20 @@ export function sanitizeHtml(html: string): string {
           continue;
         }
       }
+      if (name === "srcset") {
+        const entries = attribute.value.split(",");
+        const unsafe = entries.some((entry) =>
+          /^(?:javascript|data|vbscript)\s*:/i.test(entry.trim()),
+        );
+        if (unsafe) {
+          el.removeAttribute(attribute.name);
+        }
+        continue;
+      }
+
       if (
         (name === "href" || name === "src") &&
-        /^(javascript|data|vbscript):/i.test(attribute.value.trim())
+        /^(?:javascript|data|vbscript)\s*:/i.test(attribute.value.trim())
       ) {
         el.removeAttribute(attribute.name);
       }

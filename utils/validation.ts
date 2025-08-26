@@ -16,9 +16,10 @@ export function validateDocument(doc: unknown): boolean {
 }
 
 /**
- * Validate that a template has `title` and `body` string fields.
+ * Validate that a template has `title` and `body` fields that can be
+ * converted to strings. Numeric values are accepted and coerced later.
  * @param tpl - Template data to validate.
- * @returns `true` if both fields exist and are strings.
+ * @returns `true` if both fields exist and are non-empty.
  */
 export function validateTemplate(tpl: unknown): boolean {
   if (typeof tpl !== "object" || tpl === null || Array.isArray(tpl)) {
@@ -28,9 +29,9 @@ export function validateTemplate(tpl: unknown): boolean {
   return (
     Object.prototype.hasOwnProperty.call(rec, "title") &&
     Object.prototype.hasOwnProperty.call(rec, "body") &&
-    typeof rec.title === "string" &&
-    rec.title.trim().length > 0 &&
-    typeof rec.body === "string" &&
-    rec.body.trim().length > 0
+    (typeof rec.title === "string" || typeof rec.title === "number") &&
+    String(rec.title).trim().length > 0 &&
+    (typeof rec.body === "string" || typeof rec.body === "number") &&
+    String(rec.body).trim().length > 0
   );
 }

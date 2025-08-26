@@ -29,6 +29,10 @@ describe("validateTemplate", () => {
     assert.strictEqual(validateTemplate({ title: "t", body: "b" }), true);
   });
 
+  it("accepts numeric fields", () => {
+    assert.strictEqual(validateTemplate({ title: 1, body: 2 }), true);
+  });
+
   it("returns false otherwise", () => {
     assert.strictEqual(validateTemplate({ title: "t" }), false);
     assert.strictEqual(validateTemplate(null), false);

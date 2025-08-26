@@ -20,4 +20,10 @@ describe("integrateTemplates", () => {
     assert.deepStrictEqual(result, { title: "A", body: "b" });
     assert.notStrictEqual(result, tpl);
   });
+
+  it("coerces non-string fields to strings", () => {
+    const input: any = [{ title: 123, body: 456 }];
+    const result = integrateTemplates(input);
+    assert.deepStrictEqual(result, [{ title: "123", body: "456" }]);
+  });
 });
