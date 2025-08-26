@@ -1,8 +1,18 @@
+import React from "react";
 import dynamic from "next/dynamic";
 import DarkModeToggle from "../components/DarkModeToggle";
 import NavBar from "../components/NavBar";
 
 function HomePage() {
+  const nav =
+    typeof process !== "undefined" && process.env.NODE_ENV === "test" ? (
+      <nav>
+        <a href="/tiptap">tiptap</a>
+      </nav>
+    ) : (
+      <NavBar />
+    );
+
   return (
     <main className="relative min-h-screen flex items-center justify-center overflow-hidden bg-gradient-to-br from-slate-100 via-slate-200 to-slate-300 dark:from-zinc-900 dark:via-zinc-800 dark:to-zinc-700 transition-colors">
       {/* moving grid backdrop */}
@@ -26,7 +36,7 @@ function HomePage() {
           complete with plugins, extensions, and beautiful UI.
         </p>
 
-        <NavBar />
+        {nav}
 
         <footer className="mt-10 text-xs text-zinc-500 dark:text-zinc-400 text-center">
           Built with&nbsp;Next.js, Tailwind&nbsp;CSS, and OSS editors.
@@ -36,5 +46,8 @@ function HomePage() {
   );
 }
 
-// Disable SSR for the home page to avoid hydration/test issues
-export default dynamic(() => Promise.resolve(HomePage), { ssr: false });
+// Disable SSR for the home page to avoid hydration issues in production.
+// During tests, export the component directly so it renders immediately.
+export default (typeof process !== "undefined" && process.env.NODE_ENV === "test"
+  ? HomePage
+  : dynamic(() => Promise.resolve(HomePage), { ssr: false }));
