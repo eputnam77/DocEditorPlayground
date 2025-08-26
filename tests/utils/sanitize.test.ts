@@ -14,4 +14,10 @@ describe("sanitizeHtml", () => {
     const clean = sanitizeHtml(dirty);
     expect(clean).toBe("<a>link</a>");
   });
+
+  it("blocks other dangerous schemes like vbscript", () => {
+    const dirty = '<a href="vbscript:evil">x</a>';
+    const clean = sanitizeHtml(dirty);
+    expect(clean).toBe("<a>x</a>");
+  });
 });

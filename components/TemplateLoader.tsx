@@ -42,17 +42,19 @@ export default function TemplateLoader({
   const handleChange = async (e: React.ChangeEvent<HTMLSelectElement>) => {
     const val = e.target.value;
     if (val === "") return;
-    if (val === "__clear__") {
-      onClear();
-      return;
-    }
+
     try {
-      await onLoad(val);
+      if (val === "__clear__") {
+        onClear();
+      } else {
+        await onLoad(val);
+      }
     } catch (err) {
       console.error("TemplateLoader failed", err);
       onError?.(err);
     } finally {
-      // Reset the select so the same template can be chosen again if desired
+      // Reset the select so the same option can be chosen again if desired
+      // (previously the select would remain on "Clear" and block re-selection)
       e.target.value = "";
     }
   };

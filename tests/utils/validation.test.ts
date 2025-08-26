@@ -12,6 +12,9 @@ describe("validateDocument", () => {
     const arr: any = [];
     arr.content = "x";
     expect(validateDocument(arr)).toBe(false);
+    // should not accept properties from the prototype chain
+    const protoDoc = Object.create({ content: "p" });
+    expect(validateDocument(protoDoc)).toBe(false);
   });
 });
 
@@ -27,5 +30,7 @@ describe("validateTemplate", () => {
     arr.title = "t";
     arr.body = "b";
     expect(validateTemplate(arr)).toBe(false);
+    const protoTpl = Object.create({ title: "t", body: "b" });
+    expect(validateTemplate(protoTpl)).toBe(false);
   });
 });
