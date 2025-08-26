@@ -7,7 +7,11 @@ export function validateDocument(doc: unknown): boolean {
   if (typeof doc !== "object" || doc === null || Array.isArray(doc)) {
     return false;
   }
-  return typeof (doc as Record<string, unknown>).content === "string";
+  const rec = doc as Record<string, unknown>;
+  return (
+    Object.prototype.hasOwnProperty.call(rec, "content") &&
+    typeof rec.content === "string"
+  );
 }
 
 /**
@@ -20,5 +24,10 @@ export function validateTemplate(tpl: unknown): boolean {
     return false;
   }
   const rec = tpl as Record<string, unknown>;
-  return typeof rec.title === "string" && typeof rec.body === "string";
+  return (
+    Object.prototype.hasOwnProperty.call(rec, "title") &&
+    Object.prototype.hasOwnProperty.call(rec, "body") &&
+    typeof rec.title === "string" &&
+    typeof rec.body === "string"
+  );
 }

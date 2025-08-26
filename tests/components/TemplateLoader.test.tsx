@@ -12,11 +12,13 @@ describe("TemplateLoader", () => {
     render(
       <TemplateLoader templates={templates} onLoad={load} onClear={clear} />,
     );
-    const select = screen.getByLabelText("Templates");
+    const select = screen.getByLabelText("Templates") as HTMLSelectElement;
     fireEvent.change(select, { target: { value: "one.html" } });
     expect(load).toHaveBeenCalledWith("one.html");
     fireEvent.change(select, { target: { value: "__clear__" } });
     expect(clear).toHaveBeenCalled();
+    // the select should reset so the same option can be chosen again
+    expect(select.value).toBe("");
   });
 
   it("calls onError when load throws", async () => {

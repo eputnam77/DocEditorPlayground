@@ -17,7 +17,7 @@ export function sanitizeHtml(html: string): string {
       }
       if (
         (name === "href" || name === "src") &&
-        /^(javascript|data):/i.test(attr.value.trim())
+        /^(javascript|data|vbscript):/i.test(attr.value.trim())
       ) {
         el.removeAttribute(attr.name);
       }
