@@ -1,5 +1,4 @@
-import dynamic from "next/dynamic";
-import { useState } from "react";
+import React, { useState } from "react";
 
 /**
  * Lexical demo page.
@@ -102,4 +101,4 @@ function LexicalPage() {
   );
 }
 
-export default dynamic(() => Promise.resolve(LexicalPage), { ssr: false });
+export default LexicalPage;
