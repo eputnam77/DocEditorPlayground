@@ -1,5 +1,4 @@
-import dynamic from "next/dynamic";
-import { useState } from "react";
+import React, { useState } from "react";
 
 /**
  * CKEditor demo page.
@@ -102,4 +101,4 @@ function CkeditorPage() {
   );
 }
 
-export default dynamic(() => Promise.resolve(CkeditorPage), { ssr: false });
+export default CkeditorPage;
