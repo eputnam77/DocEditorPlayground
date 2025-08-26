@@ -3,9 +3,9 @@ import { render, screen } from "@testing-library/react";
 import { describe, it, expect } from "vitest";
 import TiptapPage from "../../pages/tiptap";
 
-describe.skip("TiptapPage", () => {
+describe("TiptapPage", () => {
   it("renders heading", () => {
     render(<TiptapPage />);
-    expect(screen.getByText("TipTap Editor")).toBeInTheDocument();
+    expect(screen.getByText("TipTap Editor")).toBeTruthy();
   });
 });
