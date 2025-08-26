@@ -1,4 +1,4 @@
-import { validateTemplate } from "./validation";
+import { validateTemplate } from "./validation.js";
 
 export interface Template {
   title: string;

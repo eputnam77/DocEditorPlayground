@@ -3,6 +3,7 @@
  */
 import { Extension } from "@tiptap/core";
 import { Plugin } from "prosemirror-state";
+import { JSDOM } from "jsdom";
 
 /**
  * Extension skeleton enforcing heading structure rules.
@@ -49,11 +50,14 @@ export function tiptapStructure() {
  * Basic validator used in tests to verify no consecutive headings.
  */
 export function isValidStructure(html: string): boolean {
-  const doc = new DOMParser().parseFromString(html, "text/html");
+  const Parser =
+    typeof DOMParser !== "undefined" ? DOMParser : new JSDOM("").window.DOMParser;
+  const doc: Document = new Parser().parseFromString(html, "text/html");
   let prevHeading = false;
-  for (const el of Array.from(doc.body.children)) {
+  for (const el of Array.from(doc.body.children) as Element[]) {
     const isHeading = /^H[1-6]$/.test(el.tagName);
     if (isHeading && prevHeading) return false;
+    if (prevHeading && !["P", "UL", "OL"].includes(el.tagName)) return false;
     prevHeading = isHeading;
   }
   return true;
