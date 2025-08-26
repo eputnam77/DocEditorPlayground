@@ -32,7 +32,7 @@ export default Extension.create<SlashCommandOptions>({
             .chain()
             .focus()
             .deleteRange(range)
-            .insertContent(props.label)
+            .insertContent(props.label ?? "")
             .run();
         },
         items: () => [],

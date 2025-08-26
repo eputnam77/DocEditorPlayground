@@ -1,0 +1,21 @@
+{
+  "extends": "./tsconfig.json",
+  "compilerOptions": {
+    "noEmit": false,
+    "outDir": "build",
+    "module": "node16",
+    "target": "es2022",
+    "types": ["node"],
+    "isolatedModules": false,
+    "moduleResolution": "node16"
+  },
+  "include": [
+    "utils/**/*.ts",
+    "extensions/slash-command.ts",
+    "extensions/tiptapStructure.ts",
+    "tests/utils/**/*.ts",
+    "tests/extensions/**/*.ts",
+    "tests/property/**/*.ts"
+  ],
+  "exclude": ["node_modules"]
+}

@@ -1,36 +1,37 @@
-import { describe, it, expect } from "vitest";
-import { validateDocument, validateTemplate } from "../../utils/validation";
+import { describe, it } from "node:test";
+import assert from "node:assert/strict";
+import { validateDocument, validateTemplate } from "../../utils/validation.js";
 
 describe("validateDocument", () => {
   it("returns true for objects with content string", () => {
-    expect(validateDocument({ content: "a" })).toBe(true);
+    assert.strictEqual(validateDocument({ content: "a" }), true);
   });
 
   it("returns false otherwise", () => {
-    expect(validateDocument({})).toBe(false);
-    expect(validateDocument(null)).toBe(false);
+    assert.strictEqual(validateDocument({}), false);
+    assert.strictEqual(validateDocument(null), false);
     const arr: any = [];
     arr.content = "x";
-    expect(validateDocument(arr)).toBe(false);
+    assert.strictEqual(validateDocument(arr), false);
     // should not accept properties from the prototype chain
     const protoDoc = Object.create({ content: "p" });
-    expect(validateDocument(protoDoc)).toBe(false);
+    assert.strictEqual(validateDocument(protoDoc), false);
   });
 });
 
 describe("validateTemplate", () => {
   it("returns true for objects with title and body", () => {
-    expect(validateTemplate({ title: "t", body: "b" })).toBe(true);
+    assert.strictEqual(validateTemplate({ title: "t", body: "b" }), true);
   });
 
   it("returns false otherwise", () => {
-    expect(validateTemplate({ title: "t" })).toBe(false);
-    expect(validateTemplate(null)).toBe(false);
+    assert.strictEqual(validateTemplate({ title: "t" }), false);
+    assert.strictEqual(validateTemplate(null), false);
     const arr: any = [];
     arr.title = "t";
     arr.body = "b";
-    expect(validateTemplate(arr)).toBe(false);
+    assert.strictEqual(validateTemplate(arr), false);
     const protoTpl = Object.create({ title: "t", body: "b" });
-    expect(validateTemplate(protoTpl)).toBe(false);
+    assert.strictEqual(validateTemplate(protoTpl), false);
   });
 });
