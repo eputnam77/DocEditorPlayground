@@ -43,7 +43,7 @@ export function validateTemplate(tpl: unknown): boolean {
     if (
       !(
         typeof title === "string" ||
-        (typeof title === "number" && !Number.isNaN(title))
+        (typeof title === "number" && Number.isFinite(title))
       )
     ) {
       return false;
@@ -51,7 +51,7 @@ export function validateTemplate(tpl: unknown): boolean {
     if (
       !(
         typeof body === "string" ||
-        (typeof body === "number" && !Number.isNaN(body))
+        (typeof body === "number" && Number.isFinite(body))
       )
     ) {
       return false;

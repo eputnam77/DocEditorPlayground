@@ -109,4 +109,19 @@ describe("validateTemplate", () => {
     assert.strictEqual(validateTemplate({ title: NaN, body: "b" }), false);
     assert.strictEqual(validateTemplate({ title: "t", body: NaN }), false);
   });
+
+  it("rejects infinite numbers", () => {
+    assert.strictEqual(
+      validateTemplate({ title: Infinity, body: 1 }),
+      false,
+    );
+    assert.strictEqual(
+      validateTemplate({ title: 1, body: Infinity }),
+      false,
+    );
+    assert.strictEqual(
+      validateTemplate({ title: -Infinity, body: 1 }),
+      false,
+    );
+  });
 });
