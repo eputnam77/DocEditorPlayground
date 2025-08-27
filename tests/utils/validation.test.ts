@@ -22,6 +22,16 @@ describe("validateDocument", () => {
     assert.strictEqual(validateDocument({ content: "" }), false);
     assert.strictEqual(validateDocument({ content: "   " }), false);
   });
+
+  it("returns false when content getter throws", () => {
+    const doc: any = {};
+    Object.defineProperty(doc, "content", {
+      get() {
+        throw new Error("boom");
+      },
+    });
+    assert.strictEqual(validateDocument(doc), false);
+  });
 });
 
 describe("validateTemplate", () => {
@@ -49,5 +59,20 @@ describe("validateTemplate", () => {
     assert.strictEqual(validateTemplate({ title: "t", body: "" }), false);
     assert.strictEqual(validateTemplate({ title: " ", body: "b" }), false);
     assert.strictEqual(validateTemplate({ title: "t", body: "   " }), false);
+  });
+
+  it("returns false when property getters throw", () => {
+    const tpl: any = {};
+    Object.defineProperty(tpl, "title", {
+      get() {
+        throw new Error("nope");
+      },
+    });
+    Object.defineProperty(tpl, "body", {
+      get() {
+        throw new Error("nope");
+      },
+    });
+    assert.strictEqual(validateTemplate(tpl), false);
   });
 });
