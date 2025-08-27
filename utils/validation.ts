@@ -9,11 +9,11 @@ export function validateDocument(doc: unknown): boolean {
   }
   const rec = doc as Record<string, unknown>;
   try {
-    return (
-      Object.prototype.hasOwnProperty.call(rec, "content") &&
-      typeof rec.content === "string" &&
-      rec.content.trim().length > 0
-    );
+    if (!Object.prototype.hasOwnProperty.call(rec, "content")) {
+      return false;
+    }
+    const value = rec.content;
+    return typeof value === "string" && value.trim().length > 0;
   } catch {
     // Accessing the property might trigger a getter that throws; treat as invalid
     return false;
@@ -32,14 +32,31 @@ export function validateTemplate(tpl: unknown): boolean {
   }
   const rec = tpl as Record<string, unknown>;
   try {
-    return (
-      Object.prototype.hasOwnProperty.call(rec, "title") &&
-      Object.prototype.hasOwnProperty.call(rec, "body") &&
-      (typeof rec.title === "string" || typeof rec.title === "number") &&
-      String(rec.title).trim().length > 0 &&
-      (typeof rec.body === "string" || typeof rec.body === "number") &&
-      String(rec.body).trim().length > 0
-    );
+    if (
+      !Object.prototype.hasOwnProperty.call(rec, "title") ||
+      !Object.prototype.hasOwnProperty.call(rec, "body")
+    ) {
+      return false;
+    }
+    const title = rec.title;
+    const body = rec.body;
+    if (
+      !(
+        typeof title === "string" ||
+        (typeof title === "number" && !Number.isNaN(title))
+      )
+    ) {
+      return false;
+    }
+    if (
+      !(
+        typeof body === "string" ||
+        (typeof body === "number" && !Number.isNaN(body))
+      )
+    ) {
+      return false;
+    }
+    return String(title).trim().length > 0 && String(body).trim().length > 0;
   } catch {
     // If accessing properties throws (e.g. getters with side effects), treat as invalid
     return false;

@@ -8,8 +8,8 @@ export function sanitizeHtml(html: string): string {
   const Parser =
     typeof DOMParser !== "undefined" ? DOMParser : new JSDOM("").window.DOMParser;
   const doc = new Parser().parseFromString(html, "text/html");
-  // Remove all script tags
-  doc.querySelectorAll("script").forEach((el) => el.remove());
+  // Remove all script and iframe tags
+  doc.querySelectorAll("script, iframe").forEach((el) => el.remove());
   // Remove event handler attributes like onclick
   doc.querySelectorAll("*").forEach((el) => {
     for (const attribute of Array.from(el.attributes) as Attr[]) {

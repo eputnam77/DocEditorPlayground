@@ -53,4 +53,10 @@ describe("sanitizeHtml", () => {
     const clean = sanitizeHtml(dirty);
     assert.strictEqual(clean, "<img>");
   });
+
+  it("removes iframe elements", () => {
+    const dirty = '<iframe src="http://example.com" onload="alert(1)"></iframe>';
+    const clean = sanitizeHtml(dirty);
+    assert.strictEqual(clean, "");
+  });
 });
