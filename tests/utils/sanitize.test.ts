@@ -54,6 +54,13 @@ describe("sanitizeHtml", () => {
     assert.strictEqual(clean, "<img>");
   });
 
+  it("removes xlink:href attributes with dangerous schemes", () => {
+    const dirty = '<svg><a xlink:href="javascript:alert(1)">x</a></svg>';
+    const clean = sanitizeHtml(dirty);
+    assert.strictEqual(clean.includes("xlink:href"), false);
+    assert.strictEqual(clean.includes("javascript"), false);
+  });
+
   it("removes iframe elements", () => {
     const dirty = '<iframe src="http://example.com" onload="alert(1)"></iframe>';
     const clean = sanitizeHtml(dirty);

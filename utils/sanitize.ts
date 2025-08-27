@@ -42,7 +42,7 @@ export function sanitizeHtml(html: string): string {
       }
 
       if (
-        (name === "href" || name === "src") &&
+        (name === "href" || name === "src" || name === "xlink:href") &&
         /^(?:javascript|data|vbscript):/i.test(
           attribute.value.replace(/[\s\u0000-\u001F]+/g, ""),
         )

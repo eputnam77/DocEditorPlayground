@@ -26,4 +26,21 @@ describe("integrateTemplates", () => {
     const result = integrateTemplates(input);
     assert.deepStrictEqual(result, [{ title: "123", body: "456" }]);
   });
+
+  it("accesses template fields only once", () => {
+    let calls = 0;
+    const tpl: any = {
+      get title() {
+        calls++;
+        if (calls > 1) {
+          throw new Error("called twice");
+        }
+        return "A";
+      },
+      body: "b",
+    };
+    const result = integrateTemplates([tpl]);
+    assert.deepStrictEqual(result, [{ title: "A", body: "b" }]);
+    assert.strictEqual(calls, 1);
+  });
 });
