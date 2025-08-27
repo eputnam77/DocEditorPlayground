@@ -20,9 +20,10 @@ export function sanitizeHtml(html: string): string {
       }
       if (name === "style") {
         const val = attribute.value.toLowerCase();
+        // Allow optional quotes around url schemes
         if (
           /expression\s*\(/i.test(val) ||
-          /url\s*\(\s*(javascript|data|vbscript):/i.test(val)
+          /url\s*\(\s*['"]?(javascript|data|vbscript):/i.test(val)
         ) {
           el.removeAttribute(attribute.name);
           continue;
@@ -30,9 +31,10 @@ export function sanitizeHtml(html: string): string {
       }
       if (name === "srcset") {
         const entries = attribute.value.split(",");
-        const unsafe = entries.some((entry) =>
-          /^(?:javascript|data|vbscript)\s*:/i.test(entry.trim()),
-        );
+        const unsafe = entries.some((entry) => {
+          const norm = entry.replace(/[\s\u0000-\u001F]+/g, "");
+          return /^(?:javascript|data|vbscript):/i.test(norm);
+        });
         if (unsafe) {
           el.removeAttribute(attribute.name);
         }
@@ -41,7 +43,9 @@ export function sanitizeHtml(html: string): string {
 
       if (
         (name === "href" || name === "src") &&
-        /^(?:javascript|data|vbscript)\s*:/i.test(attribute.value.trim())
+        /^(?:javascript|data|vbscript):/i.test(
+          attribute.value.replace(/[\s\u0000-\u001F]+/g, ""),
+        )
       ) {
         el.removeAttribute(attribute.name);
       }

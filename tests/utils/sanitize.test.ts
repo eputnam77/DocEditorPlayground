@@ -35,6 +35,19 @@ describe("sanitizeHtml", () => {
     assert.strictEqual(clean, "<a>x</a>");
   });
 
+  it("strips schemes split by whitespace", () => {
+    const dirty = '<a href="java\nscript:alert(1)">x</a>';
+    const clean = sanitizeHtml(dirty);
+    assert.strictEqual(clean, "<a>x</a>");
+  });
+
+  it("removes quoted javascript urls in style attributes", () => {
+    const dirty =
+      '<div style="background:url(\'javascript:evil\')">x</div>';
+    const clean = sanitizeHtml(dirty);
+    assert.strictEqual(clean, "<div>x</div>");
+  });
+
   it("removes dangerous srcset entries", () => {
     const dirty = '<img srcset="javascript:alert(1) 1x, http://e/x.png 2x">';
     const clean = sanitizeHtml(dirty);

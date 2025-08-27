@@ -8,11 +8,16 @@ export function validateDocument(doc: unknown): boolean {
     return false;
   }
   const rec = doc as Record<string, unknown>;
-  return (
-    Object.prototype.hasOwnProperty.call(rec, "content") &&
-    typeof rec.content === "string" &&
-    rec.content.trim().length > 0
-  );
+  try {
+    return (
+      Object.prototype.hasOwnProperty.call(rec, "content") &&
+      typeof rec.content === "string" &&
+      rec.content.trim().length > 0
+    );
+  } catch {
+    // Accessing the property might trigger a getter that throws; treat as invalid
+    return false;
+  }
 }
 
 /**
@@ -26,12 +31,17 @@ export function validateTemplate(tpl: unknown): boolean {
     return false;
   }
   const rec = tpl as Record<string, unknown>;
-  return (
-    Object.prototype.hasOwnProperty.call(rec, "title") &&
-    Object.prototype.hasOwnProperty.call(rec, "body") &&
-    (typeof rec.title === "string" || typeof rec.title === "number") &&
-    String(rec.title).trim().length > 0 &&
-    (typeof rec.body === "string" || typeof rec.body === "number") &&
-    String(rec.body).trim().length > 0
-  );
+  try {
+    return (
+      Object.prototype.hasOwnProperty.call(rec, "title") &&
+      Object.prototype.hasOwnProperty.call(rec, "body") &&
+      (typeof rec.title === "string" || typeof rec.title === "number") &&
+      String(rec.title).trim().length > 0 &&
+      (typeof rec.body === "string" || typeof rec.body === "number") &&
+      String(rec.body).trim().length > 0
+    );
+  } catch {
+    // If accessing properties throws (e.g. getters with side effects), treat as invalid
+    return false;
+  }
 }
