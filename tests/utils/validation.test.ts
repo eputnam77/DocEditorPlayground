@@ -32,6 +32,21 @@ describe("validateDocument", () => {
     });
     assert.strictEqual(validateDocument(doc), false);
   });
+
+  it("evaluates content getter only once", () => {
+    let first = true;
+    const doc: any = {};
+    Object.defineProperty(doc, "content", {
+      get() {
+        if (first) {
+          first = false;
+          return "hello";
+        }
+        return "";
+      },
+    });
+    assert.strictEqual(validateDocument(doc), true);
+  });
 });
 
 describe("validateTemplate", () => {
@@ -74,5 +89,24 @@ describe("validateTemplate", () => {
       },
     });
     assert.strictEqual(validateTemplate(tpl), false);
+  });
+
+  it("evaluates getters once and rejects NaN", () => {
+    let first = true;
+    const tpl: any = {};
+    Object.defineProperty(tpl, "title", {
+      get() {
+        if (first) {
+          first = false;
+          return "t";
+        }
+        return "";
+      },
+    });
+    tpl.body = "b";
+    assert.strictEqual(validateTemplate(tpl), true);
+
+    assert.strictEqual(validateTemplate({ title: NaN, body: "b" }), false);
+    assert.strictEqual(validateTemplate({ title: "t", body: NaN }), false);
   });
 });
