@@ -5,8 +5,22 @@
 import { JSDOM } from "jsdom";
 
 function sanitizeNode(root: ParentNode): void {
-  // Remove all script and iframe tags within this subtree
-  root.querySelectorAll("script, iframe").forEach((el) => el.remove());
+  // Remove tags that can execute scripts or modify document navigation
+  root
+    .querySelectorAll("script, iframe, object, embed, base")
+    .forEach((el) => el.remove());
+  // Remove meta refresh tags which can trigger redirects or script URLs
+  root.querySelectorAll("meta[http-equiv]").forEach((el) => {
+    const equiv = el.getAttribute("http-equiv");
+    if (equiv && equiv.toLowerCase() === "refresh") {
+      const content = el.getAttribute("content") || "";
+      const norm = content.replace(/[\s\u0000-\u001F]+/g, "").toLowerCase();
+      const urlIndex = norm.indexOf("url=");
+      if (urlIndex === -1 || /^(?:javascript|data|vbscript):/.test(norm.slice(urlIndex + 4))) {
+        el.remove();
+      }
+    }
+  });
   // Recursively process <template> contents
   root.querySelectorAll("template").forEach((tpl) => {
     sanitizeNode((tpl as HTMLTemplateElement).content);
