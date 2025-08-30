@@ -66,4 +66,17 @@ describe("sanitizeHtml", () => {
     const clean = sanitizeHtml(dirty);
     assert.strictEqual(clean, "");
   });
+
+  it("strips dangerous form actions", () => {
+    const dirty = '<form action="javascript:alert(1)"><input></form>';
+    const clean = sanitizeHtml(dirty);
+    assert.strictEqual(clean, '<form><input></form>');
+  });
+
+  it("sanitizes inside template elements", () => {
+    const dirty =
+      '<div><template><div onclick="alert(1)"><script>alert(1)</script></div></template></div>';
+    const clean = sanitizeHtml(dirty);
+    assert.strictEqual(clean, '<div><template><div></div></template></div>');
+  });
 });

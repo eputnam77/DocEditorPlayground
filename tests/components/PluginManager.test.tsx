@@ -16,4 +16,21 @@ describe("PluginManager", () => {
     fireEvent.click(checkbox);
     expect(handle).toHaveBeenCalledWith(["A", "B"]);
   });
+
+  it("does not toggle locked plugins", () => {
+    const handle = vi.fn();
+    render(
+      <PluginManager
+        plugins={plugins}
+        enabled={["A"]}
+        locked={["B"]}
+        onChange={handle}
+      />,
+    );
+    fireEvent.click(screen.getByLabelText("Extensions"));
+    const checkbox = screen.getByLabelText("B") as HTMLInputElement;
+    expect(checkbox.disabled).toBe(true);
+    fireEvent.click(checkbox);
+    expect(handle).not.toHaveBeenCalled();
+  });
 });

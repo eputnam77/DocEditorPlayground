@@ -4,14 +4,15 @@
  */
 import { JSDOM } from "jsdom";
 
-export function sanitizeHtml(html: string): string {
-  const Parser =
-    typeof DOMParser !== "undefined" ? DOMParser : new JSDOM("").window.DOMParser;
-  const doc = new Parser().parseFromString(html, "text/html");
-  // Remove all script and iframe tags
-  doc.querySelectorAll("script, iframe").forEach((el) => el.remove());
-  // Remove event handler attributes like onclick
-  doc.querySelectorAll("*").forEach((el) => {
+function sanitizeNode(root: ParentNode): void {
+  // Remove all script and iframe tags within this subtree
+  root.querySelectorAll("script, iframe").forEach((el) => el.remove());
+  // Recursively process <template> contents
+  root.querySelectorAll("template").forEach((tpl) => {
+    sanitizeNode((tpl as HTMLTemplateElement).content);
+  });
+  // Remove dangerous attributes
+  root.querySelectorAll("*").forEach((el) => {
     for (const attribute of Array.from(el.attributes) as Attr[]) {
       const name = attribute.name.toLowerCase();
       if (name.startsWith("on")) {
@@ -20,7 +21,6 @@ export function sanitizeHtml(html: string): string {
       }
       if (name === "style") {
         const val = attribute.value.toLowerCase();
-        // Allow optional quotes around url schemes
         if (
           /expression\s*\(/i.test(val) ||
           /url\s*\(\s*['"]?(javascript|data|vbscript):/i.test(val)
@@ -42,7 +42,11 @@ export function sanitizeHtml(html: string): string {
       }
 
       if (
-        (name === "href" || name === "src" || name === "xlink:href") &&
+        (name === "href" ||
+          name === "src" ||
+          name === "xlink:href" ||
+          name === "action" ||
+          name === "formaction") &&
         /^(?:javascript|data|vbscript):/i.test(
           attribute.value.replace(/[\s\u0000-\u001F]+/g, ""),
         )
@@ -51,6 +55,13 @@ export function sanitizeHtml(html: string): string {
       }
     }
   });
+}
+
+export function sanitizeHtml(html: string): string {
+  const Parser =
+    typeof DOMParser !== "undefined" ? DOMParser : new JSDOM("").window.DOMParser;
+  const doc = new Parser().parseFromString(html, "text/html");
+  sanitizeNode(doc);
   return doc.body.innerHTML;
 }
 export default sanitizeHtml;
