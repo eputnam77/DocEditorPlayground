@@ -30,7 +30,8 @@ for(const file of files){
   for(const script of data.result){
     if(!script.url.startsWith('file://')) continue;
     const filePath = new URL(script.url).pathname;
-    if(!filePath.startsWith(path.join(projectDir, 'utils'))) continue;
+    const includeDirs = ['utils', 'components'];
+    if(!includeDirs.some(dir => filePath.startsWith(path.join(projectDir, dir)))) continue;
     const content = fs.readFileSync(filePath,'utf8');
     for(const fn of script.functions){
       for(const range of fn.ranges){

@@ -15,4 +15,10 @@ describe("TrackChanges", () => {
     rerender(<TrackChanges content="abc" />);
     expect(screen.getByTestId("removed").textContent).toContain("3");
   });
+
+  it("renders nothing when unchanged", () => {
+    const { container } = render(<TrackChanges content="abc" />);
+    const node = container.querySelector('[data-testid="track-changes"]');
+    expect(node).toBeNull();
+  });
 });
