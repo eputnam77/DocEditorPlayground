@@ -87,10 +87,28 @@ describe("sanitizeHtml", () => {
     assert.strictEqual(clean, "<div>ok</div>");
   });
 
+  it("removes meta refresh without URL", () => {
+    const dirty = '<meta http-equiv="refresh" content="5"><div>ok</div>';
+    const clean = sanitizeHtml(dirty);
+    assert.strictEqual(clean, "<div>ok</div>");
+  });
+
   it("strips dangerous form actions", () => {
     const dirty = '<form action="javascript:alert(1)"><input></form>';
     const clean = sanitizeHtml(dirty);
     assert.strictEqual(clean, '<form><input></form>');
+  });
+
+  it("removes formaction attributes", () => {
+    const dirty = '<button formaction="javascript:alert(1)">x</button>';
+    const clean = sanitizeHtml(dirty);
+    assert.strictEqual(clean, '<button>x</button>');
+  });
+
+  it("strips uppercase event handlers", () => {
+    const dirty = '<div ONCLICK="alert(1)">x</div>';
+    const clean = sanitizeHtml(dirty);
+    assert.strictEqual(clean, '<div>x</div>');
   });
 
   it("sanitizes inside template elements", () => {

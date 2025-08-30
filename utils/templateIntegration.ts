@@ -20,9 +20,17 @@ export function integrateTemplates(templates: unknown[]): Template[] {
   const result: Template[] = [];
   for (const tpl of templates) {
     try {
-      if (typeof tpl !== "object" || tpl === null) {
+      // Reject non-objects, null, and arrays before touching any fields
+      if (
+        typeof tpl !== "object" ||
+        tpl === null ||
+        Array.isArray(tpl) ||
+        !Object.prototype.hasOwnProperty.call(tpl, "title") ||
+        !Object.prototype.hasOwnProperty.call(tpl, "body")
+      ) {
         continue;
       }
+
       const rec = tpl as Record<string, unknown>;
       const title = rec.title;
       const body = rec.body;
