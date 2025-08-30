@@ -1,6 +1,6 @@
 import React from "react";
 import { describe, it, expect, vi } from "vitest";
-import { render, screen, fireEvent } from "@testing-library/react";
+import { render, screen, fireEvent, act } from "@testing-library/react";
 import CommentTrack from "../../components/CommentTrack";
 
 describe("CommentTrack", () => {
@@ -10,5 +10,19 @@ describe("CommentTrack", () => {
     fireEvent.change(input, { target: { value: "hello" } });
     fireEvent.click(screen.getByText("Add"));
     expect(screen.getByText("hello").textContent).toBe("hello");
+  });
+
+  it("handles rapid sequential additions", () => {
+    render(<CommentTrack />);
+    const input = screen.getByPlaceholderText(/enter comment/i) as HTMLInputElement;
+    const button = screen.getByText("Add");
+    act(() => {
+      fireEvent.change(input, { target: { value: "one" } });
+      button.dispatchEvent(new MouseEvent("click", { bubbles: true }));
+      fireEvent.change(input, { target: { value: "two" } });
+      button.dispatchEvent(new MouseEvent("click", { bubbles: true }));
+    });
+    const items = screen.getAllByRole("listitem").map((li) => li.textContent);
+    expect(items).toEqual(["one", "two"]);
   });
 });

@@ -67,6 +67,26 @@ describe("sanitizeHtml", () => {
     assert.strictEqual(clean, "");
   });
 
+  it("removes object and embed elements", () => {
+    const dirty =
+      '<object data="javascript:alert(1)"></object><embed src="javascript:evil"></embed><div>safe</div>';
+    const clean = sanitizeHtml(dirty);
+    assert.strictEqual(clean, "<div>safe</div>");
+  });
+
+  it("strips base elements", () => {
+    const dirty = '<base href="javascript:alert(1)"><div>safe</div>';
+    const clean = sanitizeHtml(dirty);
+    assert.strictEqual(clean, "<div>safe</div>");
+  });
+
+  it("strips meta refresh redirects", () => {
+    const dirty =
+      '<meta http-equiv="refresh" content="0;url=javascript:alert(1)"><div>ok</div>';
+    const clean = sanitizeHtml(dirty);
+    assert.strictEqual(clean, "<div>ok</div>");
+  });
+
   it("strips dangerous form actions", () => {
     const dirty = '<form action="javascript:alert(1)"><input></form>';
     const clean = sanitizeHtml(dirty);
