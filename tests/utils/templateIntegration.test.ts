@@ -34,6 +34,12 @@ describe("integrateTemplates", () => {
     assert.deepStrictEqual(result, [{ title: "123", body: "456" }]);
   });
 
+  it("trims whitespace from fields", () => {
+    const input: any = [{ title: "  A  ", body: " b  " }];
+    const result = integrateTemplates(input);
+    assert.deepStrictEqual(result, [{ title: "A", body: "b" }]);
+  });
+
   it("rejects arrays and prototype properties", () => {
     const proto = { title: "t", body: "b" };
     const arr: any = Object.assign([], { title: "x", body: "y" });

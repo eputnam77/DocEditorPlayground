@@ -1,6 +1,7 @@
 import { describe, it, expect } from "vitest";
 import assert from "node:assert/strict";
-import { sanitizeHtml } from "../../utils/sanitize.js";
+import { JSDOM } from "jsdom";
+import { sanitizeHtml, sanitizeNode } from "../../utils/sanitize.js";
 
 describe("sanitizeHtml", () => {
   it("removes script tags and event handlers", () => {
@@ -91,6 +92,14 @@ describe("sanitizeHtml", () => {
     const dirty = '<meta http-equiv="refresh" content="5"><div>ok</div>';
     const clean = sanitizeHtml(dirty);
     assert.strictEqual(clean, "<div>ok</div>");
+  });
+
+  it("removes meta refresh with safe URL", () => {
+    const dom = new JSDOM(
+      '<meta http-equiv="refresh" content="0;url=/safe"><div>ok</div>',
+    );
+    sanitizeNode(dom.window.document);
+    expect(dom.window.document.querySelector("meta[http-equiv]")).toBeNull();
   });
 
   it("strips dangerous form actions", () => {

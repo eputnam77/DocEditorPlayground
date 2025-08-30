@@ -4,7 +4,7 @@
  */
 import { JSDOM } from "jsdom";
 
-function sanitizeNode(root: ParentNode): void {
+export function sanitizeNode(root: ParentNode): void {
   // Remove tags that can execute scripts or modify document navigation
   root
     .querySelectorAll("script, iframe, object, embed, base")
@@ -13,12 +13,8 @@ function sanitizeNode(root: ParentNode): void {
   root.querySelectorAll("meta[http-equiv]").forEach((el) => {
     const equiv = el.getAttribute("http-equiv");
     if (equiv && equiv.toLowerCase() === "refresh") {
-      const content = el.getAttribute("content") || "";
-      const norm = content.replace(/[\s\u0000-\u001F]+/g, "").toLowerCase();
-      const urlIndex = norm.indexOf("url=");
-      if (urlIndex === -1 || /^(?:javascript|data|vbscript):/.test(norm.slice(urlIndex + 4))) {
-        el.remove();
-      }
+      // Refresh tags can trigger unwanted redirects even with supposedly safe URLs
+      el.remove();
     }
   });
   // Recursively process <template> contents
