@@ -11,29 +11,47 @@ import { Node as PMNode } from "prosemirror-model";
  * Adds simple indent/outdent commands by storing the level
  * in a `data-indent` attribute on paragraphs and list items.
  */
+export function getIndentLevel(editor: {
+  getAttributes: (name: string) => Record<string, unknown>;
+}): number {
+  const val = editor.getAttributes("paragraph")["data-indent"];
+  const num = typeof val === "number" ? val : Number(val);
+  return Number.isFinite(num) ? num : 0;
+}
+
+export function indentCommand({
+  editor,
+  commands,
+}: {
+  editor: any;
+  commands: any;
+}): any {
+  const level = getIndentLevel(editor);
+  return commands.updateAttributes("paragraph", {
+    "data-indent": level + 1,
+  });
+}
+
+export function outdentCommand({
+  editor,
+  commands,
+}: {
+  editor: any;
+  commands: any;
+}): any {
+  const level = getIndentLevel(editor);
+  return commands.updateAttributes("paragraph", {
+    "data-indent": Math.max(0, level - 1),
+  });
+}
+
 export function tiptapIndentation() {
   return Extension.create({
     name: "indentation",
     addCommands() {
       return {
-        indent:
-          () =>
-          ({ editor, commands }: { editor: any; commands: any }) => {
-            const level =
-              (editor.getAttributes("paragraph")["data-indent"] as number) || 0;
-            return commands.updateAttributes("paragraph", {
-              "data-indent": level + 1,
-            });
-          },
-        outdent:
-          () =>
-          ({ editor, commands }: { editor: any; commands: any }) => {
-            const level =
-              (editor.getAttributes("paragraph")["data-indent"] as number) || 0;
-            return commands.updateAttributes("paragraph", {
-              "data-indent": Math.max(0, level - 1),
-            });
-          },
+        indent: () => indentCommand,
+        outdent: () => outdentCommand,
       } as Partial<RawCommands>;
     },
     addGlobalAttributes() {

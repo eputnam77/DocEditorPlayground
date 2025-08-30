@@ -36,7 +36,10 @@ export function integrateTemplates(templates: unknown[]): Template[] {
       const body = rec.body;
       // Validate using the already-read values so getters are not invoked twice
       if (validateTemplate({ title, body })) {
-        result.push({ title: String(title), body: String(body) });
+        result.push({
+          title: String(title).trim(),
+          body: String(body).trim(),
+        });
       }
     } catch {
       // Ignore entries where property access throws
