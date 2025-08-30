@@ -4,7 +4,14 @@ import { integrateTemplates } from "../../utils/templateIntegration.js";
 
 describe("integrateTemplates", () => {
   it("filters invalid templates", () => {
-    const input = [{ title: "A", body: "b" }, { title: "bad" }, null];
+    const proto = { title: "P", body: "p" };
+    const input = [
+      { title: "A", body: "b" },
+      { title: "bad" },
+      null,
+      Object.create(proto),
+      Object.assign([], { title: "x", body: "y" }),
+    ];
     const result = integrateTemplates(input as any);
     assert.deepStrictEqual(result, [{ title: "A", body: "b" }]);
   });
@@ -25,6 +32,14 @@ describe("integrateTemplates", () => {
     const input: any = [{ title: 123, body: 456 }];
     const result = integrateTemplates(input);
     assert.deepStrictEqual(result, [{ title: "123", body: "456" }]);
+  });
+
+  it("rejects arrays and prototype properties", () => {
+    const proto = { title: "t", body: "b" };
+    const arr: any = Object.assign([], { title: "x", body: "y" });
+    const obj = Object.create(proto);
+    const result = integrateTemplates([arr, obj]);
+    assert.deepStrictEqual(result, []);
   });
 
   it("accesses template fields only once", () => {
