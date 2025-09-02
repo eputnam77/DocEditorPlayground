@@ -31,7 +31,20 @@
       "lexical": ["stubs/lexical.ts"],
       "@lexical/react": ["stubs/lexical-react.tsx"],
       "slate": ["stubs/slate.ts"],
-      "slate-react": ["stubs/slate-react.tsx"]
+      "slate-react": ["stubs/slate-react.tsx"],
+      "@toast-ui/react-editor": ["stubs/toast-ui-react-editor.tsx"],
+      "@toast-ui/editor-plugin-code-syntax-highlight": [
+        "stubs/toast-ui-editor-plugin-code-syntax-highlight.ts"
+      ],
+      "@toast-ui/editor-plugin-table-merged-cell": [
+        "stubs/toast-ui-editor-plugin-table-merged-cell.ts"
+      ],
+      "@toast-ui/editor-plugin-color-syntax": [
+        "stubs/toast-ui-editor-plugin-color-syntax.ts"
+      ],
+      "@toast-ui/editor-plugin-chart": [
+        "stubs/toast-ui-editor-plugin-chart.ts"
+      ]
     }
   },
   "include": [

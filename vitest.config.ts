@@ -14,6 +14,26 @@ export default defineConfig({
       "@editorjs/list": resolve(__dirname, "stubs/editorjs-list.ts"),
       slate: resolve(__dirname, "stubs/slate.ts"),
       "slate-react": resolve(__dirname, "stubs/slate-react.tsx"),
+      "@toast-ui/react-editor": resolve(
+        __dirname,
+        "stubs/toast-ui-react-editor.tsx",
+      ),
+      "@toast-ui/editor-plugin-code-syntax-highlight": resolve(
+        __dirname,
+        "stubs/toast-ui-editor-plugin-code-syntax-highlight.ts",
+      ),
+      "@toast-ui/editor-plugin-table-merged-cell": resolve(
+        __dirname,
+        "stubs/toast-ui-editor-plugin-table-merged-cell.ts",
+      ),
+      "@toast-ui/editor-plugin-color-syntax": resolve(
+        __dirname,
+        "stubs/toast-ui-editor-plugin-color-syntax.ts",
+      ),
+      "@toast-ui/editor-plugin-chart": resolve(
+        __dirname,
+        "stubs/toast-ui-editor-plugin-chart.ts",
+      ),
     },
   },
   test: {
