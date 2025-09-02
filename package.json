@@ -65,7 +65,10 @@
     "y-protocols": "^1.0.6",
     "mark-review": "github:eputnam77/MarkReview",
     "@ckeditor/ckeditor5-react": "^6.1.0",
-    "@ckeditor/ckeditor5-build-classic": "^39.0.1"
+    "@ckeditor/ckeditor5-build-classic": "^39.0.1",
+    "@editorjs/editorjs": "^2.30.7",
+    "@editorjs/header": "^2.8.1",
+    "@editorjs/list": "^1.9.1"
   },
   "devDependencies": {
     "typescript": "^5.4.2",
