@@ -12,6 +12,8 @@ export default defineConfig({
       "@editorjs/editorjs": resolve(__dirname, "stubs/editorjs.ts"),
       "@editorjs/header": resolve(__dirname, "stubs/editorjs-header.ts"),
       "@editorjs/list": resolve(__dirname, "stubs/editorjs-list.ts"),
+      slate: resolve(__dirname, "stubs/slate.ts"),
+      "slate-react": resolve(__dirname, "stubs/slate-react.tsx"),
     },
   },
   test: {

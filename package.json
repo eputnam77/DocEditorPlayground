@@ -68,7 +68,9 @@
     "@ckeditor/ckeditor5-build-classic": "^39.0.1",
     "@editorjs/editorjs": "^2.30.7",
     "@editorjs/header": "^2.8.1",
-    "@editorjs/list": "^1.9.1"
+    "@editorjs/list": "^1.9.1",
+    "slate": "^0.94.0",
+    "slate-react": "^0.94.0"
   },
   "devDependencies": {
     "typescript": "^5.4.2",

@@ -29,7 +29,9 @@
       "@editorjs/header": ["stubs/editorjs-header.ts"],
       "@editorjs/list": ["stubs/editorjs-list.ts"],
       "lexical": ["stubs/lexical.ts"],
-      "@lexical/react": ["stubs/lexical-react.tsx"]
+      "@lexical/react": ["stubs/lexical-react.tsx"],
+      "slate": ["stubs/slate.ts"],
+      "slate-react": ["stubs/slate-react.tsx"]
     }
   },
   "include": [
