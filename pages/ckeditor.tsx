@@ -1,11 +1,11 @@
-import React, { useState } from "react";
+import React, { useRef, useState, useMemo } from "react";
+import { CKEditor } from "@ckeditor/ckeditor5-react";
+import ClassicEditor from "@ckeditor/ckeditor5-build-classic";
 
 /**
  * CKEditor demo page.
  *
- * The real CKEditor package cannot be bundled in this offline
- * playground. The surrounding UI still demonstrates plugin toggles,
- * template loading and validation logic without the editor itself.
+ * Basic CKEditor 5 integration with plugin toggles and template loading.
  */
 import EditorIntegrationInfo from "../components/EditorIntegrationInfo";
 import PluginManager from "../components/PluginManager";
@@ -20,21 +20,33 @@ import { validateDocument } from "../utils/validation";
 import { TEMPLATES } from "../utils/templates";
 import ModernLayout from "../components/ModernLayout";
 
-const PLUGINS = [{ name: "bold" }, { name: "italic" }];
+const PLUGINS = [
+  { name: "bold", label: "Bold" },
+  { name: "italic", label: "Italic" },
+  { name: "underline", label: "Underline" },
+];
 
 function CkeditorPage() {
+  const editorRef = useRef<any>(null);
   const [enabled, setEnabled] = useState<string[]>(PLUGINS.map((p) => p.name));
   const [content, setContent] = useState("");
   const [validationResults, setValidationResults] = useState<
     ValidationResult[]
   >([]);
 
+  const toolbarItems = useMemo(
+    () => [...enabled, "undo", "redo"],
+    [enabled],
+  );
+
   async function loadTemplate(filename: string) {
     try {
       const res = await fetch(`/templates/${filename}`);
       if (!res.ok) throw new Error("fetch failed");
       const html = await res.text();
-      setContent(sanitizeHtml(html));
+      const sanitized = sanitizeHtml(html);
+      setContent(sanitized);
+      editorRef.current?.setData(sanitized);
     } catch {
       alert("Failed to load template: " + filename);
     }
@@ -53,13 +65,6 @@ function CkeditorPage() {
     <ModernLayout>
       <div className="p-4 space-y-2">
         <h1>CKEditor 5</h1>
-        <p className="text-sm text-zinc-600 dark:text-zinc-300">
-          The editor bundle is omitted in this offline demo.
-        </p>
-        <p className="text-sm italic text-red-600 dark:text-red-400">
-          Full CKEditor integration requires additional dependencies and is not
-          available in this offline demo.
-        </p>
         <div className="flex gap-2">
           <TemplateLoader
             templates={TEMPLATES}
@@ -79,13 +84,19 @@ function CkeditorPage() {
             Validate
           </button>
         </div>
-        <div
-          contentEditable
-          suppressContentEditableWarning
-          className="w-full border rounded p-2 min-h-[200px]"
-          onInput={(e) => setContent((e.target as HTMLElement).innerText)}
-        >
-          {content}
+        <div className="w-full border rounded min-h-[60vh]">
+          <CKEditor
+            editor={ClassicEditor}
+            data={content}
+            key={enabled.join(",")}
+            onReady={(editor: any) => {
+              editorRef.current = editor;
+            }}
+            onChange={(event, editor: any) => {
+              setContent(editor.getData());
+            }}
+            config={{ toolbar: { items: toolbarItems } }}
+          />
         </div>
         <TrackChanges content={content} />
         {validationResults.length > 0 && (

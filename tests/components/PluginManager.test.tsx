@@ -11,7 +11,7 @@ describe("PluginManager", () => {
     render(
       <PluginManager plugins={plugins} enabled={["A"]} onChange={handle} />,
     );
-    fireEvent.click(screen.getByLabelText("Extensions"));
+    fireEvent.click(screen.getByLabelText("Plugins"));
     const checkbox = screen.getByLabelText("B") as HTMLInputElement;
     fireEvent.click(checkbox);
     expect(handle).toHaveBeenCalledWith(["A", "B"]);
@@ -27,7 +27,7 @@ describe("PluginManager", () => {
         onChange={handle}
       />,
     );
-    fireEvent.click(screen.getByLabelText("Extensions"));
+    fireEvent.click(screen.getByLabelText("Plugins"));
     const checkbox = screen.getByLabelText("B") as HTMLInputElement;
     expect(checkbox.disabled).toBe(true);
     fireEvent.click(checkbox);

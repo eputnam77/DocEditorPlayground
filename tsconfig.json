@@ -22,7 +22,9 @@
       "@tiptap/extension-table-cell": ["stubs/tiptap-extension-table-cell.ts"],
       "@tiptap/extension-table-header": [
         "stubs/tiptap-extension-table-header.ts"
-      ]
+      ],
+      "@ckeditor/ckeditor5-react": ["stubs/ckeditor5-react.tsx"],
+      "@ckeditor/ckeditor5-build-classic": ["stubs/ckeditor5-build-classic.ts"]
     }
   },
   "include": [
