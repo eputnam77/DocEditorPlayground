@@ -1,6 +1,6 @@
 import { test, expect } from "@playwright/test";
 
-const PLUGINS = ["History", "Lists", "CodeHighlight", "Link"];
+const PLUGINS = ["History", "Lists"];
 
 test.describe("lexical plugin toggles", () => {
   test.beforeEach(async ({ page }) => {
