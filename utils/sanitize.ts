@@ -12,7 +12,7 @@ export function sanitizeNode(root: ParentNode): void {
   // Remove meta refresh tags which can trigger redirects or script URLs
   root.querySelectorAll("meta[http-equiv]").forEach((el) => {
     const equiv = el.getAttribute("http-equiv");
-    if (equiv && equiv.toLowerCase() === "refresh") {
+    if (equiv && equiv.toLowerCase().trim() === "refresh") {
       // Refresh tags can trigger unwanted redirects even with supposedly safe URLs
       el.remove();
     }
@@ -30,10 +30,11 @@ export function sanitizeNode(root: ParentNode): void {
         continue;
       }
       if (name === "style") {
-        const val = attribute.value.toLowerCase();
+        const valLower = attribute.value.toLowerCase();
+        const collapsed = valLower.replace(/[\s\u0000-\u001F]+/g, "");
         if (
-          /expression\s*\(/i.test(val) ||
-          /url\s*\(\s*['"]?(javascript|data|vbscript):/i.test(val)
+          /expression\s*\(/.test(valLower) ||
+          /url\(['"]?(javascript|data|vbscript):/.test(collapsed)
         ) {
           el.removeAttribute(attribute.name);
           continue;
@@ -56,7 +57,8 @@ export function sanitizeNode(root: ParentNode): void {
           name === "src" ||
           name === "xlink:href" ||
           name === "action" ||
-          name === "formaction") &&
+          name === "formaction" ||
+          name === "background") &&
         /^(?:javascript|data|vbscript):/i.test(
           attribute.value.replace(/[\s\u0000-\u001F]+/g, ""),
         )

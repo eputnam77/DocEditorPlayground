@@ -102,6 +102,23 @@ describe("sanitizeHtml", () => {
     expect(dom.window.document.querySelector("meta[http-equiv]")).toBeNull();
   });
 
+  it("strips meta refresh with extra whitespace", () => {
+    const dirty =
+      '<meta http-equiv="  Refresh " content="0;url=javascript:alert(1)"><div>ok</div>';
+    const clean = sanitizeHtml(dirty);
+    assert.strictEqual(clean, "<div>ok</div>");
+  });
+
+  it("strips meta refresh added programmatically with spaces", () => {
+    const dom = new JSDOM("<div>ok</div>", { url: "http://localhost" });
+    const meta = dom.window.document.createElement("meta");
+    meta.setAttribute("http-equiv", " Refresh ");
+    meta.setAttribute("content", "0;url=javascript:alert(1)");
+    dom.window.document.body.prepend(meta);
+    sanitizeNode(dom.window.document);
+    expect(dom.window.document.querySelector("meta")).toBeNull();
+  });
+
   it("strips dangerous form actions", () => {
     const dirty = '<form action="javascript:alert(1)"><input></form>';
     const clean = sanitizeHtml(dirty);
@@ -114,10 +131,25 @@ describe("sanitizeHtml", () => {
     assert.strictEqual(clean, '<button>x</button>');
   });
 
+  it("removes background attributes with dangerous URLs", () => {
+    const dirty = '<table background="javascript:alert(1)">x</table>';
+    const clean = sanitizeHtml(dirty);
+    assert.strictEqual(clean.includes("background"), false);
+    assert.strictEqual(clean.includes("javascript"), false);
+    assert.ok(clean.includes("x"));
+  });
+
   it("strips uppercase event handlers", () => {
     const dirty = '<div ONCLICK="alert(1)">x</div>';
     const clean = sanitizeHtml(dirty);
     assert.strictEqual(clean, '<div>x</div>');
+  });
+
+  it("removes javascript URLs split by whitespace in style", () => {
+    const dirty =
+      '<div style="background:url(java\nscript:alert(1))">x</div>';
+    const clean = sanitizeHtml(dirty);
+    assert.strictEqual(clean, "<div>x</div>");
   });
 
   it("sanitizes inside template elements", () => {
