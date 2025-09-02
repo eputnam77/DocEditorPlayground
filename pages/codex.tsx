@@ -1,11 +1,10 @@
-import React, { useState } from "react";
+import React, { useEffect, useRef, useState } from "react";
+import EditorJS from "@editorjs/editorjs";
+import Header from "@editorjs/header";
+import List from "@editorjs/list";
 
 /**
- * Editor.js demo page.
- *
- * The real Editor.js packages are omitted in this offline demo.
- * The page still demonstrates plugin toggles, template loading and
- * validation without the actual editor bundle.
+ * Editor.js demo page with basic plugin toggles and template loading.
  */
 import EditorIntegrationInfo from "../components/EditorIntegrationInfo";
 import PluginManager from "../components/PluginManager";
@@ -20,7 +19,10 @@ import { validateDocument } from "../utils/validation";
 import { TEMPLATES } from "../utils/templates";
 import ModernLayout from "../components/ModernLayout";
 
-const PLUGINS = [{ name: "paragraph" }, { name: "header" }];
+const PLUGINS = [
+  { name: "header", label: "Header" },
+  { name: "list", label: "List" },
+];
 
 function CodexPage() {
   const [enabled, setEnabled] = useState<string[]>(PLUGINS.map((p) => p.name));
@@ -28,13 +30,40 @@ function CodexPage() {
   const [validationResults, setValidationResults] = useState<
     ValidationResult[]
   >([]);
+  const holderRef = useRef<HTMLDivElement>(null);
+  const editorRef = useRef<EditorJS | null>(null);
+
+  useEffect(() => {
+    const tools: Record<string, any> = {};
+    if (enabled.includes("header")) tools.header = Header;
+    if (enabled.includes("list")) tools.list = List;
+
+    const editor = new EditorJS({
+      holder: holderRef.current!,
+      tools,
+      async onChange() {
+        const data = await editor.save();
+        const text = data.blocks
+          .map((b: any) => (b.data && b.data.text ? b.data.text : ""))
+          .join("\n");
+        setContent(text);
+      },
+    });
+    editorRef.current = editor;
+    (window as any).editor = editor;
+    return () => {
+      editor.destroy();
+      editorRef.current = null;
+    };
+  }, [enabled]);
 
   async function loadTemplate(filename: string) {
     try {
       const res = await fetch(`/templates/${filename}`);
       if (!res.ok) throw new Error("fetch failed");
       const html = await res.text();
-      setContent(sanitizeHtml(html));
+      const sanitized = sanitizeHtml(html);
+      editorRef.current?.blocks.renderFromHTML(sanitized);
     } catch {
       alert("Failed to load template: " + filename);
     }
@@ -53,18 +82,11 @@ function CodexPage() {
     <ModernLayout>
       <div className="p-4 space-y-2">
         <h1>Editor.js</h1>
-        <p className="text-sm text-zinc-600 dark:text-zinc-300">
-          The editor bundle is omitted in this offline demo.
-        </p>
-        <p className="text-sm italic text-red-600 dark:text-red-400">
-          Full Editor.js integration requires additional dependencies and is not
-          available in this offline demo.
-        </p>
         <div className="flex gap-2">
           <TemplateLoader
             templates={TEMPLATES}
             onLoad={loadTemplate}
-            onClear={() => setContent("")}
+            onClear={() => editorRef.current?.blocks.renderFromHTML("")}
             onError={(e) => alert(String(e))}
           />
           <PluginManager
@@ -80,13 +102,11 @@ function CodexPage() {
           </button>
         </div>
         <div
-          contentEditable
-          suppressContentEditableWarning
-          className="w-full border rounded p-2 min-h-[200px]"
-          onInput={(e) => setContent((e.target as HTMLElement).innerText)}
-        >
-          {content}
-        </div>
+          id="codex-editor"
+          data-testid="codex-editor"
+          ref={holderRef}
+          className="w-full border rounded p-2 min-h-[60vh]"
+        />
         <TrackChanges content={content} />
         {validationResults.length > 0 && (
           <ValidationStatus

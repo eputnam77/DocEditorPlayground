@@ -30,6 +30,9 @@ export default withAnalyze({
         __dirname,
         "stubs/tiptap-extension-table-header.ts",
       ),
+      "@editorjs/editorjs": path.resolve(__dirname, "stubs/editorjs.ts"),
+      "@editorjs/header": path.resolve(__dirname, "stubs/editorjs-header.ts"),
+      "@editorjs/list": path.resolve(__dirname, "stubs/editorjs-list.ts"),
     };
     return config;
   },

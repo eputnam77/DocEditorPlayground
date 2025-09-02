@@ -9,6 +9,9 @@ export default defineConfig({
         __dirname,
         "stubs/ckeditor5-build-classic.ts",
       ),
+      "@editorjs/editorjs": resolve(__dirname, "stubs/editorjs.ts"),
+      "@editorjs/header": resolve(__dirname, "stubs/editorjs-header.ts"),
+      "@editorjs/list": resolve(__dirname, "stubs/editorjs-list.ts"),
     },
   },
   test: {
