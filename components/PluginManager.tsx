@@ -61,10 +61,10 @@ export default function PluginManager({
         type="button"
         className="px-3 py-1 border rounded bg-gray-50 hover:bg-gray-200 flex items-center gap-1"
         onClick={() => setOpen(!open)}
-        title="Extensions"
-        aria-label="Extensions"
+        title="Plugins"
+        aria-label="Plugins"
       >
-        Extensions
+        Plugins
         {open ? (
           <ChevronUp className="w-4 h-4" />
         ) : (

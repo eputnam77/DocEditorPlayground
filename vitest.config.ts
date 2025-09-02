@@ -1,8 +1,15 @@
 import { defineConfig } from "vitest/config";
+import { resolve } from "path";
 
 export default defineConfig({
   resolve: {
-    alias: {},
+    alias: {
+      "@ckeditor/ckeditor5-react": resolve(__dirname, "stubs/ckeditor5-react.tsx"),
+      "@ckeditor/ckeditor5-build-classic": resolve(
+        __dirname,
+        "stubs/ckeditor5-build-classic.ts",
+      ),
+    },
   },
   test: {
     globals: true,
