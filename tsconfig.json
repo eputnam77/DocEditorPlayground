@@ -27,7 +27,9 @@
       "@ckeditor/ckeditor5-build-classic": ["stubs/ckeditor5-build-classic.ts"],
       "@editorjs/editorjs": ["stubs/editorjs.ts"],
       "@editorjs/header": ["stubs/editorjs-header.ts"],
-      "@editorjs/list": ["stubs/editorjs-list.ts"]
+      "@editorjs/list": ["stubs/editorjs-list.ts"],
+      "lexical": ["stubs/lexical.ts"],
+      "@lexical/react": ["stubs/lexical-react.tsx"]
     }
   },
   "include": [

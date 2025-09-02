@@ -1,11 +1,23 @@
 import React, { useState } from "react";
+import {
+  LexicalComposer,
+  RichTextPlugin,
+  ContentEditable,
+  HistoryPlugin,
+  ListPlugin,
+  OnChangePlugin,
+  useLexicalComposerContext,
+} from "../stubs/lexical-react";
+import {
+  FORMAT_TEXT_COMMAND,
+  INSERT_UNORDERED_LIST_COMMAND,
+  INSERT_ORDERED_LIST_COMMAND,
+  UNDO_COMMAND,
+  REDO_COMMAND,
+} from "../stubs/lexical";
 
 /**
- * Lexical demo page.
- *
- * Lexical's full editor bundle is not included in this repository to
- * keep the offline demo lightweight. The page omits the editor bundle
- * and shows only the surrounding controls.
+ * Lexical demo page with a lightweight stub editor.
  */
 import EditorIntegrationInfo from "../components/EditorIntegrationInfo";
 import PluginManager from "../components/PluginManager";
@@ -49,16 +61,74 @@ function LexicalPage() {
     }
   }
 
+  function Toolbar() {
+    const [editor] = useLexicalComposerContext();
+    return (
+      <div className="flex gap-2 mb-2">
+        <button
+          aria-label="Bold"
+          className="px-2 py-1 border rounded"
+          onClick={() =>
+            editor.dispatchCommand(FORMAT_TEXT_COMMAND, "bold")
+          }
+        >
+          Bold
+        </button>
+        <button
+          aria-label="Italic"
+          className="px-2 py-1 border rounded"
+          onClick={() =>
+            editor.dispatchCommand(FORMAT_TEXT_COMMAND, "italic")
+          }
+        >
+          Italic
+        </button>
+        <button
+          aria-label="Bullet List"
+          className="px-2 py-1 border rounded"
+          disabled={!enabled.includes("lists")}
+          onClick={() =>
+            editor.dispatchCommand(INSERT_UNORDERED_LIST_COMMAND)
+          }
+        >
+          Bullet List
+        </button>
+        <button
+          aria-label="Numbered List"
+          className="px-2 py-1 border rounded"
+          disabled={!enabled.includes("lists")}
+          onClick={() =>
+            editor.dispatchCommand(INSERT_ORDERED_LIST_COMMAND)
+          }
+        >
+          Numbered List
+        </button>
+        <button
+          aria-label="Undo"
+          className="px-2 py-1 border rounded"
+          disabled={!enabled.includes("history")}
+          onClick={() => editor.dispatchCommand(UNDO_COMMAND)}
+        >
+          Undo
+        </button>
+        <button
+          aria-label="Redo"
+          className="px-2 py-1 border rounded"
+          disabled={!enabled.includes("history")}
+          onClick={() => editor.dispatchCommand(REDO_COMMAND)}
+        >
+          Redo
+        </button>
+      </div>
+    );
+  }
+
   return (
     <ModernLayout>
       <div className="p-4 space-y-2">
         <h1>Lexical</h1>
         <p className="text-sm text-zinc-600 dark:text-zinc-300">
-          The editor bundle is omitted in this offline demo.
-        </p>
-        <p className="text-sm italic text-red-600 dark:text-red-400">
-          Full Lexical editor integration requires additional dependencies and
-          is not available in this offline demo.
+          Basic Lexical-style editor with formatting toolbar.
         </p>
         <div className="flex gap-2">
           <TemplateLoader
@@ -79,14 +149,20 @@ function LexicalPage() {
             Validate
           </button>
         </div>
-        <div
-          contentEditable
-          suppressContentEditableWarning
-          className="w-full border rounded p-2 min-h-[200px]"
-          onInput={(e) => setContent((e.target as HTMLElement).innerText)}
-        >
-          {content}
-        </div>
+        <LexicalComposer initialConfig={{}}>
+          <Toolbar />
+          <RichTextPlugin
+            contentEditable={
+              <ContentEditable
+                data-testid="lexical-editor"
+                className="w-full border rounded p-2 min-h-[200px]"
+              />
+            }
+          />
+          {enabled.includes("history") && <HistoryPlugin />}
+          {enabled.includes("lists") && <ListPlugin />}
+          <OnChangePlugin onChange={(e: any) => setContent(e.getText())} />
+        </LexicalComposer>
         <TrackChanges content={content} />
         {validationResults.length > 0 && (
           <ValidationStatus
