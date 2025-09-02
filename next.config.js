@@ -33,6 +33,26 @@ export default withAnalyze({
       "@editorjs/editorjs": path.resolve(__dirname, "stubs/editorjs.ts"),
       "@editorjs/header": path.resolve(__dirname, "stubs/editorjs-header.ts"),
       "@editorjs/list": path.resolve(__dirname, "stubs/editorjs-list.ts"),
+      "@toast-ui/react-editor": path.resolve(
+        __dirname,
+        "stubs/toast-ui-react-editor.tsx",
+      ),
+      "@toast-ui/editor-plugin-code-syntax-highlight": path.resolve(
+        __dirname,
+        "stubs/toast-ui-editor-plugin-code-syntax-highlight.ts",
+      ),
+      "@toast-ui/editor-plugin-table-merged-cell": path.resolve(
+        __dirname,
+        "stubs/toast-ui-editor-plugin-table-merged-cell.ts",
+      ),
+      "@toast-ui/editor-plugin-color-syntax": path.resolve(
+        __dirname,
+        "stubs/toast-ui-editor-plugin-color-syntax.ts",
+      ),
+      "@toast-ui/editor-plugin-chart": path.resolve(
+        __dirname,
+        "stubs/toast-ui-editor-plugin-chart.ts",
+      ),
     };
     return config;
   },
