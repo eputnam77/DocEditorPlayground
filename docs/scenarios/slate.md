@@ -1,6 +1,6 @@
 # Slate Usage Scenarios
 
-Slate's composable plugins let you build rich behaviour. Integrate the actual editor package to enable editing functionality.
+Slate's composable plugins let you build rich behavior. Integrate the actual editor package to enable editing functionality.
 
 ## Track changes
 
