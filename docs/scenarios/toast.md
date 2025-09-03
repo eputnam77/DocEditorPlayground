@@ -22,7 +22,7 @@ Pair Toast UI with Yjs by broadcasting editor events through a provider service.
 
 ## Section nodes
 
-Wrap content in movable blocks labelled with Heading&nbsp;2 if you need reordering.
+Wrap content in movable blocks labeled with Heading&nbsp;2 if you need reordering.
 
 ## Custom watermark
 
