@@ -165,4 +165,11 @@ describe("sanitizeHtml", () => {
     const clean = sanitizeHtml(dirty);
     assert.strictEqual(clean, '<div>x</div>');
   });
+
+  it("removes style and link elements", () => {
+    const dirty =
+      '<style>body{background:url(javascript:alert(1))}</style><link rel="stylesheet" href="javascript:alert(1)"><div>ok</div>';
+    const clean = sanitizeHtml(dirty);
+    assert.strictEqual(clean, '<div>ok</div>');
+  });
 });

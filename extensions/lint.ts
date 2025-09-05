@@ -33,12 +33,21 @@ export default Extension.create<{ rule: LintRule }>({
             const decorations: any[] = [];
             const issues = rule.match({ tr });
             issues.forEach((issue) => {
-              decorations.push(
-                Decoration.inline(issue.from, issue.to, {
-                  class: "lint-highlight",
-                  title: issue.message,
-                }),
-              );
+              const from = Number(issue.from);
+              const to = Number(issue.to);
+              if (
+                Number.isFinite(from) &&
+                Number.isFinite(to) &&
+                from >= 0 &&
+                to > from
+              ) {
+                decorations.push(
+                  Decoration.inline(from, to, {
+                    class: "lint-highlight",
+                    title: issue.message,
+                  }),
+                );
+              }
             });
             return DecorationSet.create(tr.doc, decorations);
           },

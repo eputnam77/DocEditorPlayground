@@ -39,6 +39,23 @@ export default function TemplateLoader({
     );
     return null;
   }
+  const seen = new Set<string>();
+  const validTemplates = templates.filter((tpl) => {
+    if (
+      !tpl ||
+      typeof tpl.filename !== "string" ||
+      typeof tpl.label !== "string" ||
+      seen.has(tpl.filename)
+    ) {
+      if (tpl) {
+        console.warn("TemplateLoader: ignoring invalid template", tpl);
+      }
+      return false;
+    }
+    seen.add(tpl.filename);
+    return true;
+  });
+
   const handleChange = async (e: React.ChangeEvent<HTMLSelectElement>) => {
     const val = e.target.value;
     if (val === "") return;
@@ -71,7 +88,7 @@ export default function TemplateLoader({
       <option value="" disabled>
         Templates
       </option>
-      {templates.map((tpl) => (
+      {validTemplates.map((tpl) => (
         <option key={tpl.filename} value={tpl.filename}>
           {tpl.label}
         </option>
