@@ -47,6 +47,19 @@ describe("validateDocument", () => {
     });
     assert.strictEqual(validateDocument(doc), true);
   });
+
+  it("accepts String objects", () => {
+    const doc: any = { content: new String("hi") };
+    assert.strictEqual(validateDocument(doc), true);
+    assert.strictEqual(
+      validateDocument({ content: new String("") as any }),
+      false,
+    );
+    assert.strictEqual(
+      validateTemplate({ title: new String("t"), body: new String("b") }),
+      true,
+    );
+  });
 });
 
 describe("validateTemplate", () => {

@@ -39,22 +39,29 @@ export default function TemplateLoader({
     );
     return null;
   }
+  // Normalise input templates by trimming whitespace and dropping duplicates.
+  // Previously templates with blank labels/filenames or extra whitespace would
+  // slip through and even create duplicate entries in the dropdown. This could
+  // leave the select stuck on the placeholder value or show the same template
+  // multiple times. We now trim values and ensure they are non-empty.
   const seen = new Set<string>();
-  const validTemplates = templates.filter((tpl) => {
-    if (
-      !tpl ||
-      typeof tpl.filename !== "string" ||
-      typeof tpl.label !== "string" ||
-      seen.has(tpl.filename)
-    ) {
+  const validTemplates = templates.reduce<TemplateMeta[]>((acc, tpl) => {
+    if (!tpl || typeof tpl.filename !== "string" || typeof tpl.label !== "string") {
       if (tpl) {
         console.warn("TemplateLoader: ignoring invalid template", tpl);
       }
-      return false;
+      return acc;
     }
-    seen.add(tpl.filename);
-    return true;
-  });
+    const filename = tpl.filename.trim();
+    const label = tpl.label.trim();
+    if (!filename || !label || seen.has(filename)) {
+      console.warn("TemplateLoader: ignoring invalid template", tpl);
+      return acc;
+    }
+    seen.add(filename);
+    acc.push({ label, filename });
+    return acc;
+  }, []);
 
   const handleChange = async (e: React.ChangeEvent<HTMLSelectElement>) => {
     const val = e.target.value;

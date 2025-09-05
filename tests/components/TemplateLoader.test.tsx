@@ -57,4 +57,23 @@ describe("TemplateLoader", () => {
     expect(options.filter((t) => t === "One").length).toBe(1);
     expect(options).not.toContain("Bad");
   });
+
+  it("trims whitespace and rejects blank values", () => {
+    const noisy: any = [
+      { label: "  One  ", filename: "  one.html  " },
+      { label: "   ", filename: "two.html" }, // blank label
+      { label: "Two", filename: "   " }, // blank filename
+      { label: "One", filename: "one.html" }, // duplicate after trimming
+    ];
+    render(
+      <TemplateLoader templates={noisy} onLoad={() => {}} onClear={() => {}} />,
+    );
+    const opts = screen
+      .getAllByRole("option")
+      .filter((o) => o.value !== "" && o.value !== "__clear__");
+    // Only one valid template should remain and values should be trimmed
+    expect(opts).toHaveLength(1);
+    expect(opts[0].value).toBe("one.html");
+    expect(opts[0].textContent).toBe("One");
+  });
 });

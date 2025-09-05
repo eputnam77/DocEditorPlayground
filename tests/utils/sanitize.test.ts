@@ -109,6 +109,15 @@ describe("sanitizeHtml", () => {
     assert.strictEqual(clean, "<div>ok</div>");
   });
 
+  it("removes meta refresh with internal whitespace", () => {
+    const dom = new JSDOM(
+      '<meta http-equiv="re fres h" content="0;url=javascript:alert(1)"><div>ok</div>',
+      { url: "http://localhost" },
+    );
+    sanitizeNode(dom.window.document);
+    expect(dom.window.document.querySelector("meta")).toBeNull();
+  });
+
   it("strips meta refresh added programmatically with spaces", () => {
     const dom = new JSDOM("<div>ok</div>", { url: "http://localhost" });
     const meta = dom.window.document.createElement("meta");
