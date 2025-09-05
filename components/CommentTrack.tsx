@@ -10,8 +10,10 @@ export default function CommentTrack() {
   const [comments, setComments] = useState<string[]>([]);
 
   function add() {
-    if (comment.trim()) {
-      setComments([...comments, comment.trim()]);
+    const trimmed = comment.trim();
+    if (trimmed) {
+      // Use functional updates to avoid stale state when called rapidly
+      setComments((prev: string[]) => [...prev, trimmed]);
       setComment("");
     }
   }

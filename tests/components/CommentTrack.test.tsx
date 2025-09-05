@@ -25,4 +25,17 @@ describe("CommentTrack", () => {
     const items = screen.getAllByRole("listitem").map((li) => li.textContent);
     expect(items).toEqual(["one", "two"]);
   });
+
+  it("avoids losing comments on concurrent adds", () => {
+    render(<CommentTrack />);
+    const input = screen.getByPlaceholderText(/enter comment/i) as HTMLInputElement;
+    const button = screen.getByText("Add");
+    fireEvent.change(input, { target: { value: "hi" } });
+    act(() => {
+      button.dispatchEvent(new MouseEvent("click", { bubbles: true }));
+      button.dispatchEvent(new MouseEvent("click", { bubbles: true }));
+    });
+    const items = screen.getAllByRole("listitem");
+    expect(items).toHaveLength(2);
+  });
 });

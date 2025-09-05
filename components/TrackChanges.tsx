@@ -11,13 +11,14 @@ export interface TrackChangesProps {
  * mounts. This is a minimal placeholder for a full track‑changes UI.
  */
 export default function TrackChanges({ content }: TrackChangesProps) {
-  // Capture the initial content on first render
-  const [initial] = useState(content);
-  // Compare current content length to the captured initial length to determine
-  // simple added/removed character counts. This avoids diff algorithms while
-  // providing basic insight into editing activity.
-  const added = Math.max(0, content.length - initial.length);
-  const removed = Math.max(0, initial.length - content.length);
+  // Capture the initial content length using Unicode code points
+  const initialLen = useState<number>(() => Array.from(content).length)[0];
+  const currentLen = Array.from(content).length;
+  // Compare current length to the captured initial length to determine
+  // simple added/removed character counts while correctly handling emojis and
+  // other astral symbols represented by surrogate pairs.
+  const added = Math.max(0, currentLen - initialLen);
+  const removed = Math.max(0, initialLen - currentLen);
 
   if (added === 0 && removed === 0) return null;
 
