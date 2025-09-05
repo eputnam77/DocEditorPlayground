@@ -158,4 +158,11 @@ describe("sanitizeHtml", () => {
     const clean = sanitizeHtml(dirty);
     assert.strictEqual(clean, '<div><template><div></div></template></div>');
   });
+
+  it("removes javascript urls in style even with comments", () => {
+    const dirty =
+      '<div style="background:url(/**/javascript:alert(1))">x</div>';
+    const clean = sanitizeHtml(dirty);
+    assert.strictEqual(clean, '<div>x</div>');
+  });
 });

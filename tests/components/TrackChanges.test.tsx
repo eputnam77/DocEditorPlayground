@@ -21,4 +21,10 @@ describe("TrackChanges", () => {
     const node = container.querySelector('[data-testid="track-changes"]');
     expect(node).toBeNull();
   });
+
+  it("counts unicode characters correctly", () => {
+    const { rerender } = render(<TrackChanges content="😀" />);
+    rerender(<TrackChanges content="" />);
+    expect(screen.getByTestId("removed").textContent).toContain("1");
+  });
 });

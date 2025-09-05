@@ -30,7 +30,9 @@ export function sanitizeNode(root: ParentNode): void {
         continue;
       }
       if (name === "style") {
-        const valLower = attribute.value.toLowerCase();
+        // Strip CSS comments before checking for dangerous patterns
+        const stripped = attribute.value.replace(/\/\*[^]*?\*\//g, "");
+        const valLower = stripped.toLowerCase();
         const collapsed = valLower.replace(/[\s\u0000-\u001F]+/g, "");
         if (
           /expression\s*\(/.test(valLower) ||
