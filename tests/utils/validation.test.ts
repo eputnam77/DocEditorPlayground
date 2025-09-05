@@ -23,6 +23,11 @@ describe("validateDocument", () => {
     assert.strictEqual(validateDocument({ content: "   " }), false);
   });
 
+  it("rejects zero-width whitespace", () => {
+    const zw = "\u200B\u200C"; // zero-width space and non-joiner
+    assert.strictEqual(validateDocument({ content: zw }), false);
+  });
+
   it("returns false when content getter throws", () => {
     const doc: any = {};
     Object.defineProperty(doc, "content", {
@@ -71,6 +76,11 @@ describe("validateTemplate", () => {
     assert.strictEqual(validateTemplate({ title: 1, body: 2 }), true);
   });
 
+  it("accepts Number objects", () => {
+    const tpl: any = { title: new Number(1), body: new Number(2) };
+    assert.strictEqual(validateTemplate(tpl), true);
+  });
+
   it("returns false otherwise", () => {
     assert.strictEqual(validateTemplate({ title: "t" }), false);
     assert.strictEqual(validateTemplate(null), false);
@@ -87,6 +97,18 @@ describe("validateTemplate", () => {
     assert.strictEqual(validateTemplate({ title: "t", body: "" }), false);
     assert.strictEqual(validateTemplate({ title: " ", body: "b" }), false);
     assert.strictEqual(validateTemplate({ title: "t", body: "   " }), false);
+  });
+
+  it("rejects zero-width whitespace strings", () => {
+    const zw = "\u200B";
+    assert.strictEqual(
+      validateTemplate({ title: zw, body: "b" }),
+      false,
+    );
+    assert.strictEqual(
+      validateTemplate({ title: "t", body: zw }),
+      false,
+    );
   });
 
   it("returns false when property getters throw", () => {

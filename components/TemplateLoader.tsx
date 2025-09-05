@@ -54,11 +54,12 @@ export default function TemplateLoader({
     }
     const filename = tpl.filename.trim();
     const label = tpl.label.trim();
-    if (!filename || !label || seen.has(filename)) {
+    const key = filename.toLowerCase();
+    if (!filename || !label || seen.has(key)) {
       console.warn("TemplateLoader: ignoring invalid template", tpl);
       return acc;
     }
-    seen.add(filename);
+    seen.add(key);
     acc.push({ label, filename });
     return acc;
   }, []);

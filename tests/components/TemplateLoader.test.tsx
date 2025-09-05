@@ -76,4 +76,19 @@ describe("TemplateLoader", () => {
     expect(opts[0].value).toBe("one.html");
     expect(opts[0].textContent).toBe("One");
   });
+
+  it("treats filenames case-insensitively when checking duplicates", () => {
+    const noisy: any = [
+      { label: "Upper", filename: "DOC.html" },
+      { label: "Lower", filename: "doc.HTML" },
+    ];
+    render(
+      <TemplateLoader templates={noisy} onLoad={() => {}} onClear={() => {}} />,
+    );
+    const opts = screen
+      .getAllByRole("option")
+      .filter((o) => o.value !== "" && o.value !== "__clear__");
+    expect(opts).toHaveLength(1);
+    expect(opts[0].value).toBe("DOC.html");
+  });
 });

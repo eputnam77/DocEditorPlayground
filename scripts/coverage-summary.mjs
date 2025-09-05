@@ -1,56 +1,48 @@
 import fs from 'fs';
 import path from 'path';
 
-const coverageDir = path.resolve('./coverage');
-const files = fs.readdirSync(coverageDir).filter(f => f.endsWith('.json'));
-const fileCoverage = new Map();
-const projectDir = path.resolve('.');
-
-function markLines(url, start, end, content){
-  if(!fileCoverage.has(url)){
-    const lines = content.split('\n').map(()=>({covered:false, text:''}));
-    lines.forEach((_,i)=>{ lines[i].text = content.split('\n')[i]; });
-    fileCoverage.set(url, lines);
-  }
-  const arr = fileCoverage.get(url);
-  // Precompute line start offsets
-  const lineOffsets = []; let offset=0; const lines=content.split('\n');
-  for(const line of lines){ lineOffsets.push(offset); offset += line.length+1; }
-  for(let i=0;i<lines.length;i++){
-    const lineStart=lineOffsets[i];
-    const lineEnd=i===lines.length-1?content.length:lineOffsets[i+1];
-    if(Math.min(end,lineEnd) > Math.max(start,lineStart)){
-      arr[i].covered = true;
+const root = path.resolve('.');
+const covDir = path.join(root, 'coverage');
+const files = fs.readdirSync(covDir).filter(f => f.endsWith('.json'));
+const fileMap = new Map();
+for (const file of files) {
+  const data = JSON.parse(fs.readFileSync(path.join(covDir, file), 'utf8'));
+  for (const res of data.result) {
+    if (!res.url || !res.url.startsWith('file://')) continue;
+    const filePath = res.url.slice('file://'.length);
+    if (!filePath.startsWith(root)) continue;
+    if (filePath.includes('/node_modules/') || filePath.includes('/tests/') || filePath.includes('/coverage/')) continue;
+    if (!fs.existsSync(filePath)) continue;
+    const source = fs.readFileSync(filePath, 'utf8');
+    const lines = source.split('\n');
+    let info = fileMap.get(filePath);
+    if (!info) {
+      info = { total: lines.length, covered: new Set() };
+      fileMap.set(filePath, info);
     }
-  }
-}
-
-for(const file of files){
-  const data = JSON.parse(fs.readFileSync(path.join(coverageDir,file),'utf8'));
-  for(const script of data.result){
-    if(!script.url.startsWith('file://')) continue;
-    const filePath = new URL(script.url).pathname;
-    const includeDirs = ['utils', 'components'];
-    if(!includeDirs.some(dir => filePath.startsWith(path.join(projectDir, dir)))) continue;
-    const content = fs.readFileSync(filePath,'utf8');
-    for(const fn of script.functions){
-      for(const range of fn.ranges){
-        if(range.count>0){
-          markLines(filePath, range.startOffset, range.endOffset, content);
+    const lineStarts = [];
+    let offset = 0;
+    for (const line of lines) {
+      lineStarts.push(offset);
+      offset += line.length + 1;
+    }
+    for (const fn of res.functions) {
+      for (const range of fn.ranges) {
+        if (range.count === 0) continue;
+        let i = 0;
+        while (i < lineStarts.length && lineStarts[i] + lines[i].length + 1 <= range.startOffset) i++;
+        for (; i < lineStarts.length && lineStarts[i] < range.endOffset; i++) {
+          info.covered.add(i + 1);
         }
       }
     }
   }
 }
-
-let total=0, covered=0;
-for(const [url, lines] of fileCoverage.entries()){
-  const filtered = lines.filter(l => l.text.trim() !== '');
-  const fileCovered = filtered.filter(l=>l.covered).length;
-  const fileTotal = filtered.length;
-  total += fileTotal; covered += fileCovered;
-  const pct = ((fileCovered/fileTotal)*100).toFixed(2);
-  console.log(`${path.relative('.', url)}: ${fileCovered}/${fileTotal} (${pct}%)`);
+let total = 0;
+let covered = 0;
+for (const [file, info] of fileMap.entries()) {
+  total += info.total;
+  covered += info.covered.size;
+  console.log(`${path.relative(root, file)}: ${info.covered.size}/${info.total} (${(info.covered.size/info.total*100).toFixed(2)}%)`);
 }
-const pctTotal = ((covered/total)*100).toFixed(2);
-console.log(`TOTAL: ${covered}/${total} (${pctTotal}%)`);
+console.log(`Total: ${covered}/${total} (${(covered/total*100).toFixed(2)}%)`);
