@@ -39,4 +39,22 @@ describe("TemplateLoader", () => {
     });
     expect(handle).toHaveBeenCalled();
   });
+
+  it("ignores templates missing fields or duplicates", () => {
+    const noisy: any = [
+      { label: "One", filename: "one.html" },
+      { label: "Bad" },
+      { filename: "two.html" },
+      { label: "One", filename: "one.html" },
+      { label: "Two", filename: "two.html" },
+    ];
+    render(
+      <TemplateLoader templates={noisy} onLoad={() => {}} onClear={() => {}} />,
+    );
+    const options = screen.getAllByRole("option").map((o) => o.textContent);
+    expect(options).toContain("One");
+    expect(options).toContain("Two");
+    expect(options.filter((t) => t === "One").length).toBe(1);
+    expect(options).not.toContain("Bad");
+  });
 });

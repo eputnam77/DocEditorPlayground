@@ -12,6 +12,7 @@
   "include": [
     "utils/**/*.ts",
     "extensions/slash-command.ts",
+    "extensions/lint.ts",
     "extensions/tiptapStructure.ts",
     "tests/utils/**/*.ts",
     "tests/extensions/**/*.ts",

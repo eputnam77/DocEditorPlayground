@@ -7,7 +7,7 @@ import { JSDOM } from "jsdom";
 export function sanitizeNode(root: ParentNode): void {
   // Remove tags that can execute scripts or modify document navigation
   root
-    .querySelectorAll("script, iframe, object, embed, base")
+    .querySelectorAll("script, iframe, object, embed, base, style, link")
     .forEach((el) => el.remove());
   // Remove meta refresh tags which can trigger redirects or script URLs
   root.querySelectorAll("meta[http-equiv]").forEach((el) => {
