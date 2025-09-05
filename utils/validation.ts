@@ -13,7 +13,11 @@ export function validateDocument(doc: unknown): boolean {
       return false;
     }
     const value = rec.content;
-    return typeof value === "string" && value.trim().length > 0;
+    // Accept both primitive strings and String objects
+    if (typeof value === "string" || value instanceof String) {
+      return value.toString().trim().length > 0;
+    }
+    return false;
   } catch {
     // Accessing the property might trigger a getter that throws; treat as invalid
     return false;
@@ -40,23 +44,17 @@ export function validateTemplate(tpl: unknown): boolean {
     }
     const title = rec.title;
     const body = rec.body;
-    if (
-      !(
-        typeof title === "string" ||
-        (typeof title === "number" && Number.isFinite(title))
-      )
-    ) {
+    const isStringLike = (v: unknown) =>
+      typeof v === "string" || v instanceof String;
+    const isNumberLike = (v: unknown) =>
+      typeof v === "number" && Number.isFinite(v);
+    if (!(isStringLike(title) || isNumberLike(title))) {
       return false;
     }
-    if (
-      !(
-        typeof body === "string" ||
-        (typeof body === "number" && Number.isFinite(body))
-      )
-    ) {
+    if (!(isStringLike(body) || isNumberLike(body))) {
       return false;
     }
-    return String(title).trim().length > 0 && String(body).trim().length > 0;
+    return title.toString().trim().length > 0 && body.toString().trim().length > 0;
   } catch {
     // If accessing properties throws (e.g. getters with side effects), treat as invalid
     return false;

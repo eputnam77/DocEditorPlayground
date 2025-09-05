@@ -12,7 +12,9 @@ export function sanitizeNode(root: ParentNode): void {
   // Remove meta refresh tags which can trigger redirects or script URLs
   root.querySelectorAll("meta[http-equiv]").forEach((el) => {
     const equiv = el.getAttribute("http-equiv");
-    if (equiv && equiv.toLowerCase().trim() === "refresh") {
+    // Some browsers are tolerant of stray whitespace inside the value, so we
+    // normalise by removing all whitespace characters before comparison.
+    if (equiv && equiv.toLowerCase().replace(/\s+/g, "") === "refresh") {
       // Refresh tags can trigger unwanted redirects even with supposedly safe URLs
       el.remove();
     }
