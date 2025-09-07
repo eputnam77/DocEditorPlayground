@@ -19,4 +19,22 @@ describe("tiptapIndentation", () => {
     });
     expect(updateAttributes).toHaveBeenCalledWith("paragraph", { "data-indent": 0 });
   });
+
+  it("treats negative indent as zero", () => {
+    const updateAttributes = vi.fn();
+    indentCommand({
+      editor: { getAttributes: () => ({ "data-indent": -2 }) },
+      commands: { updateAttributes },
+    });
+    expect(updateAttributes).toHaveBeenCalledWith("paragraph", { "data-indent": 1 });
+  });
+
+  it("floors fractional indent values", () => {
+    const updateAttributes = vi.fn();
+    indentCommand({
+      editor: { getAttributes: () => ({ "data-indent": 2.7 }) },
+      commands: { updateAttributes },
+    });
+    expect(updateAttributes).toHaveBeenCalledWith("paragraph", { "data-indent": 3 });
+  });
 });
