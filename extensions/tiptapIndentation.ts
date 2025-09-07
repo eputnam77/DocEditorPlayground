@@ -16,7 +16,8 @@ export function getIndentLevel(editor: {
 }): number {
   const val = editor.getAttributes("paragraph")["data-indent"];
   const num = typeof val === "number" ? val : Number(val);
-  return Number.isFinite(num) ? num : 0;
+  if (!Number.isFinite(num) || num <= 0) return 0;
+  return Math.floor(num);
 }
 
 export function indentCommand({

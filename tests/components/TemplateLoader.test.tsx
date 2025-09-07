@@ -91,4 +91,25 @@ describe("TemplateLoader", () => {
     expect(opts).toHaveLength(1);
     expect(opts[0].value).toBe("DOC.html");
   });
+
+  it("accesses template fields only once", () => {
+    let calls = 0;
+    const tpl: any = {};
+    Object.defineProperty(tpl, "filename", {
+      get() {
+        calls++;
+        if (calls > 1) throw new Error("getter called twice");
+        return "one.html";
+      },
+    });
+    Object.defineProperty(tpl, "label", {
+      get() {
+        return "One";
+      },
+    });
+    render(
+      <TemplateLoader templates={[tpl]} onLoad={() => {}} onClear={() => {}} />,
+    );
+    expect(calls).toBe(1);
+  });
 });

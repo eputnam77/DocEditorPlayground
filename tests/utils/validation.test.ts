@@ -111,6 +111,15 @@ describe("validateTemplate", () => {
     );
   });
 
+  it("rejects word-joiner characters", () => {
+    const wj = "\u2060";
+    assert.strictEqual(validateDocument({ content: wj }), false);
+    assert.strictEqual(
+      validateTemplate({ title: "t", body: wj }),
+      false,
+    );
+  });
+
   it("returns false when property getters throw", () => {
     const tpl: any = {};
     Object.defineProperty(tpl, "title", {

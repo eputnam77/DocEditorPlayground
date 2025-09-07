@@ -46,21 +46,35 @@ export default function TemplateLoader({
   // multiple times. We now trim values and ensure they are non-empty.
   const seen = new Set<string>();
   const validTemplates = templates.reduce<TemplateMeta[]>((acc, tpl) => {
-    if (!tpl || typeof tpl.filename !== "string" || typeof tpl.label !== "string") {
-      if (tpl) {
-        console.warn("TemplateLoader: ignoring invalid template", tpl);
+    try {
+      if (!tpl || typeof tpl !== "object") {
+        if (tpl) {
+          console.warn("TemplateLoader: ignoring invalid template", tpl);
+        }
+        return acc;
       }
-      return acc;
-    }
-    const filename = tpl.filename.trim();
-    const label = tpl.label.trim();
-    const key = filename.toLowerCase();
-    if (!filename || !label || seen.has(key)) {
+
+      const rec = tpl as Record<string, unknown>;
+      const rawFilename = rec.filename;
+      const rawLabel = rec.label;
+      if (typeof rawFilename !== "string" || typeof rawLabel !== "string") {
+        console.warn("TemplateLoader: ignoring invalid template", tpl);
+        return acc;
+      }
+
+      const filename = rawFilename.trim();
+      const label = rawLabel.trim();
+      const key = filename.toLowerCase();
+      if (!filename || !label || seen.has(key)) {
+        console.warn("TemplateLoader: ignoring invalid template", tpl);
+        return acc;
+      }
+
+      seen.add(key);
+      acc.push({ label, filename });
+    } catch {
       console.warn("TemplateLoader: ignoring invalid template", tpl);
-      return acc;
     }
-    seen.add(key);
-    acc.push({ label, filename });
     return acc;
   }, []);
 

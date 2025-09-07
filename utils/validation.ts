@@ -3,7 +3,7 @@
  * @param doc - Arbitrary document data to validate.
  * @returns `true` if the document has a `content` string field, `false` otherwise.
  */
-const ZWS_RE = /[\s\u200B\u200C\u200D\uFEFF]+/g;
+const ZWS_RE = /[\s\u200B-\u200D\u2060-\u206F\uFEFF]+/g;
 
 function isStringLike(v: unknown): v is string | String {
   return typeof v === "string" || v instanceof String;
