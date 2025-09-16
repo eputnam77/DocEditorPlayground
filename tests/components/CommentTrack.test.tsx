@@ -38,4 +38,12 @@ describe("CommentTrack", () => {
     const items = screen.getAllByRole("listitem");
     expect(items).toHaveLength(2);
   });
+
+  it("ignores comments containing only zero-width characters", () => {
+    render(<CommentTrack />);
+    const input = screen.getByPlaceholderText(/enter comment/i);
+    fireEvent.change(input, { target: { value: "\u200B\u200C" } });
+    fireEvent.click(screen.getByText("Add"));
+    expect(screen.queryByRole("listitem")).toBeNull();
+  });
 });

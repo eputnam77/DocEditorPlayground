@@ -27,4 +27,11 @@ describe("TrackChanges", () => {
     rerender(<TrackChanges content="" />);
     expect(screen.getByTestId("removed").textContent).toContain("1");
   });
+
+  it("treats grapheme clusters as single characters", () => {
+    const flag = "🇨🇦"; // regional indicator sequence (two code points)
+    const { rerender } = render(<TrackChanges content={flag} />);
+    rerender(<TrackChanges content="" />);
+    expect(screen.getByTestId("removed").textContent).toContain("1");
+  });
 });

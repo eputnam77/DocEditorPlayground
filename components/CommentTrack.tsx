@@ -1,5 +1,7 @@
 import React, { useState } from "react";
 
+const INVISIBLE_COMMENT_CHARS = /[\u200B-\u200D\u2060-\u206F\uFEFF]/g;
+
 /**
  * CommentTrack is a tiny demonstration component that allows users to add
  * comments to a list. It purposely avoids persistence and rich features so the
@@ -8,14 +10,13 @@ import React, { useState } from "react";
 export default function CommentTrack() {
   const [comment, setComment] = useState("");
   const [comments, setComments] = useState<string[]>([]);
-
   function add() {
-    const trimmed = comment.trim();
-    if (trimmed) {
-      // Use functional updates to avoid stale state when called rapidly
-      setComments((prev: string[]) => [...prev, trimmed]);
-      setComment("");
-    }
+    const cleaned = comment.replace(INVISIBLE_COMMENT_CHARS, "");
+    const trimmed = cleaned.trim();
+    if (!trimmed) return;
+    // Use functional updates to avoid stale state when called rapidly
+    setComments((prev: string[]) => [...prev, trimmed]);
+    setComment("");
   }
 
   return (

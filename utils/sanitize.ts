@@ -4,6 +4,9 @@
  */
 import { JSDOM } from "jsdom";
 
+const INVISIBLE_SEPARATORS =
+  /[\s\u0000-\u001F\u200B-\u200D\u2060-\u206F\uFEFF]+/g;
+
 export function sanitizeNode(root: ParentNode): void {
   // Remove tags that can execute scripts or modify document navigation
   root
@@ -14,7 +17,12 @@ export function sanitizeNode(root: ParentNode): void {
     const equiv = el.getAttribute("http-equiv");
     // Some browsers are tolerant of stray whitespace inside the value, so we
     // normalise by removing all whitespace characters before comparison.
-    if (equiv && equiv.toLowerCase().replace(/\s+/g, "") === "refresh") {
+    if (
+      equiv &&
+      equiv
+        .toLowerCase()
+        .replace(INVISIBLE_SEPARATORS, "") === "refresh"
+    ) {
       // Refresh tags can trigger unwanted redirects even with supposedly safe URLs
       el.remove();
     }
@@ -35,7 +43,7 @@ export function sanitizeNode(root: ParentNode): void {
         // Strip CSS comments before checking for dangerous patterns
         const stripped = attribute.value.replace(/\/\*[^]*?\*\//g, "");
         const valLower = stripped.toLowerCase();
-        const collapsed = valLower.replace(/[\s\u0000-\u001F]+/g, "");
+        const collapsed = valLower.replace(INVISIBLE_SEPARATORS, "");
         if (
           /expression\s*\(/.test(valLower) ||
           /url\(['"]?(javascript|data|vbscript):/.test(collapsed)
@@ -47,7 +55,7 @@ export function sanitizeNode(root: ParentNode): void {
       if (name === "srcset") {
         const entries = attribute.value.split(",");
         const unsafe = entries.some((entry) => {
-          const norm = entry.replace(/[\s\u0000-\u001F]+/g, "");
+          const norm = entry.replace(INVISIBLE_SEPARATORS, "");
           return /^(?:javascript|data|vbscript):/i.test(norm);
         });
         if (unsafe) {
@@ -64,7 +72,7 @@ export function sanitizeNode(root: ParentNode): void {
           name === "formaction" ||
           name === "background") &&
         /^(?:javascript|data|vbscript):/i.test(
-          attribute.value.replace(/[\s\u0000-\u001F]+/g, ""),
+          attribute.value.replace(INVISIBLE_SEPARATORS, ""),
         )
       ) {
         el.removeAttribute(attribute.name);

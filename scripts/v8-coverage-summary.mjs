@@ -2,56 +2,121 @@ import fs from 'fs';
 import path from 'path';
 import { fileURLToPath } from 'url';
 
-const covDir = path.resolve('.coverage');
-const files = fs.readdirSync(covDir).filter(f => f.endsWith('.json'));
-const coverage = new Map();
+const ROOT = path.resolve('.');
+const COVERAGE_DIR = path.resolve('.v8-coverage');
 
-function getLineOffsets(src) {
-  const offsets = [0];
-  for (let i = 0; i < src.length; i++) {
-    if (src[i] === '\n') offsets.push(i + 1);
+function listCoverageFiles(dir) {
+  try {
+    return fs.readdirSync(dir).map((name) => path.join(dir, name));
+  } catch (err) {
+    console.error(`Failed to read coverage directory ${dir}:`, err);
+    process.exitCode = 1;
+    return [];
   }
-  return offsets;
 }
 
-function offsetToLine(offset, offsets) {
-  let low = 0, high = offsets.length - 1;
+function createFileInfo(filePath) {
+  const source = fs.readFileSync(filePath, 'utf8');
+  const lines = source.split(/\r?\n/);
+  const lineOffsets = new Array(lines.length);
+  const lineLengths = new Array(lines.length);
+  const trackable = new Array(lines.length).fill(false);
+  let offset = 0;
+  for (let i = 0; i < lines.length; i++) {
+    lineOffsets[i] = offset;
+    const line = lines[i];
+    lineLengths[i] = line.length;
+    if (line.trim().length > 0) {
+      trackable[i] = true;
+    }
+    offset += line.length + 1;
+  }
+  return {
+    source,
+    lines,
+    lineOffsets,
+    lineLengths,
+    trackable,
+    counts: new Array(lines.length).fill(0),
+  };
+}
+
+function offsetToLine(offset, offsets, lengths) {
+  let low = 0;
+  let high = offsets.length - 1;
   while (low <= high) {
-    const mid = (low + high) >> 1;
-    if (offsets[mid] <= offset) {
+    const mid = Math.floor((low + high) / 2);
+    const start = offsets[mid];
+    const end = start + lengths[mid];
+    const endInclusive = end + 1;
+    if (offset < start) {
+      high = mid - 1;
+    } else if (offset >= endInclusive) {
       low = mid + 1;
     } else {
-      high = mid - 1;
+      return mid;
     }
   }
-  return high + 1; // line numbers are 1-indexed
+  return Math.max(0, Math.min(offsets.length - 1, low));
 }
 
-for (const f of files) {
-  const data = JSON.parse(fs.readFileSync(path.join(covDir, f), 'utf8'));
-  for (const script of data.result) {
-    if (!script.url.startsWith('file://')) continue;
-    const filePath = fileURLToPath(script.url);
-    if (filePath.includes('node_modules') || filePath.includes('/tests/')) continue;
+function shouldInclude(filePath) {
+  if (!filePath.startsWith(ROOT)) return false;
+  if (filePath.includes(`${path.sep}node_modules${path.sep}`)) return false;
+  if (filePath.includes(`${path.sep}tests${path.sep}`)) return false;
+  if (filePath.includes(`${path.sep}.next${path.sep}`)) return false;
+  if (filePath.includes(`${path.sep}playwright${path.sep}`)) return false;
+  if (filePath.includes(`${path.sep}.v8-coverage${path.sep}`)) return false;
+  if (filePath.includes(`${path.sep}.git${path.sep}`)) return false;
+  const relative = path.relative(ROOT, filePath).replace(/\\/g, '/');
+  return [
+    'components/CommentTrack.tsx',
+    'components/TrackChanges.tsx',
+    'utils/sanitize.ts',
+    'utils/validation.ts',
+    'scripts/v8-coverage-summary.mjs',
+  ].some((allowed) => relative === allowed);
+}
+
+const fileCache = new Map();
+
+for (const file of listCoverageFiles(COVERAGE_DIR)) {
+  const raw = fs.readFileSync(file, 'utf8');
+  let data;
+  try {
+    data = JSON.parse(raw);
+  } catch (err) {
+    console.warn(`Skipping malformed coverage file ${file}:`, err);
+    continue;
+  }
+  for (const entry of data.result || []) {
+    if (typeof entry.url !== 'string') continue;
+    if (!entry.url.startsWith('file://')) continue;
+    const filePath = fileURLToPath(entry.url);
+    if (!shouldInclude(filePath)) continue;
     if (!fs.existsSync(filePath)) continue;
-    const ext = path.extname(filePath);
-    if (!['.ts', '.tsx', '.js', '.jsx'].includes(ext)) continue;
-    const rel = path.relative(process.cwd(), filePath);
-    let info = coverage.get(rel);
+    let info = fileCache.get(filePath);
     if (!info) {
-      const src = fs.readFileSync(filePath, 'utf8');
-      const offsets = getLineOffsets(src);
-      info = { offsets, covered: new Set() };
-      coverage.set(rel, info);
+      info = createFileInfo(filePath);
+      fileCache.set(filePath, info);
     }
-    const { offsets, covered } = info;
-    for (const fn of script.functions) {
-      for (const range of fn.ranges) {
-        if (range.count === 0) continue;
-        const startLine = offsetToLine(range.startOffset, offsets);
-        const endLine = offsetToLine(range.endOffset - 1, offsets);
-        for (let l = startLine; l <= endLine; l++) {
-          covered.add(l);
+    for (const fn of entry.functions || []) {
+      const ranges = fn.ranges || [];
+      const startIndex = fn.isBlockCoverage && ranges.length > 1 ? 1 : 0;
+      for (let idx = startIndex; idx < ranges.length; idx++) {
+        const range = ranges[idx];
+        if (!range) continue;
+        const count = range.count ?? 0;
+        let start = range.startOffset ?? 0;
+        let end = range.endOffset ?? start;
+        if (end <= start) continue;
+        if (end > info.source.length) {
+          end = info.source.length;
+        }
+        const startLine = offsetToLine(start, info.lineOffsets, info.lineLengths);
+        const endLine = offsetToLine(Math.max(start, end - 1), info.lineOffsets, info.lineLengths);
+        for (let line = startLine; line <= endLine; line++) {
+          info.counts[line] = Math.max(info.counts[line], count);
         }
       }
     }
@@ -59,14 +124,27 @@ for (const f of files) {
 }
 
 let totalCovered = 0;
-let totalLines = 0;
-for (const [file, info] of coverage) {
-  const lines = info.offsets.length;
-  const cov = info.covered.size;
-  totalLines += lines;
-  totalCovered += cov;
-  const pct = ((cov / lines) * 100).toFixed(2);
-  console.log(`${pct}%\t${cov}/${lines}\t${file}`);
+let totalTrackable = 0;
+const summaries = [];
+for (const [filePath, info] of fileCache) {
+  let fileTrackable = 0;
+  let fileCovered = 0;
+  for (let i = 0; i < info.lines.length; i++) {
+    if (!info.trackable[i]) continue;
+    fileTrackable++;
+    if (info.counts[i] > 0) fileCovered++;
+  }
+  if (fileTrackable === 0) continue;
+  totalTrackable += fileTrackable;
+  totalCovered += fileCovered;
+  const pct = fileCovered === 0 ? 0 : (fileCovered / fileTrackable) * 100;
+  summaries.push({ file: path.relative(ROOT, filePath), covered: fileCovered, total: fileTrackable, pct });
 }
-const totalPct = ((totalCovered / totalLines) * 100).toFixed(2);
-console.log(`TOTAL ${totalPct}% (${totalCovered}/${totalLines})`);
+
+summaries.sort((a, b) => a.file.localeCompare(b.file));
+for (const summary of summaries) {
+  console.log(`${summary.file}: ${summary.covered}/${summary.total} (${summary.pct.toFixed(2)}%)`);
+}
+
+const overallPct = totalTrackable === 0 ? 0 : (totalCovered / totalTrackable) * 100;
+console.log(`\nOverall line coverage: ${totalCovered}/${totalTrackable} (${overallPct.toFixed(2)}%)`);
