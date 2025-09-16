@@ -175,6 +175,22 @@ describe("sanitizeHtml", () => {
     assert.strictEqual(clean, '<div>x</div>');
   });
 
+  it("removes javascript urls containing zero-width characters", () => {
+    const dirty = '<a href="java\u200Bscript:alert(1)">x</a>';
+    const clean = sanitizeHtml(dirty);
+    assert.strictEqual(clean, "<a>x</a>");
+
+    const styleBypass =
+      '<div style="background:url(java\u200Bscript:alert(1))">x</div>';
+    const cleanStyle = sanitizeHtml(styleBypass);
+    assert.strictEqual(cleanStyle, "<div>x</div>");
+
+    const srcsetBypass =
+      '<img srcset="java\u200Bscript:alert(1) 1x, https://e/x.png 2x">';
+    const cleanSrcset = sanitizeHtml(srcsetBypass);
+    assert.strictEqual(cleanSrcset, "<img>");
+  });
+
   it("removes style and link elements", () => {
     const dirty =
       '<style>body{background:url(javascript:alert(1))}</style><link rel="stylesheet" href="javascript:alert(1)"><div>ok</div>';
