@@ -118,6 +118,16 @@ This repository includes a `.nvmrc` file pinned to the recommended Node.js LTS
 version. Most `nvm` implementations will automatically pick up this version so
 contributors can simply run `nvm use`.
 
+## Continuous Integration
+
+GitHub Actions runs a single workflow, [`Node CI`](.github/workflows/ci.yml), on
+every push to `main` and on pull requests. The job installs dependencies once,
+then executes `npm run lint` for ESLint and `npm test` for the Vitest suite. The
+workflow intentionally omits the standalone TypeScript check for now because the
+codebase contains long-standing type errors that still need to be addressed. You
+can run `npm run typecheck` locally to see the current failures and tackle them
+incrementally.
+
 ```
 cat .nvmrc
 ```
