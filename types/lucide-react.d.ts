@@ -1,20 +1,24 @@
+import type { ComponentType, SVGProps } from "react";
+
 declare module "lucide-react" {
-  export const Bold: any;
-  export const ChevronDown: any;
-  export const ChevronUp: any;
-  export const Clock: any;
-  export const Code: any;
-  export const Italic: any;
-  export const List: any;
-  export const ListOrdered: any;
-  export const Quote: any;
-  export const Redo2: any;
-  export const Strikethrough: any;
-  export const Underline: any;
-  export const Undo2: any;
-  export const Image: any;
-  export const Table: any;
-  export const Menu: any;
-  export const X: any;
-  export const Loader2: any;
+  export type LucideIcon = ComponentType<SVGProps<SVGSVGElement>>;
+
+  export const Bold: LucideIcon;
+  export const ChevronDown: LucideIcon;
+  export const ChevronUp: LucideIcon;
+  export const Clock: LucideIcon;
+  export const Code: LucideIcon;
+  export const Italic: LucideIcon;
+  export const List: LucideIcon;
+  export const ListOrdered: LucideIcon;
+  export const Quote: LucideIcon;
+  export const Redo2: LucideIcon;
+  export const Strikethrough: LucideIcon;
+  export const Underline: LucideIcon;
+  export const Undo2: LucideIcon;
+  export const Image: LucideIcon;
+  export const Table: LucideIcon;
+  export const Menu: LucideIcon;
+  export const X: LucideIcon;
+  export const Loader2: LucideIcon;
 }
