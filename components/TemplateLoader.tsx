@@ -17,6 +17,12 @@ export interface TemplateLoaderProps {
   onError?(err: unknown): void;
 }
 
+type TemplateCandidate = Partial<TemplateMeta>;
+
+function isTemplateCandidate(value: unknown): value is TemplateCandidate {
+  return Boolean(value) && typeof value === "object";
+}
+
 /**
  * TemplateLoader provides a dropdown for loading example templates into
  * an editor. It delegates the actual loading logic to the parent component.
@@ -47,18 +53,20 @@ export default function TemplateLoader({
   const seen = new Set<string>();
   const validTemplates = templates.reduce<TemplateMeta[]>((acc, tpl) => {
     try {
-      if (!tpl || typeof tpl !== "object") {
+      if (!isTemplateCandidate(tpl)) {
         if (tpl) {
           console.warn("TemplateLoader: ignoring invalid template", tpl);
         }
         return acc;
       }
 
-      const rec = tpl as unknown as Record<string, unknown>;
-      const rawFilename = rec.filename;
-      const rawLabel = rec.label;
+      const rawFilename = tpl.filename;
+      const rawLabel = tpl.label;
+
       if (typeof rawFilename !== "string" || typeof rawLabel !== "string") {
-        console.warn("TemplateLoader: ignoring invalid template", tpl);
+        if (tpl) {
+          console.warn("TemplateLoader: ignoring invalid template", tpl);
+        }
         return acc;
       }
 
@@ -71,7 +79,8 @@ export default function TemplateLoader({
       }
 
       seen.add(key);
-      acc.push({ label, filename });
+      const normalized: TemplateMeta = { label, filename };
+      acc.push(normalized);
     } catch {
       console.warn("TemplateLoader: ignoring invalid template", tpl);
     }
