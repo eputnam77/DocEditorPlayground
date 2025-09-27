@@ -32,7 +32,7 @@ function createLintPlugin(rule: { match: (a: { tr: any }) => any[] }) {
       },
     },
     props: {
-      decorations(state) {
+      decorations(this: any, state) {
         return this.getState(state);
       },
     },

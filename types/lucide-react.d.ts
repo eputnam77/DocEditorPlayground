@@ -12,4 +12,9 @@ declare module "lucide-react" {
   export const Strikethrough: any;
   export const Underline: any;
   export const Undo2: any;
+  export const Image: any;
+  export const Table: any;
+  export const Menu: any;
+  export const X: any;
+  export const Loader2: any;
 }
