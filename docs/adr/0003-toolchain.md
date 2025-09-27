@@ -12,7 +12,8 @@ This playground integrates multiple editors and aims to remain lightweight. We n
 
 - **tsup** will compile any library code under `src/`.
 - **Vitest** runs unit and property tests.
-- **Playwright** covers end‑to‑end flows.
+- **Playwright** covers end‑to‑end flows. See the [Running Tests](../../README.md#running-tests)
+  guidance for sandbox limitations and CI workarounds when installing browsers.
 - **Stryker Mutator** measures mutation score.
 - **ESLint** and **Prettier** enforce style.
 - **TypeScript** checks via `tsc --noEmit`.

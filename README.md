@@ -139,21 +139,30 @@ a single line containing the desired Node.js version.
 
 ## Running Tests
 
-Run all linters and the full test suite after installing dependencies.
-Navigation links prefetch their destination pages on hover for snappier
-transitions.
+Use the standard lint, type, and unit test commands after installing dependencies:
 
 ```bash
 npm run lint
 npm run typecheck
 npm test
-npx playwright install   # install browsers for E2E tests
-npx playwright test --reporter=line
 ```
 
-> **Note** The E2E tests in `tests/e2e` use `test.skip` to avoid failures in
-> environments without Playwright browsers. Remove those lines and ensure
-> `npx playwright install` has run before executing the suite locally.
+### About Playwright browsers in the sandbox
+
+Running the end-to-end suite requires Playwright to download Chromium from the
+Microsoft CDN. Inside the OpenAI sandbox that request consistently fails with an
+HTTP **403 Forbidden**, so `npx playwright install` never completes. If you need
+browser binaries:
+
+- **Rely on CI artifacts.** GitHub Actions installs Playwright with network
+  access and caches the browsers for reuse. When you clone build artifacts or
+  rerun the workflow, the binaries are already present.
+- **Skip local E2E runs in the sandbox.** Focus on `npm test` (Vitest) locally
+  and mark Playwright tests with `test.skip`. When developing on a machine with
+  network access you can remove the skips and execute `npm run test:e2e`.
+
+See the [E2E test report](tests/E2E_REPORT.md) for status updates and links to
+CI runs.
 
 ## Adding or Removing Plugins
 
