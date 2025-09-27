@@ -4,13 +4,21 @@ export default class EditorJS {
   public config: any;
   private data: { blocks: Block[] } = { blocks: [] };
   public blocks = {
-    insert: (type: string, data: any) => {
+    insert: async (type: string, data: any) => {
       this.data.blocks.push({ type, data });
       this.config?.onChange?.();
     },
-    renderFromHTML: (html: string) => {
+    render: async (data: { blocks: Block[] }) => {
+      this.data = data;
+      this.config?.onChange?.();
+    },
+    renderFromHTML: async (html: string) => {
       const text = html.replace(/<[^>]+>/g, "");
       this.data.blocks = [{ type: "paragraph", data: { text } }];
+      this.config?.onChange?.();
+    },
+    clear: async () => {
+      this.data.blocks = [];
       this.config?.onChange?.();
     },
   };
@@ -31,6 +39,10 @@ export default class EditorJS {
   }
   async save() {
     return this.data;
+  }
+  async render(data: { blocks: Block[] }) {
+    this.data = data;
+    this.config?.onChange?.();
   }
   destroy() {
     // no-op

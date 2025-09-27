@@ -1,14 +1,19 @@
 declare module "@toast-ui/editor/dist/toastui-editor.css";
 declare module "@editorjs/editorjs" {
+  export interface EditorBlocks {
+    insert(type: string, data?: any, config?: any): Promise<void>;
+    render(data: any): Promise<void>;
+    renderFromHTML(html: string): Promise<void>;
+    clear(): Promise<void>;
+    [key: string]: any;
+  }
+
   export default class EditorJS {
     constructor(options?: any);
     save(): Promise<any>;
-    render(data: any): void;
+    render(data: any): Promise<void>;
     destroy(): void;
-    blocks: {
-      renderFromHTML(html: string): void;
-      [key: string]: any;
-    };
+    blocks: EditorBlocks;
   }
 }
 declare module "@editorjs/header" {
