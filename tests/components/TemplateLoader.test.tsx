@@ -58,6 +58,27 @@ describe("TemplateLoader", () => {
     expect(options).not.toContain("Bad");
   });
 
+  it("drops malformed template entries while keeping valid ones", () => {
+    const noisy = [
+      { label: "One", filename: "one.html" },
+      { label: 123, filename: "number.html" },
+      { label: "Two", filename: null },
+      { label: true, filename: "bool.html" },
+    ] as unknown[];
+
+    render(
+      <TemplateLoader templates={noisy as TemplateMeta[]} onLoad={() => {}} onClear={() => {}} />,
+    );
+
+    const options = screen
+      .getAllByRole("option")
+      .filter((opt) => opt.value !== "" && opt.value !== "__clear__");
+
+    expect(options).toHaveLength(1);
+    expect(options[0].textContent).toBe("One");
+    expect(options[0].getAttribute("value")).toBe("one.html");
+  });
+
   it("trims whitespace and rejects blank values", () => {
     const noisy: any = [
       { label: "  One  ", filename: "  one.html  " },
