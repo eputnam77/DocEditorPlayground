@@ -17,15 +17,30 @@ interface Editor {
 
 const EditorContext = createContext<Editor | null>(null);
 
-export function LexicalComposer({
-  children,
-}: {
+interface LexicalComposerProps {
   children: React.ReactNode;
   initialConfig?: Record<string, unknown>;
-}) {
+  onError?: (error: Error) => void;
+}
+
+export function LexicalComposer({
+  children,
+  initialConfig,
+  onError,
+}: LexicalComposerProps) {
   const rootRef = useRef<HTMLDivElement>(null);
   const historyRef = useRef<string[]>(['']);
   const indexRef = useRef(0);
+  const configRef = useRef<LexicalComposerProps['initialConfig']>(initialConfig);
+  const errorHandlerRef = useRef<LexicalComposerProps['onError']>(onError);
+
+  useEffect(() => {
+    configRef.current = initialConfig;
+  }, [initialConfig]);
+
+  useEffect(() => {
+    errorHandlerRef.current = onError;
+  }, [onError]);
 
   const editor: Editor = {
     rootRef,
