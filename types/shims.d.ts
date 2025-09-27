@@ -10,7 +10,15 @@ declare namespace JSX {
 
 declare module "react" {
   /** Minimal React type definitions for offline compilation */
-  export function useState<T = any>(initial: T): [T, (value: T) => void];
+  export type Dispatch<A> = (value: A) => void;
+  export type SetStateAction<S> = S | ((prevState: S) => S);
+  export function useState<S>(
+    initialState: S | (() => S),
+  ): [S, Dispatch<SetStateAction<S>>];
+  export function useState<S = undefined>(): [
+    S | undefined,
+    Dispatch<SetStateAction<S | undefined>>,
+  ];
   export const useEffect: any;
   export function useRef<T>(initial?: T | null): { current: T | null };
   export function useMemo<T>(factory: () => T, deps: any[]): T;
@@ -21,6 +29,8 @@ declare module "react" {
   const React: any;
   export default React;
   namespace React {
+    export type Dispatch<A> = (value: A) => void;
+    export type SetStateAction<S> = S | ((prevState: S) => S);
     export type FC<P = {}> = (props: P) => any;
     export interface ChangeEvent<T = Element> {
       target: T;
