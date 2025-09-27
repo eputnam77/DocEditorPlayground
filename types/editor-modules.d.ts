@@ -1,9 +1,3 @@
-declare module "@toast-ui/react-editor" {
-    export class Editor {
-    getInstance(): any;
-  }
-  export const ToastEditor: React.FC<any>;
-}
 declare module "@toast-ui/editor/dist/toastui-editor.css";
 declare module "@editorjs/editorjs" {
   export default class EditorJS {
@@ -11,6 +5,10 @@ declare module "@editorjs/editorjs" {
     save(): Promise<any>;
     render(data: any): void;
     destroy(): void;
+    blocks: {
+      renderFromHTML(html: string): void;
+      [key: string]: any;
+    };
   }
 }
 declare module "@editorjs/header" {
@@ -42,6 +40,28 @@ declare module "@tiptap/react" {
   export function EditorContent(props: any): any;
   export function useEditor(props: any, deps?: any[]): any;
   export type Extension = any;
+}
+declare module "@tiptap/core" {
+  export class Editor {
+    constructor(options?: any);
+    chain(): ChainedCommands;
+    getHTML(): string;
+    getAttributes(name: string): Record<string, unknown>;
+  }
+  export interface ChainedCommands {
+    setTextSelection(pos: number): ChainedCommands;
+    indent(): ChainedCommands;
+    outdent(): ChainedCommands;
+    run(): void;
+  }
+  export type RawCommands = Record<string, any>;
+  export const Extension: {
+    create<T = any>(config: any): any;
+  };
+  export function mergeAttributes(...inputs: any[]): Record<string, any>;
+  export class Node {
+    static create(config: any): any;
+  }
 }
 declare module "@tiptap/starter-kit" {
   const StarterKit: any;

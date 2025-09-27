@@ -53,7 +53,7 @@ export default Extension.create<{ rule: LintRule }>({
           },
         },
         props: {
-          decorations(state) {
+          decorations(this: any, state) {
             return this.getState(state);
           },
         },

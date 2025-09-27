@@ -17,7 +17,12 @@ interface Editor {
 
 const EditorContext = createContext<Editor | null>(null);
 
-export function LexicalComposer({ children }: { children: React.ReactNode }) {
+export function LexicalComposer({
+  children,
+}: {
+  children: React.ReactNode;
+  initialConfig?: Record<string, unknown>;
+}) {
   const rootRef = useRef<HTMLDivElement>(null);
   const historyRef = useRef<string[]>(['']);
   const indexRef = useRef(0);

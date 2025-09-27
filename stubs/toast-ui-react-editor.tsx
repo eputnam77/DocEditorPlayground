@@ -6,6 +6,7 @@ export interface EditorProps {
   previewStyle?: string;
   plugins?: any[];
   onChange?(): void;
+  usageStatistics?: boolean;
 }
 
 export interface EditorHandle {
@@ -101,8 +102,9 @@ const Editor = forwardRef<EditorHandle, EditorProps>(({ initialValue = '', onCha
       />
     </div>
   );
-});
+}) as unknown as React.FC<EditorProps & { ref?: React.Ref<EditorHandle> }>;
 
 export { Editor };
 export default Editor;
+export type Editor = EditorHandle;
 

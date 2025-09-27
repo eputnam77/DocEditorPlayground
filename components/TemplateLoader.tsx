@@ -54,7 +54,7 @@ export default function TemplateLoader({
         return acc;
       }
 
-      const rec = tpl as Record<string, unknown>;
+      const rec = tpl as unknown as Record<string, unknown>;
       const rawFilename = rec.filename;
       const rawLabel = rec.label;
       if (typeof rawFilename !== "string" || typeof rawLabel !== "string") {

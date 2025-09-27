@@ -41,8 +41,8 @@ export const CKEditor: React.FC<CKEditorProps> = ({
 
   const exec = (command: string) => document.execCommand(command);
 
-  const handleInput = (e: React.FormEvent<HTMLDivElement>) => {
-    onChange?.(e, editor);
+  const handleInput = () => {
+    onChange?.({}, editor);
   };
 
   return (
