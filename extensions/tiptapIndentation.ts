@@ -2,18 +2,26 @@
  * TipTap extension adding indentation controls.
  */
 import { Extension, RawCommands } from "@tiptap/core";
-import { Node as PMNode } from "prosemirror-model";
 
-/**
- * Minimal indentation extension returning a blank command set.
- */
+type IndentationCommandProps = {
+  editor: {
+    getAttributes: (name: string) => Record<string, unknown>;
+  };
+  commands: {
+    updateAttributes: (
+      name: string,
+      attributes: Record<string, unknown>
+    ) => boolean;
+  };
+};
+
 /**
  * Adds simple indent/outdent commands by storing the level
  * in a `data-indent` attribute on paragraphs and list items.
  */
-export function getIndentLevel(editor: {
-  getAttributes: (name: string) => Record<string, unknown>;
-}): number {
+export function getIndentLevel(
+  editor: IndentationCommandProps["editor"]
+): number {
   const val = editor.getAttributes("paragraph")["data-indent"];
   const num = typeof val === "number" ? val : Number(val);
   if (!Number.isFinite(num) || num <= 0) return 0;
@@ -23,10 +31,7 @@ export function getIndentLevel(editor: {
 export function indentCommand({
   editor,
   commands,
-}: {
-  editor: any;
-  commands: any;
-}): any {
+}: IndentationCommandProps): boolean {
   const level = getIndentLevel(editor);
   return commands.updateAttributes("paragraph", {
     "data-indent": level + 1,
@@ -36,10 +41,7 @@ export function indentCommand({
 export function outdentCommand({
   editor,
   commands,
-}: {
-  editor: any;
-  commands: any;
-}): any {
+}: IndentationCommandProps): boolean {
   const level = getIndentLevel(editor);
   return commands.updateAttributes("paragraph", {
     "data-indent": Math.max(0, level - 1),
