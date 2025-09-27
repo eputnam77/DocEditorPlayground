@@ -52,7 +52,7 @@ describe("lint extension", () => {
       .spyOn(DecorationSet, "create")
       .mockReturnValue(DecorationSet.empty as any);
     const tr = { docChanged: true, doc: {} } as any;
-    expect(() => plugin.spec.state.apply(tr, DecorationSet.empty)).not.toThrow();
+    expect(() => plugin.spec.state!.apply(tr, DecorationSet.empty)).not.toThrow();
     expect(spyInline).toHaveBeenCalledTimes(1);
     expect(spyInline).toHaveBeenCalledWith(0, 1, expect.any(Object));
     spyInline.mockRestore();
