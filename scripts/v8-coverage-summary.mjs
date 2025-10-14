@@ -69,13 +69,15 @@ function shouldInclude(filePath) {
   if (filePath.includes(`${path.sep}.v8-coverage${path.sep}`)) return false;
   if (filePath.includes(`${path.sep}.git${path.sep}`)) return false;
   const relative = path.relative(ROOT, filePath).replace(/\\/g, '/');
-  return [
-    'components/CommentTrack.tsx',
-    'components/TrackChanges.tsx',
-    'utils/sanitize.ts',
-    'utils/validation.ts',
-    'scripts/v8-coverage-summary.mjs',
-  ].some((allowed) => relative === allowed);
+  if (
+    relative.startsWith('components/') ||
+    relative.startsWith('extensions/') ||
+    relative.startsWith('utils/') ||
+    relative.startsWith('pages/')
+  ) {
+    return /\.(ts|tsx)$/.test(relative);
+  }
+  return false;
 }
 
 const fileCache = new Map();
