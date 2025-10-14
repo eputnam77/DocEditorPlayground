@@ -1,3 +1,4 @@
+import React from "react";
 import Link from "next/link";
 import { useRouter } from "next/router";
 
@@ -26,7 +27,7 @@ export default function NavBar() {
             <Link
               href={path}
               onMouseEnter={() => router.prefetch(path)}
-              className={`relative inline-block px-6 py-2 sm:px-8 sm:py-3 rounded-full text-sm sm:text-base font-semibold focus-visible:outline-none focus-visible:ring-2 ring-offset-2 ring-indigo-400 transition-colors
+              className={`group relative inline-block px-6 py-2 sm:px-8 sm:py-3 rounded-full text-sm sm:text-base font-semibold focus-visible:outline-none focus-visible:ring-2 ring-offset-2 ring-indigo-400 transition-colors
                 ${
                   isActive
                     ? "bg-gradient-to-r from-emerald-500 to-blue-500 text-white"
