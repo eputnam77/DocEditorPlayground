@@ -19,13 +19,31 @@ type IndentationCommandProps = {
  * Adds simple indent/outdent commands by storing the level
  * in a `data-indent` attribute on paragraphs and list items.
  */
-export function getIndentLevel(
-  editor: IndentationCommandProps["editor"]
+function readIndent(
+  editor: IndentationCommandProps["editor"],
+  type: string,
 ): number {
-  const val = editor.getAttributes("paragraph")["data-indent"];
-  const num = typeof val === "number" ? val : Number(val);
-  if (!Number.isFinite(num) || num <= 0) return 0;
-  return Math.floor(num);
+  try {
+    const attrs = editor.getAttributes(type) as
+      | Record<string, unknown>
+      | undefined;
+    const val = attrs ? attrs["data-indent"] : undefined;
+    const num = typeof val === "number" ? val : Number(val);
+    if (!Number.isFinite(num) || num <= 0) {
+      return 0;
+    }
+    return Math.floor(num);
+  } catch {
+    return 0;
+  }
+}
+
+export function getIndentLevel(
+  editor: IndentationCommandProps["editor"],
+): number {
+  const paragraphIndent = readIndent(editor, "paragraph");
+  const listIndent = readIndent(editor, "listItem");
+  return Math.max(paragraphIndent, listIndent);
 }
 
 export function indentCommand({
@@ -33,9 +51,19 @@ export function indentCommand({
   commands,
 }: IndentationCommandProps): boolean {
   const level = getIndentLevel(editor);
-  return commands.updateAttributes("paragraph", {
-    "data-indent": level + 1,
-  });
+  const next = { "data-indent": level + 1 };
+  let updated = false;
+  try {
+    updated = commands.updateAttributes("paragraph", next) || updated;
+  } catch {
+    // ignore failures for node types that aren't active
+  }
+  try {
+    updated = commands.updateAttributes("listItem", next) || updated;
+  } catch {
+    // ignore failures for node types that aren't active
+  }
+  return updated;
 }
 
 export function outdentCommand({
@@ -43,9 +71,20 @@ export function outdentCommand({
   commands,
 }: IndentationCommandProps): boolean {
   const level = getIndentLevel(editor);
-  return commands.updateAttributes("paragraph", {
-    "data-indent": Math.max(0, level - 1),
-  });
+  const nextLevel = Math.max(0, level - 1);
+  const next = { "data-indent": nextLevel };
+  let updated = false;
+  try {
+    updated = commands.updateAttributes("paragraph", next) || updated;
+  } catch {
+    // ignore failures for node types that aren't active
+  }
+  try {
+    updated = commands.updateAttributes("listItem", next) || updated;
+  } catch {
+    // ignore failures for node types that aren't active
+  }
+  return updated;
 }
 
 export function tiptapIndentation() {
