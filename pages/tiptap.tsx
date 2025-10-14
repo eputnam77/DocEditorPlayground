@@ -1,4 +1,4 @@
-import React, { useEffect, useMemo, useState } from "react";
+import React, { useEffect, useMemo, useRef, useState } from "react";
 import dynamic from "next/dynamic";
 import { EditorContent, useEditor } from "@tiptap/react";
 
@@ -58,7 +58,7 @@ interface NewSuggestion {
   suggestion: string;
 }
 
-function AiSuggestButton({
+export function AiSuggestButton({
   editor,
   aiSuggestEnabled,
   onNewSuggestion,
@@ -89,16 +89,26 @@ function AiSuggestButton({
         }),
       });
       if (!res.ok) throw new Error(await res.text());
-      const { suggestion } = await res.json();
+      const data = await res.json();
+      const rawSuggestion =
+        typeof data?.suggestion === "string"
+          ? data.suggestion
+          : String(data?.suggestion ?? "");
+      const cleanSuggestion = sanitizeHtml(rawSuggestion);
 
       if (aiSuggestEnabled && onNewSuggestion) {
-        onNewSuggestion({ from, to, original: selectedText, suggestion });
+        onNewSuggestion({
+          from,
+          to,
+          original: selectedText,
+          suggestion: cleanSuggestion,
+        });
       } else {
         editor.chain().focus();
         if (empty) {
-          editor.commands.setContent(suggestion);
+          editor.commands.setContent(cleanSuggestion);
         } else {
-          editor.commands.insertContentAt({ from, to }, suggestion);
+          editor.commands.insertContentAt({ from, to }, cleanSuggestion);
         }
       }
     } catch (err: any) {
@@ -129,6 +139,42 @@ function AiSuggestButton({
       )}
     </span>
   );
+}
+
+export function useCollabResources(collabEnabled: boolean) {
+  const [collabDoc, setCollabDoc] = useState<Y.Doc | null>(null);
+  const providerRef = useRef<any>(null);
+
+  useEffect(() => {
+    if (!collabEnabled) {
+      if (providerRef.current) {
+        providerRef.current.destroy?.();
+        providerRef.current = null;
+      }
+      setCollabDoc(null);
+      return;
+    }
+
+    try {
+      const doc = new Y.Doc();
+      const providerInstance = new WebrtcProvider("tiptap-demo-room", doc);
+      providerRef.current = providerInstance;
+      setCollabDoc(doc);
+
+      return () => {
+        providerInstance.destroy?.();
+        if (providerRef.current === providerInstance) {
+          providerRef.current = null;
+        }
+      };
+    } catch (err) {
+      console.warn("Failed to initialise collaboration", err);
+      providerRef.current = null;
+      setCollabDoc(null);
+    }
+  }, [collabEnabled]);
+
+  return { collabDoc, collabProvider: providerRef.current };
 }
 
 interface SidebarProps {
@@ -405,8 +451,7 @@ function Sidebar(props: SidebarProps) {
 export default function TipTapEditorPage() {
   // Yjs Setup
   const [collabEnabled, setCollabEnabled] = useState(false);
-  const [yDoc, setYDoc] = useState<Y.Doc | null>(null);
-  const [provider, setProvider] = useState<any>(null);
+  const { collabDoc, collabProvider } = useCollabResources(collabEnabled);
 
   // Lint (validation)
   const [lintEnabled, setLintEnabled] = useState(false);
@@ -499,28 +544,14 @@ export default function TipTapEditorPage() {
         }),
       );
     }
-    if (collabEnabled) {
-      if (!yDoc) {
-        const doc = new Y.Doc();
-        const webrtcProvider = new WebrtcProvider("tiptap-demo-room", doc);
-        setYDoc(doc);
-        setProvider(webrtcProvider);
-        base.push(
-          Collaboration.configure({ document: doc }),
-          CollaborationCursor.configure({
-            provider: webrtcProvider,
-            user: { name: "You", color: "#3b82f6" },
-          }),
-        );
-      } else if (yDoc && provider) {
-        base.push(
-          Collaboration.configure({ document: yDoc }),
-          CollaborationCursor.configure({
-            provider: provider,
-            user: { name: "You", color: "#3b82f6" },
-          }),
-        );
-      }
+    if (collabEnabled && collabDoc && collabProvider) {
+      base.push(
+        Collaboration.configure({ document: collabDoc }),
+        CollaborationCursor.configure({
+          provider: collabProvider,
+          user: { name: "You", color: "#3b82f6" },
+        }),
+      );
     }
     if (headingLockEnabled) {
       base.push(tiptapHeadingLock());
@@ -541,8 +572,8 @@ export default function TipTapEditorPage() {
   }, [
     lintEnabled,
     collabEnabled,
-    yDoc,
-    provider,
+    collabDoc,
+    collabProvider,
     headingLockEnabled,
     indentationEnabled,
     sectionNodeEnabled,
@@ -621,11 +652,6 @@ export default function TipTapEditorPage() {
   }
   function handleToggleCollab() {
     setCollabEnabled((prev) => !prev);
-    if (!collabEnabled && yDoc && provider) {
-      provider.disconnect();
-      setYDoc(null);
-      setProvider(null);
-    }
   }
 
   function handleToggleAiSuggest() {
