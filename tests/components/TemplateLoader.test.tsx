@@ -113,6 +113,21 @@ describe("TemplateLoader", () => {
     expect(opts[0].value).toBe("DOC.html");
   });
 
+  it("accepts string-like template values", () => {
+    const funky: any = [
+      { label: new String("Fancy"), filename: new String("fancy.html") },
+    ];
+    render(
+      <TemplateLoader templates={funky} onLoad={() => {}} onClear={() => {}} />,
+    );
+    const opts = screen
+      .getAllByRole("option")
+      .filter((o) => o.value !== "" && o.value !== "__clear__");
+    expect(opts).toHaveLength(1);
+    expect(opts[0].value).toBe("fancy.html");
+    expect(opts[0].textContent).toBe("Fancy");
+  });
+
   it("accesses template fields only once", () => {
     let calls = 0;
     const tpl: any = {};

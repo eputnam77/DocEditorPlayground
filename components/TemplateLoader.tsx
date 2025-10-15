@@ -23,6 +23,10 @@ function isTemplateCandidate(value: unknown): value is TemplateCandidate {
   return Boolean(value) && typeof value === "object";
 }
 
+function isStringLike(value: unknown): value is string | String {
+  return typeof value === "string" || value instanceof String;
+}
+
 /**
  * TemplateLoader provides a dropdown for loading example templates into
  * an editor. It delegates the actual loading logic to the parent component.
@@ -63,15 +67,15 @@ export default function TemplateLoader({
       const rawFilename = tpl.filename;
       const rawLabel = tpl.label;
 
-      if (typeof rawFilename !== "string" || typeof rawLabel !== "string") {
+      if (!isStringLike(rawFilename) || !isStringLike(rawLabel)) {
         if (tpl) {
           console.warn("TemplateLoader: ignoring invalid template", tpl);
         }
         return acc;
       }
 
-      const filename = rawFilename.trim();
-      const label = rawLabel.trim();
+      const filename = String(rawFilename).trim();
+      const label = String(rawLabel).trim();
       const key = filename.toLowerCase();
       if (!filename || !label || seen.has(key)) {
         console.warn("TemplateLoader: ignoring invalid template", tpl);

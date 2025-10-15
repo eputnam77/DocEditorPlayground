@@ -58,6 +58,8 @@ interface NewSuggestion {
   suggestion: string;
 }
 
+const EMPTY_TEXT_RE = /[\s\u200B-\u200D\u2060-\u206F\uFEFF]+/g;
+
 export function AiSuggestButton({
   editor,
   aiSuggestEnabled,
@@ -73,19 +75,28 @@ export function AiSuggestButton({
   async function handleSuggest() {
     setError(null);
     if (!editor) return;
-    setLoading(true);
-
     const { from, to, empty } = editor.state.selection;
-    const selectedText = empty
+    const rawSelected = empty
       ? editor.state.doc.textContent
       : editor.state.doc.textBetween(from, to, " ");
+    const selectedText =
+      typeof rawSelected === "string" ? rawSelected : String(rawSelected ?? "");
+
+    const normalized = selectedText.replace(EMPTY_TEXT_RE, "");
+    if (!normalized) {
+      setError("Select some text before requesting a suggestion.");
+      return;
+    }
+
+    const requestText = selectedText.trim() || normalized;
+    setLoading(true);
 
     try {
       const res = await fetch("/api/ai-suggest", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
-          text: selectedText,
+          text: requestText,
         }),
       });
       if (!res.ok) throw new Error(await res.text());

@@ -3,6 +3,9 @@
   "version": "0.1.2",
   "private": true,
   "type": "module",
+  "imports": {
+    "@vitest/coverage-v8": "./stubs/vitest-coverage-v8.ts"
+  },
   "engines": {
     "node": ">=18.18"
   },

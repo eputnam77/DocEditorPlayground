@@ -58,4 +58,36 @@ describe("AiSuggestButton", () => {
     expect(inserted).toContain("<img");
     expect(inserted).not.toContain("onerror");
   });
+
+  it("avoids calling the API when no text is selected", async () => {
+    const editor = {
+      state: {
+        selection: { from: 0, to: 0, empty: true },
+        doc: {
+          textContent: "   ",
+          textBetween: vi.fn().mockReturnValue("   "),
+        },
+      },
+      commands: {
+        setContent: vi.fn(),
+        insertContentAt: vi.fn(),
+      },
+      chain: () => ({ focus: () => ({}) }),
+    };
+
+    fetchMock.mockResolvedValue({ ok: true, json: async () => ({}) });
+
+    render(<AiSuggestButton editor={editor as any} aiSuggestEnabled={false} />);
+
+    await act(async () => {
+      fireEvent.click(
+        screen.getByTitle("AI Suggest (rewrite selection)") as HTMLButtonElement,
+      );
+    });
+
+    expect(fetchMock).not.toHaveBeenCalled();
+    expect(
+      screen.getByText(/select some text/i, { selector: "div" }),
+    ).toBeTruthy();
+  });
 });
