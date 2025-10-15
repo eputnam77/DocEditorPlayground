@@ -19,6 +19,8 @@ export interface TemplateLoaderProps {
 
 type TemplateCandidate = Partial<TemplateMeta>;
 
+const CLEAR_SENTINEL = "__clear__";
+
 function isTemplateCandidate(value: unknown): value is TemplateCandidate {
   return Boolean(value) && typeof value === "object";
 }
@@ -77,7 +79,7 @@ export default function TemplateLoader({
       const filename = String(rawFilename).trim();
       const label = String(rawLabel).trim();
       const key = filename.toLowerCase();
-      if (!filename || !label || seen.has(key)) {
+      if (!filename || !label || key === CLEAR_SENTINEL || seen.has(key)) {
         console.warn("TemplateLoader: ignoring invalid template", tpl);
         return acc;
       }
@@ -96,7 +98,7 @@ export default function TemplateLoader({
     if (val === "") return;
 
     try {
-      if (val === "__clear__") {
+      if (val.toLowerCase() === CLEAR_SENTINEL) {
         onClear();
       } else {
         await onLoad(val);

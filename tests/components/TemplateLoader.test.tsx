@@ -128,6 +128,29 @@ describe("TemplateLoader", () => {
     expect(opts[0].textContent).toBe("Fancy");
   });
 
+  it("skips templates that use the reserved clear sentinel", () => {
+    const load = vi.fn();
+    const clear = vi.fn();
+    const reserved: TemplateMeta[] = [
+      { label: "Reserved", filename: "__clear__" },
+      { label: "Valid", filename: "valid.html" },
+    ];
+    render(
+      <TemplateLoader templates={reserved} onLoad={load} onClear={clear} />,
+    );
+
+    const select = screen.getByLabelText("Templates");
+    const optionLabels = screen.getAllByRole("option").map((o) => o.textContent);
+    expect(optionLabels).not.toContain("Reserved");
+
+    fireEvent.change(select, { target: { value: "valid.html" } });
+    expect(load).toHaveBeenCalledWith("valid.html");
+
+    fireEvent.change(select, { target: { value: "__clear__" } });
+    expect(clear).toHaveBeenCalledTimes(1);
+    expect(load).toHaveBeenCalledTimes(1);
+  });
+
   it("accesses template fields only once", () => {
     let calls = 0;
     const tpl: any = {};

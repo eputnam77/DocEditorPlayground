@@ -7,6 +7,21 @@ import { JSDOM } from "jsdom";
 const INVISIBLE_SEPARATORS =
   /[\s\u0000-\u001F\u200B-\u200D\u2060-\u206F\uFEFF]+/g;
 
+const DECODER_DOCUMENT =
+  typeof document !== "undefined" &&
+  typeof document.createElement === "function"
+    ? document
+    : new JSDOM("").window.document;
+
+const ENTITY_DECODER = DECODER_DOCUMENT.createElement("textarea");
+
+function decodeEntities(value: string): string {
+  ENTITY_DECODER.innerHTML = value;
+  const decoded = ENTITY_DECODER.value || ENTITY_DECODER.textContent || "";
+  ENTITY_DECODER.innerHTML = "";
+  return decoded;
+}
+
 export function sanitizeNode(root: ParentNode): void {
   // Remove tags that can execute scripts or modify document navigation
   root
@@ -15,11 +30,12 @@ export function sanitizeNode(root: ParentNode): void {
   // Remove meta refresh tags which can trigger redirects or script URLs
   root.querySelectorAll("meta[http-equiv]").forEach((el) => {
     const equiv = el.getAttribute("http-equiv");
+    const decodedEquiv = equiv ? decodeEntities(equiv) : null;
     // Some browsers are tolerant of stray whitespace inside the value, so we
     // normalise by removing all whitespace characters before comparison.
     if (
-      equiv &&
-      equiv
+      decodedEquiv &&
+      decodedEquiv
         .toLowerCase()
         .replace(INVISIBLE_SEPARATORS, "") === "refresh"
     ) {
@@ -40,8 +56,9 @@ export function sanitizeNode(root: ParentNode): void {
         continue;
       }
       if (name === "style") {
+        const decoded = decodeEntities(attribute.value);
         // Strip CSS comments before checking for dangerous patterns
-        const stripped = attribute.value.replace(/\/\*[^]*?\*\//g, "");
+        const stripped = decoded.replace(/\/\*[^]*?\*\//g, "");
         const valLower = stripped.toLowerCase();
         const collapsed = valLower.replace(INVISIBLE_SEPARATORS, "");
         if (
@@ -49,14 +66,18 @@ export function sanitizeNode(root: ParentNode): void {
           /url\(['"]?(javascript|data|vbscript):/.test(collapsed)
         ) {
           el.removeAttribute(attribute.name);
-          continue;
         }
+        continue;
       }
       if (name === "srcset") {
-        const entries = attribute.value.split(",");
+        const decoded = decodeEntities(attribute.value);
+        const entries = decoded.split(",");
         const unsafe = entries.some((entry) => {
-          const norm = entry.replace(INVISIBLE_SEPARATORS, "");
-          return /^(?:javascript|data|vbscript):/i.test(norm);
+          const normalized = decodeEntities(entry).replace(
+            INVISIBLE_SEPARATORS,
+            "",
+          );
+          return /^(?:javascript|data|vbscript):/i.test(normalized);
         });
         if (unsafe) {
           el.removeAttribute(attribute.name);
@@ -65,17 +86,19 @@ export function sanitizeNode(root: ParentNode): void {
       }
 
       if (
-        (name === "href" ||
-          name === "src" ||
-          name === "xlink:href" ||
-          name === "action" ||
-          name === "formaction" ||
-          name === "background") &&
-        /^(?:javascript|data|vbscript):/i.test(
-          attribute.value.replace(INVISIBLE_SEPARATORS, ""),
-        )
+        name === "href" ||
+        name === "src" ||
+        name === "xlink:href" ||
+        name === "action" ||
+        name === "formaction" ||
+        name === "background"
       ) {
-        el.removeAttribute(attribute.name);
+        const decoded = decodeEntities(attribute.value);
+        const normalized = decoded.replace(INVISIBLE_SEPARATORS, "");
+        if (/^(?:javascript|data|vbscript):/i.test(normalized)) {
+          el.removeAttribute(attribute.name);
+        }
+        continue;
       }
     }
   });

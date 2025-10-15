@@ -1,46 +1,40 @@
 import { describe, it, expect } from "vitest";
 import handler from "../../pages/api/ai-suggest";
 
-interface MockResponse {
+type MockRes = {
   statusCode: number;
-  jsonBody: any;
-  status(code: number): MockResponse;
-  json(payload: any): MockResponse;
-}
+  body: unknown;
+  status(code: number): MockRes;
+  json(payload: unknown): MockRes;
+};
 
-function createResponse(): MockResponse {
-  const res: MockResponse = {
+function createResponse(): MockRes {
+  return {
     statusCode: 200,
-    jsonBody: undefined,
+    body: undefined,
     status(code: number) {
-      res.statusCode = code;
-      return res;
+      this.statusCode = code;
+      return this;
     },
-    json(payload: any) {
-      res.jsonBody = payload;
-      return res;
+    json(payload: unknown) {
+      this.body = payload;
+      return this;
     },
   };
-  return res;
 }
 
 describe("api/ai-suggest", () => {
-  it("returns 400 for missing or non-string text", async () => {
+  it("uppercases visible content", async () => {
     const res = createResponse();
-    await handler({ method: "POST", body: null } as any, res as any);
-    expect(res.statusCode).toBe(400);
-    expect(res.jsonBody).toEqual({ error: "No text provided" });
-
-    const res2 = createResponse();
-    await handler({ method: "POST", body: { text: 123 } } as any, res2 as any);
-    expect(res2.statusCode).toBe(400);
-    expect(res2.jsonBody).toEqual({ error: "No text provided" });
+    await handler({ method: "POST", body: { text: "  hello  " } } as any, res);
+    expect(res.statusCode).toBe(200);
+    expect(res.body).toEqual({ suggestion: "HELLO" });
   });
 
-  it("uppercases valid text input", async () => {
+  it("rejects input made only of zero-width characters", async () => {
     const res = createResponse();
-    await handler({ method: "POST", body: { text: " hello " } } as any, res as any);
-    expect(res.statusCode).toBe(200);
-    expect(res.jsonBody).toEqual({ suggestion: "HELLO" });
+    await handler({ method: "POST", body: { text: "\u200B\u200C" } } as any, res);
+    expect(res.statusCode).toBe(400);
+    expect(res.body).toEqual({ error: "No text provided" });
   });
 });

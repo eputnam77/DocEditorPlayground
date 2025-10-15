@@ -191,6 +191,17 @@ describe("sanitizeHtml", () => {
     assert.strictEqual(cleanSrcset, "<img>");
   });
 
+  it("strips encoded javascript schemes in attributes", () => {
+    const dirty = '<a href="&#x6a;&#x61;vascript:alert(1)">x</a>';
+    const clean = sanitizeHtml(dirty);
+    assert.strictEqual(clean, "<a>x</a>");
+
+    const styleDirty =
+      '<div style="background:url(&#x6a;&#x61;vascript:alert(1))">x</div>';
+    const styleClean = sanitizeHtml(styleDirty);
+    assert.strictEqual(styleClean, "<div>x</div>");
+  });
+
   it("removes style and link elements", () => {
     const dirty =
       '<style>body{background:url(javascript:alert(1))}</style><link rel="stylesheet" href="javascript:alert(1)"><div>ok</div>';

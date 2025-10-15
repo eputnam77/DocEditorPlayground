@@ -9,6 +9,14 @@ type ApiResponse = {
   json(payload: unknown): ApiResponse;
 };
 
+const ZERO_WIDTH_RE = /[\u200B-\u200D\u2060-\u206F\uFEFF]+/g;
+
+function toText(value: unknown): string | null {
+  if (typeof value === "string") return value;
+  if (value instanceof String) return value.toString();
+  return null;
+}
+
 const handler = async (req: ApiRequest, res: ApiResponse) => {
   if (req.method !== "POST")
     return res.status(405).json({ error: "Method not allowed" });
@@ -18,18 +26,24 @@ const handler = async (req: ApiRequest, res: ApiResponse) => {
   }
 
   const { text } = req.body as { text?: unknown };
-  if (typeof text !== "string") {
+  const raw = toText(text);
+  if (raw === null) {
     return res.status(400).json({ error: "No text provided" });
   }
 
-  const trimmed = text.trim();
+  const trimmed = raw.trim();
   if (trimmed.length === 0) {
+    return res.status(400).json({ error: "No text provided" });
+  }
+
+  const visible = trimmed.replace(ZERO_WIDTH_RE, "");
+  if (visible.length === 0) {
     return res.status(400).json({ error: "No text provided" });
   }
 
   // Replace with your LLM call here!
   // For demo, just uppercase
-  const suggestion = trimmed.toUpperCase();
+  const suggestion = visible.toUpperCase();
 
   res.json({ suggestion });
 };

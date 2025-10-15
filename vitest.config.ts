@@ -34,7 +34,6 @@ export default defineConfig({
         __dirname,
         "stubs/toast-ui-editor-plugin-chart.ts",
       ),
-      "@vitest/coverage-v8": resolve(__dirname, "stubs/vitest-coverage-v8.ts"),
     },
   },
   test: {
@@ -44,5 +43,12 @@ export default defineConfig({
     include: ["tests/**/*.test.ts?(x)"],
     exclude: ["tests/e2e/**"],
     threads: false,
+    coverage: {
+      provider: "custom",
+      customProviderModule: resolve(
+        __dirname,
+        "stubs/vitest-coverage-v8.ts",
+      ),
+    },
   },
 });
