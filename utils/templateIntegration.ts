@@ -5,6 +5,8 @@ export interface Template {
   body: string;
 }
 
+const INVISIBLE_TEMPLATE_CHARS = /[\u200B-\u200D\u2060-\u206F\uFEFF]/g;
+
 /**
  * Filter and normalise an array of templates.
  *
@@ -36,9 +38,15 @@ export function integrateTemplates(templates: unknown[]): Template[] {
       const body = rec.body;
       // Validate using the already-read values so getters are not invoked twice
       if (validateTemplate({ title, body })) {
+        const normalizedTitle = String(title)
+          .replace(INVISIBLE_TEMPLATE_CHARS, "")
+          .trim();
+        const normalizedBody = String(body)
+          .replace(INVISIBLE_TEMPLATE_CHARS, "")
+          .trim();
         result.push({
-          title: String(title).trim(),
-          body: String(body).trim(),
+          title: normalizedTitle,
+          body: normalizedBody,
         });
       }
     } catch {

@@ -40,6 +40,12 @@ describe("integrateTemplates", () => {
     assert.deepStrictEqual(result, [{ title: "A", body: "b" }]);
   });
 
+  it("removes zero-width characters while normalising", () => {
+    const input: any = [{ title: "Tit\u200Ble", body: "Body\u200C" }];
+    const result = integrateTemplates(input);
+    assert.deepStrictEqual(result, [{ title: "Title", body: "Body" }]);
+  });
+
   it("rejects arrays and prototype properties", () => {
     const proto = { title: "t", body: "b" };
     const arr: any = Object.assign([], { title: "x", body: "y" });

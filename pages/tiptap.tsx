@@ -155,6 +155,12 @@ export function AiSuggestButton({
 export function useCollabResources(collabEnabled: boolean) {
   const [collabDoc, setCollabDoc] = useState<Y.Doc | null>(null);
   const providerRef = useRef<any>(null);
+  const docRef = useRef<Y.Doc | null>(null);
+  const safeDestroyDoc = (doc: Y.Doc | null) => {
+    if (doc && typeof (doc as unknown as { destroy?: () => void }).destroy === "function") {
+      (doc as unknown as { destroy: () => void }).destroy();
+    }
+  };
 
   useEffect(() => {
     if (!collabEnabled) {
@@ -162,12 +168,15 @@ export function useCollabResources(collabEnabled: boolean) {
         providerRef.current.destroy?.();
         providerRef.current = null;
       }
+      safeDestroyDoc(docRef.current);
+      docRef.current = null;
       setCollabDoc(null);
       return;
     }
 
     try {
       const doc = new Y.Doc();
+      docRef.current = doc;
       const providerInstance = new WebrtcProvider("tiptap-demo-room", doc);
       providerRef.current = providerInstance;
       setCollabDoc(doc);
@@ -177,9 +186,16 @@ export function useCollabResources(collabEnabled: boolean) {
         if (providerRef.current === providerInstance) {
           providerRef.current = null;
         }
+        if (docRef.current === doc) {
+          docRef.current = null;
+        }
+        safeDestroyDoc(doc);
+        setCollabDoc((prev) => (prev === doc ? null : prev));
       };
     } catch (err) {
       console.warn("Failed to initialise collaboration", err);
+      safeDestroyDoc(docRef.current);
+      docRef.current = null;
       providerRef.current = null;
       setCollabDoc(null);
     }

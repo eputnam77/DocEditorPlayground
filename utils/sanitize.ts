@@ -22,6 +22,38 @@ function decodeEntities(value: string): string {
   return decoded;
 }
 
+const CSS_ESCAPE_HEX_RE = /\\([0-9a-f]{1,6})(\s)?/gi;
+const CSS_ESCAPE_SIMPLE_RE = /\\(.)/g;
+
+function decodeCssEscapes(value: string): string {
+  return value
+    .replace(CSS_ESCAPE_HEX_RE, (_match, hex: string) => {
+      const codePoint = Number.parseInt(hex, 16);
+      if (Number.isFinite(codePoint)) {
+        try {
+          return String.fromCodePoint(codePoint);
+        } catch {
+          return "";
+        }
+      }
+      return "";
+    })
+    .replace(CSS_ESCAPE_SIMPLE_RE, "$1")
+    .replace(/\\$/g, "");
+}
+
+function isDangerousStyleValue(raw: string): boolean {
+  const withoutComments = raw.replace(/\/\*[^]*?\*\//g, "");
+  const lower = decodeCssEscapes(withoutComments).toLowerCase();
+  if (/expression\s*\(/.test(lower)) {
+    return true;
+  }
+  const collapsed = lower.replace(INVISIBLE_SEPARATORS, "");
+  return /(?:url|image-set)\([^)]*(?:javascript|data|vbscript)\s*:/.test(
+    collapsed,
+  );
+}
+
 export function sanitizeNode(root: ParentNode): void {
   // Remove tags that can execute scripts or modify document navigation
   root
@@ -57,14 +89,7 @@ export function sanitizeNode(root: ParentNode): void {
       }
       if (name === "style") {
         const decoded = decodeEntities(attribute.value);
-        // Strip CSS comments before checking for dangerous patterns
-        const stripped = decoded.replace(/\/\*[^]*?\*\//g, "");
-        const valLower = stripped.toLowerCase();
-        const collapsed = valLower.replace(INVISIBLE_SEPARATORS, "");
-        if (
-          /expression\s*\(/.test(valLower) ||
-          /url\(['"]?(javascript|data|vbscript):/.test(collapsed)
-        ) {
+        if (isDangerousStyleValue(decoded)) {
           el.removeAttribute(attribute.name);
         }
         continue;
