@@ -175,6 +175,20 @@ describe("sanitizeHtml", () => {
     assert.strictEqual(clean, '<div>x</div>');
   });
 
+  it("removes css-escaped javascript urls", () => {
+    const dirty =
+      '<div style="background:url(j\\61vascript:alert(1))">x</div>';
+    const clean = sanitizeHtml(dirty);
+    assert.strictEqual(clean, '<div>x</div>');
+  });
+
+  it("blocks dangerous image-set declarations", () => {
+    const dirty =
+      '<div style="background-image:image-set(\'javascript:alert(1)\' 1x)">x</div>';
+    const clean = sanitizeHtml(dirty);
+    assert.strictEqual(clean, '<div>x</div>');
+  });
+
   it("removes javascript urls containing zero-width characters", () => {
     const dirty = '<a href="java\u200Bscript:alert(1)">x</a>';
     const clean = sanitizeHtml(dirty);

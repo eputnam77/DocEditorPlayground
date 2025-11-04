@@ -2,6 +2,7 @@ import React, { useEffect } from "react";
 import { render, waitFor } from "@testing-library/react";
 import { describe, it, expect, vi } from "vitest";
 import { WebrtcProvider } from "y-webrtc";
+import { Doc } from "yjs";
 import { useCollabResources } from "../../pages/tiptap";
 
 function Harness({
@@ -22,6 +23,7 @@ describe("useCollabResources", () => {
   it("creates and tears down collaboration provider", async () => {
     const reports: Array<{ collabDoc: unknown; collabProvider: unknown }> = [];
     const destroySpy = vi.spyOn(WebrtcProvider.prototype, "destroy");
+    const docDestroySpy = vi.spyOn(Doc.prototype, "destroy");
 
     const { rerender } = render(
       <Harness
@@ -46,6 +48,7 @@ describe("useCollabResources", () => {
     });
 
     destroySpy.mockClear();
+    docDestroySpy.mockClear();
 
     rerender(
       <Harness
@@ -56,7 +59,11 @@ describe("useCollabResources", () => {
 
     await waitFor(() => {
       expect(destroySpy).toHaveBeenCalled();
+      expect(docDestroySpy).toHaveBeenCalled();
       expect(reports.at(-1)?.collabDoc ?? null).toBeNull();
     });
+
+    destroySpy.mockRestore();
+    docDestroySpy.mockRestore();
   });
 });
