@@ -28,6 +28,17 @@ describe("validateDocument", () => {
     assert.strictEqual(validateDocument({ content: zw }), false);
   });
 
+  it("accepts visible content alongside zero-width characters", () => {
+    const content = "Hi\u200B";
+    assert.strictEqual(validateDocument({ content }), true);
+  });
+
+  it("rejects non-string content types", () => {
+    assert.strictEqual(validateDocument({ content: 123 }), false);
+    assert.strictEqual(validateDocument({ content: true }), false);
+    assert.strictEqual(validateDocument({ content: {} }), false);
+  });
+  
   it("returns false when content getter throws", () => {
     const doc: any = {};
     Object.defineProperty(doc, "content", {
@@ -111,6 +122,28 @@ describe("validateTemplate", () => {
     );
   });
 
+  it("accepts visible content with zero-width characters", () => {
+    assert.strictEqual(
+      validateTemplate({ title: "T\u200B", body: "Body" }),
+      true,
+    );
+    assert.strictEqual(
+      validateTemplate({ title: "Title", body: "B\u2060ody" }),
+      true,
+    );
+  });
+
+  it("rejects boolean values", () => {
+    assert.strictEqual(
+      validateTemplate({ title: true, body: "b" }),
+      false,
+    );
+    assert.strictEqual(
+      validateTemplate({ title: "t", body: false }),
+      false,
+    );
+  });
+  
   it("rejects word-joiner characters", () => {
     const wj = "\u2060";
     assert.strictEqual(validateDocument({ content: wj }), false);
