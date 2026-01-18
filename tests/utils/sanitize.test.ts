@@ -222,4 +222,34 @@ describe("sanitizeHtml", () => {
     const clean = sanitizeHtml(dirty);
     assert.strictEqual(clean, '<div>ok</div>');
   });
+  
+  it("preserves safe links and sources", () => {
+    const dirty =
+      '<a href="https://example.com">ok</a><img src="/safe.png" alt="ok">';
+    const clean = sanitizeHtml(dirty);
+    assert.strictEqual(
+      clean,
+      '<a href="https://example.com">ok</a><img src="/safe.png" alt="ok">',
+    );
+  });
+
+  it("keeps safe style attributes", () => {
+    const dirty =
+      '<div style="color: blue; background-image: url(https://example.com/a.png)">x</div>';
+    const clean = sanitizeHtml(dirty);
+    assert.strictEqual(
+      clean,
+      '<div style="color: blue; background-image: url(https://example.com/a.png)">x</div>',
+    );
+  });
+
+  it("preserves safe srcset entries", () => {
+    const dirty =
+      '<img srcset="/a.png 1x, https://example.com/b.png 2x" alt="ok">';
+    const clean = sanitizeHtml(dirty);
+    assert.strictEqual(
+      clean,
+      '<img srcset="/a.png 1x, https://example.com/b.png 2x" alt="ok">',
+    );
+  });
 });
