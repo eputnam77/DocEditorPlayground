@@ -70,4 +70,34 @@ describe("integrateTemplates", () => {
     assert.deepStrictEqual(result, [{ title: "A", body: "b" }]);
     assert.strictEqual(calls, 1);
   });
+
+  it("ignores entries when body getter throws", () => {
+    const tpl: any = { title: "A" };
+    Object.defineProperty(tpl, "body", {
+      get() {
+        throw new Error("boom");
+      },
+    });
+    const result = integrateTemplates([tpl]);
+    assert.deepStrictEqual(result, []);
+  });
+
+  it("does not mutate the original template objects", () => {
+    const tpl: any = { title: " Title ", body: " Body " };
+    integrateTemplates([tpl]);
+    assert.deepStrictEqual(tpl, { title: " Title ", body: " Body " });
+  });
+
+  it("keeps template order after filtering", () => {
+    const input: any = [
+      { title: "First", body: "One" },
+      { title: "", body: "skip" },
+      { title: "Second", body: "Two" },
+    ];
+    const result = integrateTemplates(input);
+    assert.deepStrictEqual(result, [
+      { title: "First", body: "One" },
+      { title: "Second", body: "Two" },
+    ]);
+  });
 });
