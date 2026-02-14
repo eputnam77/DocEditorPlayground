@@ -16,6 +16,8 @@ import SlashCommand from "../extensions/slash-command";
 import Lint from "../extensions/lint";
 import sanitizeHtml from "../utils/sanitize";
 import { TEMPLATES } from "../utils/templates";
+import DarkModeToggle from "../components/DarkModeToggle";
+import NavBar from "../components/NavBar";
 
 // Custom TipTap extensions
 import { tiptapHeadingLock } from "../extensions/tiptapHeadingLock";
@@ -616,6 +618,7 @@ export default function TipTapEditorPage() {
       extensions,
       content,
       autofocus: true,
+      immediatelyRender: false,
       editorProps: {
         attributes: {
           class:
@@ -750,12 +753,30 @@ export default function TipTapEditorPage() {
     );
 
   return (
-    <div className="flex flex-col h-screen w-full bg-white">
+    <div className="workspace-shell flex min-h-screen flex-col">
+      <header className="workspace-top-bar border-b px-4 py-4 sm:px-8">
+        <div className="mx-auto flex w-full max-w-[1440px] items-center justify-between gap-4">
+          <div>
+            <p className="workspace-brand">Document Editor Playground</p>
+            <p className="workspace-brand-subtitle">
+              TipTap advanced authoring workspace
+            </p>
+          </div>
+          <DarkModeToggle />
+        </div>
+      </header>
+
+      <div className="border-b px-4 py-3 sm:px-8">
+        <div className="mx-auto w-full max-w-[1440px]">
+          <NavBar />
+        </div>
+      </div>
+
       {/* Header Toolbar */}
-      <header className="flex items-center gap-2 bg-gray-100 px-6 py-3 border-b w-full">
+      <header className="flex items-center gap-2 border-b bg-slate-100 px-6 py-3 dark:bg-slate-900/50">
         <button
           onClick={() => setSidebarOpen(true)}
-          className="p-2 rounded bg-gray-200 mr-2"
+          className="mr-2 rounded bg-gray-200 p-2"
           aria-label="Open sidebar"
         >
           <MenuIcon className="w-5 h-5" />
@@ -870,7 +891,7 @@ export default function TipTapEditorPage() {
       )}
 
       {/* Main Editor */}
-      <main className="flex-1 overflow-auto flex justify-center items-start bg-white">
+      <main className="flex flex-1 items-start justify-center overflow-auto bg-white dark:bg-slate-950">
         <div className="w-full max-w-[860px] p-8">
           <EditorContent editor={editor} />
         </div>

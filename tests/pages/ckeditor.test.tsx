@@ -6,8 +6,8 @@ import CkeditorPage from "../../pages/ckeditor";
 describe("CkeditorPage", () => {
   it("renders heading", () => {
     render(<CkeditorPage />);
-    expect(screen.getByText("CKEditor 5")).toBeTruthy();
-    expect(screen.getByLabelText("Add Comment")).toBeTruthy();
+    expect(screen.getByRole("heading", { level: 1, name: "CKEditor 5" })).toBeTruthy();
+    expect(screen.getByText("Comments")).toBeTruthy();
   });
 
   it("renders editor and accepts input", () => {

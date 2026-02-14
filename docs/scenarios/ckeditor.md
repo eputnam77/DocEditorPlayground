@@ -1,37 +1,16 @@
-# CKEditor 5 Usage Scenarios
+# CKEditor 5 Scenario Guide
 
-CKEditor 5 can replicate the playground features with plugins or custom builds.
+Use `/ckeditor` to test CKEditor 5 inside the shared full-page workspace.
 
-## Track changes
+## Core flow
 
-1. Navigate to `/ckeditor`.
-2. Make edits in the placeholder field.
-3. The change summary below reflects character differences.
+1. Open `/ckeditor`.
+2. Enter content in the editor field.
+3. Open **Plugins** and toggle formatting options such as `Bold`.
+4. Run **Run validation** to check status output.
 
-## Add comments
+## Template flow
 
-Use the **Add Comment** box to store feedback. CKEditor's own comments plugin can replace this widget in a production build.
-
-## Lock down headings
-
-Create a plugin that restricts which heading levels are allowed in the document.
-
-## Yjs collaboration
-
-CKEditor supports real-time collaboration with its commercial packages. Connect your Yjs provider to sync data if using open-source builds.
-
-## Section nodes
-
-Wrap each Heading&nbsp;2 in a container element so entire sections can be reordered via drag and drop.
-
-## Custom watermark
-
-Overlay a positioned element with your watermark text. Hide it when exporting the content.
-
-## Indentation
-
-Use built‑in list and indentation commands to nest content where needed.
-
-## Structure enforcement
-
-Validate the editor output before saving to ensure required headings appear in order.
+1. Use **Load template** to insert sample content.
+2. Edit the content and add comments in the side panel.
+3. Use the top navigation to move to another editor and repeat the flow.

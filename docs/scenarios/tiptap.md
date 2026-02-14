@@ -1,62 +1,35 @@
-# TipTap Usage Scenarios
+# TipTap Scenario Guide
 
-The TipTap page showcases advanced collaboration features while keeping the interface simple.
+Use `/tiptap` when you want to evaluate advanced extension behavior.
 
-## Track changes
+## Core flow
 
-1. Open `/tiptap` in your browser.
-2. Type or paste text in the editor.
-3. The **Track Changes** widget below the editor displays how many characters were added or removed.
+1. Open `/tiptap`.
+2. Type in the main editor canvas.
+3. Use the top toolbar for bold, italic, lists, tables, images, undo, redo, and save.
+4. Click **Open sidebar** to manage advanced toggles.
 
-```tsx
-<TrackChanges content={content} />
-```
+## Sidebar flow
 
-## Add comments
+1. Open **Templates** and load a sample document.
+2. Toggle features such as:
+   - Lint
+   - AI Suggest
+   - Heading lock
+   - Indentation
+   - Section node
+   - Mark review
+   - Watermark
+   - Collaboration
+3. Close and reopen the sidebar to verify state behavior.
 
-1. Use the text box labeled **Add Comment** beneath the editor.
-2. Press **Enter** to store the note.
+## AI Suggest flow
 
-```tsx
-<CommentTrack />
-```
+1. Enable **AI Suggest** in the sidebar.
+2. Select text in the editor.
+3. Click **AI Suggest** in the toolbar.
+4. Accept or reject the suggestion from the sidebar panel.
 
-## Lock down headings
+## Compare with other editors
 
-Heading levels 1 and 2 are locked by default. Any attempt to change them is ignored thanks to the `tiptapHeadingLock` extension.
-
-```ts
-const ALWAYS_ENABLED = [
-  { name: "HeadingLock", extension: tiptapHeadingLock() },
-];
-```
-
-## Yjs collaboration
-
-1. Open the **Extensions** menu.
-2. Enable **YjsCollab**.
-3. Share the page URL with collaborators.
-
-```ts
-{ name: "YjsCollab", extension: tiptapYjsCollab() }
-```
-
-## Section nodes
-
-Toggle **SectionNode** from the extension list to allow dragging content by its Heading&nbsp;2 title.
-
-## Custom watermark
-
-Enable **Watermark** and edit the overlay text in the side panel.
-
-## Indentation
-
-Paragraphs and lists support basic indentation via the `Indentation` extension.
-
-## AI Suggest
-
-Enable **AI Suggest** in the sidebar to rewrite selected text. Highlight a sentence and press **AI Suggest** in the toolbar. The default API just uppercases your text; customize `pages/api/ai-suggest.ts` to call your language model with a federal writing prompt.
-
-## Structure enforcement
-
-The `tiptapStructure` extension prevents consecutive headings and ensures paragraphs follow each heading.
+Use the shared top navigation to jump to any other editor page and continue testing with the same workflow.

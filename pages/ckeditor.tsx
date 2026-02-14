@@ -1,12 +1,6 @@
-import React, { useRef, useState, useMemo } from "react";
+import React, { useMemo, useRef, useState } from "react";
 import { CKEditor } from "@ckeditor/ckeditor5-react";
 import ClassicEditor from "@ckeditor/ckeditor5-build-classic";
-
-/**
- * CKEditor demo page.
- *
- * Basic CKEditor 5 integration with plugin toggles and template loading.
- */
 import EditorIntegrationInfo from "../components/EditorIntegrationInfo";
 import PluginManager from "../components/PluginManager";
 import TemplateLoader from "../components/TemplateLoader";
@@ -18,7 +12,7 @@ import CommentTrack from "../components/CommentTrack";
 import TrackChanges from "../components/TrackChanges";
 import { validateDocument } from "../utils/validation";
 import { TEMPLATES } from "../utils/templates";
-import ModernLayout from "../components/ModernLayout";
+import EditorWorkspace from "../components/EditorWorkspace";
 
 const PLUGINS = [
   { name: "bold", label: "Bold" },
@@ -26,18 +20,13 @@ const PLUGINS = [
   { name: "underline", label: "Underline" },
 ];
 
-function CkeditorPage() {
+export default function CkeditorPage() {
   const editorRef = useRef<any>(null);
   const [enabled, setEnabled] = useState<string[]>(PLUGINS.map((p) => p.name));
   const [content, setContent] = useState("");
-  const [validationResults, setValidationResults] = useState<
-    ValidationResult[]
-  >([]);
+  const [validationResults, setValidationResults] = useState<ValidationResult[]>([]);
 
-  const toolbarItems = useMemo(
-    () => [...enabled, "undo", "redo"],
-    [enabled],
-  );
+  const toolbarItems = useMemo(() => [...enabled, "undo", "redo"], [enabled]);
 
   async function loadTemplate(filename: string) {
     try {
@@ -48,7 +37,7 @@ function CkeditorPage() {
       setContent(sanitized);
       editorRef.current?.setData(sanitized);
     } catch {
-      alert("Failed to load template: " + filename);
+      alert(`Failed to load template: ${filename}`);
     }
   }
 
@@ -57,15 +46,16 @@ function CkeditorPage() {
       const passed = validateDocument({ content });
       setValidationResults([{ id: 1, label: "Document", passed }]);
     } catch {
-      alert("Validation failed");
+      alert("Validation failed.");
     }
   }
 
   return (
-    <ModernLayout>
-      <div className="p-4 space-y-2">
-        <h1>CKEditor 5</h1>
-        <div className="flex gap-2">
+    <EditorWorkspace
+      title="CKEditor 5"
+      description="Evaluate classic rich-text commands and plugin toggles in a full-page CKEditor flow."
+      controls={
+        <>
           <TemplateLoader
             templates={TEMPLATES}
             onLoad={loadTemplate}
@@ -78,13 +68,33 @@ function CkeditorPage() {
             onChange={setEnabled}
           />
           <button
-            className="px-3 py-1 border rounded bg-gray-50 hover:bg-gray-200"
+            className="rounded-md bg-sky-600 px-3 py-2 text-sm font-semibold text-white hover:bg-sky-700"
             onClick={runValidation}
           >
-            Validate
+            Run validation
           </button>
+        </>
+      }
+      statusPanel={
+        <div className="space-y-3">
+          <TrackChanges content={content} />
+          {validationResults.length > 0 && (
+            <ValidationStatus
+              results={validationResults}
+              onClear={() => setValidationResults([])}
+            />
+          )}
         </div>
-        <div className="w-full border rounded min-h-[60vh]">
+      }
+      sidePanel={
+        <div className="space-y-4">
+          <CommentTrack />
+          <EditorIntegrationInfo editorName="CKEditor 5" />
+        </div>
+      }
+    >
+      <div className="h-full p-3">
+        <div className="h-[58vh] overflow-auto rounded-md border border-slate-300 bg-white p-2 dark:border-slate-600 dark:bg-slate-900">
           <CKEditor
             editor={ClassicEditor}
             data={content}
@@ -98,18 +108,7 @@ function CkeditorPage() {
             config={{ toolbar: { items: toolbarItems } }}
           />
         </div>
-        <TrackChanges content={content} />
-        {validationResults.length > 0 && (
-          <ValidationStatus
-            results={validationResults}
-            onClear={() => setValidationResults([])}
-          />
-        )}
-        <CommentTrack />
-        <EditorIntegrationInfo editorName="CKEditor 5" />
       </div>
-    </ModernLayout>
+    </EditorWorkspace>
   );
 }
-
-export default CkeditorPage;

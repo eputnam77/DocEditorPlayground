@@ -1,15 +1,26 @@
 # End-to-End Test Report
 
-**Status:** ❌ Tests failed (missing Playwright)
+**Status:** Passing
 
-With stub binaries removed, `npx playwright test` attempts to download the real
-`playwright` package but this environment blocks network access. Install the
-dependencies in a networked environment and run `npx playwright install` before
-running the test suite locally. Otherwise the browsers are missing and tests are
-ignored. See the [Running Tests guidance](../README.md#running-tests) for
-workarounds when the Chromium CDN responds with `403 Forbidden` errors in the
-sandbox.
+## Current result
 
-## Summary
+- Playwright suite: `38` tests passed
+- Browser: Chromium (`playwright install chromium`)
+- Configuration: dedicated local server on port `3101`
 
-No scenarios were executed.
+## Covered areas
+
+- Home and route availability
+- Cross-page navigation between all editor routes
+- Dark mode behavior on home and editor pages
+- Editor typing and validation workflows for each editor
+- Plugin/feature toggles, including TipTap sidebar controls
+- Cross-editor workflow transition scenarios
+- Shared cross-editor contract checks (navigation, theme persistence, workspace shell)
+
+## Run command
+
+```bash
+npx playwright install chromium
+npm run test:e2e
+```

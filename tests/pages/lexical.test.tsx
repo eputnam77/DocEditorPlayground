@@ -6,8 +6,8 @@ import LexicalPage from "../../pages/lexical";
 describe("LexicalPage", () => {
   it("renders heading", () => {
     render(<LexicalPage />);
-    expect(screen.getByText("Lexical")).toBeTruthy();
-    expect(screen.getByLabelText("Add Comment")).toBeTruthy();
+    expect(screen.getByText("Lexical editor")).toBeTruthy();
+    expect(screen.getByText("Comments")).toBeTruthy();
   });
 
   it("accepts user input", async () => {

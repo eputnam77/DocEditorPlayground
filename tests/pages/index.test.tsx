@@ -6,6 +6,7 @@ import HomePage from "../../pages";
 describe("HomePage", () => {
   it("links to editor pages", () => {
     render(<HomePage />);
-    expect(screen.getByText("tiptap")).toBeTruthy();
+    expect(screen.getByRole("link", { name: "TipTap" })).toBeTruthy();
+    expect(screen.getAllByText("Open editor").length).toBeGreaterThan(1);
   });
 });

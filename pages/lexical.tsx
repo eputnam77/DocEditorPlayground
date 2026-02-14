@@ -15,10 +15,6 @@ import {
   UNDO_COMMAND,
   REDO_COMMAND,
 } from "../stubs/lexical";
-
-/**
- * Lexical demo page with a lightweight stub editor.
- */
 import EditorIntegrationInfo from "../components/EditorIntegrationInfo";
 import PluginManager from "../components/PluginManager";
 import TemplateLoader from "../components/TemplateLoader";
@@ -30,16 +26,69 @@ import CommentTrack from "../components/CommentTrack";
 import TrackChanges from "../components/TrackChanges";
 import { validateDocument } from "../utils/validation";
 import { TEMPLATES } from "../utils/templates";
-import ModernLayout from "../components/ModernLayout";
+import EditorWorkspace from "../components/EditorWorkspace";
 
-const PLUGINS = [{ name: "history" }, { name: "lists" }];
+const PLUGINS = [{ name: "history", label: "History" }, { name: "lists", label: "Lists" }];
 
-function LexicalPage() {
+function Toolbar({ enabled }: { enabled: string[] }) {
+  const [editor] = useLexicalComposerContext();
+
+  return (
+    <div className="mb-3 flex flex-wrap gap-2">
+      <button
+        aria-label="Bold"
+        className="rounded-md border border-slate-300 bg-white px-3 py-2 text-sm font-semibold hover:bg-slate-100 dark:border-slate-600 dark:bg-slate-900 dark:hover:bg-slate-800"
+        onClick={() => editor.dispatchCommand(FORMAT_TEXT_COMMAND, "bold")}
+      >
+        Bold
+      </button>
+      <button
+        aria-label="Italic"
+        className="rounded-md border border-slate-300 bg-white px-3 py-2 text-sm font-semibold hover:bg-slate-100 dark:border-slate-600 dark:bg-slate-900 dark:hover:bg-slate-800"
+        onClick={() => editor.dispatchCommand(FORMAT_TEXT_COMMAND, "italic")}
+      >
+        Italic
+      </button>
+      <button
+        aria-label="Bullet List"
+        className="rounded-md border border-slate-300 bg-white px-3 py-2 text-sm font-semibold hover:bg-slate-100 disabled:opacity-50 dark:border-slate-600 dark:bg-slate-900 dark:hover:bg-slate-800"
+        disabled={!enabled.includes("lists")}
+        onClick={() => editor.dispatchCommand(INSERT_UNORDERED_LIST_COMMAND)}
+      >
+        Bullet list
+      </button>
+      <button
+        aria-label="Numbered List"
+        className="rounded-md border border-slate-300 bg-white px-3 py-2 text-sm font-semibold hover:bg-slate-100 disabled:opacity-50 dark:border-slate-600 dark:bg-slate-900 dark:hover:bg-slate-800"
+        disabled={!enabled.includes("lists")}
+        onClick={() => editor.dispatchCommand(INSERT_ORDERED_LIST_COMMAND)}
+      >
+        Numbered list
+      </button>
+      <button
+        aria-label="Undo"
+        className="rounded-md border border-slate-300 bg-white px-3 py-2 text-sm font-semibold hover:bg-slate-100 disabled:opacity-50 dark:border-slate-600 dark:bg-slate-900 dark:hover:bg-slate-800"
+        disabled={!enabled.includes("history")}
+        onClick={() => editor.dispatchCommand(UNDO_COMMAND)}
+      >
+        Undo
+      </button>
+      <button
+        aria-label="Redo"
+        className="rounded-md border border-slate-300 bg-white px-3 py-2 text-sm font-semibold hover:bg-slate-100 disabled:opacity-50 dark:border-slate-600 dark:bg-slate-900 dark:hover:bg-slate-800"
+        disabled={!enabled.includes("history")}
+        onClick={() => editor.dispatchCommand(REDO_COMMAND)}
+      >
+        Redo
+      </button>
+    </div>
+  );
+}
+
+export default function LexicalPage() {
   const [enabled, setEnabled] = useState<string[]>(PLUGINS.map((p) => p.name));
   const [content, setContent] = useState("");
-  const [validationResults, setValidationResults] = useState<
-    ValidationResult[]
-  >([]);
+  const [validationResults, setValidationResults] = useState<ValidationResult[]>([]);
 
   async function loadTemplate(filename: string) {
     try {
@@ -48,7 +97,7 @@ function LexicalPage() {
       const html = await res.text();
       setContent(sanitizeHtml(html));
     } catch {
-      alert("Failed to load template: " + filename);
+      alert(`Failed to load template: ${filename}`);
     }
   }
 
@@ -57,80 +106,16 @@ function LexicalPage() {
       const passed = validateDocument({ content });
       setValidationResults([{ id: 1, label: "Document", passed }]);
     } catch {
-      alert("Validation failed");
+      alert("Validation failed.");
     }
   }
 
-  function Toolbar() {
-    const [editor] = useLexicalComposerContext();
-    return (
-      <div className="flex gap-2 mb-2">
-        <button
-          aria-label="Bold"
-          className="px-2 py-1 border rounded"
-          onClick={() =>
-            editor.dispatchCommand(FORMAT_TEXT_COMMAND, "bold")
-          }
-        >
-          Bold
-        </button>
-        <button
-          aria-label="Italic"
-          className="px-2 py-1 border rounded"
-          onClick={() =>
-            editor.dispatchCommand(FORMAT_TEXT_COMMAND, "italic")
-          }
-        >
-          Italic
-        </button>
-        <button
-          aria-label="Bullet List"
-          className="px-2 py-1 border rounded"
-          disabled={!enabled.includes("lists")}
-          onClick={() =>
-            editor.dispatchCommand(INSERT_UNORDERED_LIST_COMMAND)
-          }
-        >
-          Bullet List
-        </button>
-        <button
-          aria-label="Numbered List"
-          className="px-2 py-1 border rounded"
-          disabled={!enabled.includes("lists")}
-          onClick={() =>
-            editor.dispatchCommand(INSERT_ORDERED_LIST_COMMAND)
-          }
-        >
-          Numbered List
-        </button>
-        <button
-          aria-label="Undo"
-          className="px-2 py-1 border rounded"
-          disabled={!enabled.includes("history")}
-          onClick={() => editor.dispatchCommand(UNDO_COMMAND)}
-        >
-          Undo
-        </button>
-        <button
-          aria-label="Redo"
-          className="px-2 py-1 border rounded"
-          disabled={!enabled.includes("history")}
-          onClick={() => editor.dispatchCommand(REDO_COMMAND)}
-        >
-          Redo
-        </button>
-      </div>
-    );
-  }
-
   return (
-    <ModernLayout>
-      <div className="p-4 space-y-2">
-        <h1>Lexical</h1>
-        <p className="text-sm text-zinc-600 dark:text-zinc-300">
-          Basic Lexical-style editor with formatting toolbar.
-        </p>
-        <div className="flex gap-2">
+    <EditorWorkspace
+      title="Lexical editor"
+      description="Test core text formatting, list commands, and plugin toggles in a full-page Lexical workflow."
+      controls={
+        <>
           <TemplateLoader
             templates={TEMPLATES}
             onLoad={loadTemplate}
@@ -143,19 +128,39 @@ function LexicalPage() {
             onChange={setEnabled}
           />
           <button
-            className="px-3 py-1 border rounded bg-gray-50 hover:bg-gray-200"
+            className="rounded-md bg-sky-600 px-3 py-2 text-sm font-semibold text-white hover:bg-sky-700"
             onClick={runValidation}
           >
-            Validate
+            Run validation
           </button>
+        </>
+      }
+      statusPanel={
+        <div className="space-y-3">
+          <TrackChanges content={content} />
+          {validationResults.length > 0 && (
+            <ValidationStatus
+              results={validationResults}
+              onClear={() => setValidationResults([])}
+            />
+          )}
         </div>
+      }
+      sidePanel={
+        <div className="space-y-4">
+          <CommentTrack />
+          <EditorIntegrationInfo editorName="Lexical" />
+        </div>
+      }
+    >
+      <div className="h-full p-3">
         <LexicalComposer initialConfig={{}}>
-          <Toolbar />
+          <Toolbar enabled={enabled} />
           <RichTextPlugin
             contentEditable={
               <ContentEditable
                 data-testid="lexical-editor"
-                className="w-full border rounded p-2 min-h-[200px]"
+                className="h-[58vh] w-full rounded-md border border-slate-300 bg-white p-3 text-slate-900 outline-none dark:border-slate-600 dark:bg-slate-900 dark:text-slate-100"
               />
             }
           />
@@ -163,18 +168,7 @@ function LexicalPage() {
           {enabled.includes("lists") && <ListPlugin />}
           <OnChangePlugin onChange={(e: any) => setContent(e.getText())} />
         </LexicalComposer>
-        <TrackChanges content={content} />
-        {validationResults.length > 0 && (
-          <ValidationStatus
-            results={validationResults}
-            onClear={() => setValidationResults([])}
-          />
-        )}
-        <CommentTrack />
-        <EditorIntegrationInfo editorName="Lexical" />
       </div>
-    </ModernLayout>
+    </EditorWorkspace>
   );
 }
-
-export default LexicalPage;

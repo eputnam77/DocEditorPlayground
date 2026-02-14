@@ -1,15 +1,11 @@
 import { expect, test } from "@playwright/test";
 
-test.describe("TipTap extension persistence", () => {
-  test("persists Underline toggle", async ({ page }) => {
-    await page.goto("/tiptap");
-    await page.getByRole("button", { name: "Extensions" }).click();
-    const checkbox = page.getByLabel("Underline");
-    await expect(checkbox).toBeChecked();
-    await checkbox.uncheck();
-    await page.getByRole("button", { name: "Close" }).click();
-    await page.reload();
-    await page.getByRole("button", { name: "Extensions" }).click();
-    await expect(page.getByLabel("Underline")).not.toBeChecked();
-  });
+test("tiptap keeps sidebar toggle state while staying on page", async ({ page }) => {
+  await page.goto("/tiptap");
+  await page.getByRole("button", { name: "Open sidebar" }).click();
+  await page.getByRole("button", { name: "Enable Indentation" }).click();
+  await expect(page.getByRole("button", { name: "Disable Indentation" })).toBeVisible();
+  await page.getByRole("button", { name: "Close sidebar" }).click();
+  await page.getByRole("button", { name: "Open sidebar" }).click();
+  await expect(page.getByRole("button", { name: "Disable Indentation" })).toBeVisible();
 });

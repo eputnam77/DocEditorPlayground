@@ -1,43 +1,36 @@
 import React from "react";
 import Link from "next/link";
 import { useRouter } from "next/router";
-
-const editors = [
-  { name: "TipTap", path: "/tiptap" },
-  { name: "Toast Editor", path: "/toast" },
-  { name: "CodeX", path: "/codex" },
-  { name: "Slate", path: "/slate" },
-  { name: "Lexical", path: "/lexical" },
-  { name: "CKEditor 5", path: "/ckeditor" },
-];
+import { EDITOR_CATALOG } from "./editorCatalog";
 
 export default function NavBar() {
-  const router = useRouter();
-  const { pathname } = router;
+  let pathname = "";
+  let prefetch: (path: string) => Promise<void> | void = () => undefined;
+
+  try {
+    const router = useRouter();
+    pathname = router.pathname;
+    prefetch = router.prefetch;
+  } catch {
+    // Some unit tests render pages without a mounted Next router.
+  }
 
   return (
-    <nav className="w-full flex flex-wrap items-center justify-center gap-4 sm:gap-6">
-      {editors.map(({ name, path }) => {
+    <nav className="flex w-full flex-wrap items-center gap-2 sm:gap-3">
+      {EDITOR_CATALOG.map(({ name, path }) => {
         const isActive = pathname === path;
         return (
-          <div
-            key={name}
-            className="transform-gpu transition-transform hover:scale-105"
-          >
+          <div key={name} className="transform-gpu transition-transform hover:scale-[1.015]">
             <Link
               href={path}
-              onMouseEnter={() => router.prefetch(path)}
-              className={`group relative inline-block px-6 py-2 sm:px-8 sm:py-3 rounded-full text-sm sm:text-base font-semibold focus-visible:outline-none focus-visible:ring-2 ring-offset-2 ring-indigo-400 transition-colors
+              onMouseEnter={() => prefetch(path)}
+              className={`group relative inline-block rounded-full border px-4 py-2 text-sm font-semibold transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-offset-2
                 ${
                   isActive
-                    ? "bg-gradient-to-r from-emerald-500 to-blue-500 text-white"
-                    : "bg-white/20 dark:bg-zinc-700/40 text-zinc-800 dark:text-zinc-100 backdrop-blur-md hover:bg-gradient-to-r hover:from-blue-400 hover:to-violet-500 hover:text-white"
+                    ? "border-sky-300 bg-sky-500 text-white shadow-lg shadow-sky-500/25 dark:border-sky-700 dark:bg-sky-400 dark:text-slate-950"
+                    : "border-slate-300 bg-white text-slate-900 hover:border-sky-300 hover:bg-slate-100 dark:border-slate-700 dark:bg-slate-900 dark:text-slate-100 dark:hover:border-sky-600 dark:hover:bg-slate-800"
                 }`}
             >
-              {/* sheen effect on hover */}
-              <span className="absolute inset-0 rounded-full overflow-hidden pointer-events-none">
-                <span className="absolute inset-0 bg-gradient-to-r from-transparent via-white/40 to-transparent translate-x-[-100%] group-hover:translate-x-[100%] transition-transform duration-700 ease-out" />
-              </span>
               <span className="relative z-10">{name}</span>
             </Link>
           </div>

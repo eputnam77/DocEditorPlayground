@@ -9,6 +9,7 @@
   "engines": {
     "node": ">=18.18"
   },
+  "packageManager": "npm@10",
   "scripts": {
     "dev": "next dev",
     "dev:debug": "set DEBUG=* && next dev",

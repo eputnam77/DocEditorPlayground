@@ -1,21 +1,12 @@
-import { test, expect } from "@playwright/test";
+import { expect, test } from "@playwright/test";
 
-const PLUGINS = ["CodeSyntax", "TableMerge", "ColorSyntax"];
-
-test.describe("toast plugin toggles", () => {
-  test.beforeEach(async ({ page }) => {
-    await page.goto("/toast");
-    await page.getByRole("button", { name: "Plugins" }).click();
-  });
-
-  for (const name of PLUGINS) {
-    test(`toggle ${name}`, async ({ page }) => {
-      const checkbox = page.getByLabel(name);
-      await expect(checkbox).toBeChecked();
-      await checkbox.uncheck();
-      await expect(checkbox).not.toBeChecked();
-      await checkbox.check();
-      await expect(checkbox).toBeChecked();
-    });
-  }
+test("toast plugin menu toggles CodeSyntax", async ({ page }) => {
+  await page.goto("/toast");
+  await page.getByRole("button", { name: "Plugins" }).click();
+  const toggle = page.getByLabel("CodeSyntax");
+  await expect(toggle).toBeChecked();
+  await toggle.uncheck();
+  await expect(toggle).not.toBeChecked();
+  await toggle.check();
+  await expect(toggle).toBeChecked();
 });

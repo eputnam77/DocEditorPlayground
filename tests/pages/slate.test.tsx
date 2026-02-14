@@ -6,8 +6,8 @@ import SlatePage from "../../pages/slate";
 describe("SlatePage", () => {
   it("renders heading", () => {
     render(<SlatePage />);
-    expect(screen.getByText("Slate")).toBeTruthy();
-    expect(screen.getByLabelText("Add Comment")).toBeTruthy();
+    expect(screen.getByText("Slate editor")).toBeTruthy();
+    expect(screen.getByText("Comments")).toBeTruthy();
   });
 
   it("accepts user input", () => {

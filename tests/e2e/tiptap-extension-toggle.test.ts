@@ -1,21 +1,10 @@
-import { test, expect } from "@playwright/test";
+import { expect, test } from "@playwright/test";
 
-const EXTENSIONS = ["StarterKit", "Underline", "History"];
-
-test.describe("tiptap extension toggles", () => {
-  test.beforeEach(async ({ page }) => {
-    await page.goto("/tiptap");
-    await page.getByRole("button", { name: "Extensions" }).click();
-  });
-
-  for (const name of EXTENSIONS) {
-    test(`toggle ${name}`, async ({ page }) => {
-      const checkbox = page.getByLabel(name);
-      await expect(checkbox).toBeChecked();
-      await checkbox.uncheck();
-      await expect(checkbox).not.toBeChecked();
-      await checkbox.check();
-      await expect(checkbox).toBeChecked();
-    });
-  }
+test("tiptap sidebar toggles heading lock", async ({ page }) => {
+  await page.goto("/tiptap");
+  await page.getByRole("button", { name: "Open sidebar" }).click();
+  const lockButton = page.getByRole("button", { name: "Enable Heading Lock" });
+  await expect(lockButton).toBeVisible();
+  await lockButton.click();
+  await expect(page.getByRole("button", { name: "Disable Heading Lock" })).toBeVisible();
 });

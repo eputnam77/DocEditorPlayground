@@ -1,4 +1,4 @@
-import React from 'react';
+import React from "react";
 
 interface Props {
   editorName: string;
@@ -10,12 +10,12 @@ interface Props {
  */
 export default function EditorIntegrationInfo({ editorName }: Props) {
   return (
-    <section className="mt-4 text-sm text-zinc-700 dark:text-zinc-200">
+    <section className="text-sm text-slate-700 dark:text-slate-200">
       <p>
-        For instructions on integrating {editorName}, see{' '}
+        Need integration details for {editorName}? Review{" "}
         <a
           href="https://github.com/eputnam77/DocEditorPlayground/blob/main/docs/integration-guides.md"
-          className="text-indigo-600 underline"
+          className="font-semibold text-sky-700 underline dark:text-sky-300"
         >
           the integration guide
         </a>

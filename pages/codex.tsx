@@ -2,10 +2,6 @@ import React, { useEffect, useRef, useState } from "react";
 import EditorJS from "@editorjs/editorjs";
 import Header from "@editorjs/header";
 import List from "@editorjs/list";
-
-/**
- * Editor.js demo page with basic plugin toggles and template loading.
- */
 import EditorIntegrationInfo from "../components/EditorIntegrationInfo";
 import PluginManager from "../components/PluginManager";
 import TemplateLoader from "../components/TemplateLoader";
@@ -17,19 +13,17 @@ import CommentTrack from "../components/CommentTrack";
 import TrackChanges from "../components/TrackChanges";
 import { validateDocument } from "../utils/validation";
 import { TEMPLATES } from "../utils/templates";
-import ModernLayout from "../components/ModernLayout";
+import EditorWorkspace from "../components/EditorWorkspace";
 
 const PLUGINS = [
   { name: "header", label: "Header" },
   { name: "list", label: "List" },
 ];
 
-function CodexPage() {
+export default function CodexPage() {
   const [enabled, setEnabled] = useState<string[]>(PLUGINS.map((p) => p.name));
   const [content, setContent] = useState("");
-  const [validationResults, setValidationResults] = useState<
-    ValidationResult[]
-  >([]);
+  const [validationResults, setValidationResults] = useState<ValidationResult[]>([]);
   const holderRef = useRef<HTMLDivElement>(null);
   const editorRef = useRef<EditorJS | null>(null);
 
@@ -63,9 +57,9 @@ function CodexPage() {
       if (!res.ok) throw new Error("fetch failed");
       const html = await res.text();
       const sanitized = sanitizeHtml(html);
-      editorRef.current?.blocks.renderFromHTML(sanitized);
+      await editorRef.current?.blocks.renderFromHTML(sanitized);
     } catch {
-      alert("Failed to load template: " + filename);
+      alert(`Failed to load template: ${filename}`);
     }
   }
 
@@ -74,15 +68,16 @@ function CodexPage() {
       const passed = validateDocument({ content });
       setValidationResults([{ id: 1, label: "Document", passed }]);
     } catch {
-      alert("Validation failed");
+      alert("Validation failed.");
     }
   }
 
   return (
-    <ModernLayout>
-      <div className="p-4 space-y-2">
-        <h1>Editor.js</h1>
-        <div className="flex gap-2">
+    <EditorWorkspace
+      title="Editor.js"
+      description="Test block-based authoring, plugin toggles, and content updates in one full-page canvas."
+      controls={
+        <>
           <TemplateLoader
             templates={TEMPLATES}
             onLoad={loadTemplate}
@@ -95,30 +90,39 @@ function CodexPage() {
             onChange={setEnabled}
           />
           <button
-            className="px-3 py-1 border rounded bg-gray-50 hover:bg-gray-200"
+            className="rounded-md bg-sky-600 px-3 py-2 text-sm font-semibold text-white hover:bg-sky-700"
             onClick={runValidation}
           >
-            Validate
+            Run validation
           </button>
+        </>
+      }
+      statusPanel={
+        <div className="space-y-3">
+          <TrackChanges content={content} />
+          {validationResults.length > 0 && (
+            <ValidationStatus
+              results={validationResults}
+              onClear={() => setValidationResults([])}
+            />
+          )}
         </div>
+      }
+      sidePanel={
+        <div className="space-y-4">
+          <CommentTrack />
+          <EditorIntegrationInfo editorName="Editor.js" />
+        </div>
+      }
+    >
+      <div className="h-full p-3">
         <div
           id="codex-editor"
           data-testid="codex-editor"
           ref={holderRef}
-          className="w-full border rounded p-2 min-h-[60vh]"
+          className="h-[58vh] w-full rounded-md border border-slate-300 bg-white p-3 text-slate-900 outline-none dark:border-slate-600 dark:bg-slate-900 dark:text-slate-100"
         />
-        <TrackChanges content={content} />
-        {validationResults.length > 0 && (
-          <ValidationStatus
-            results={validationResults}
-            onClear={() => setValidationResults([])}
-          />
-        )}
-        <CommentTrack />
-        <EditorIntegrationInfo editorName="Editor.js" />
       </div>
-    </ModernLayout>
+    </EditorWorkspace>
   );
 }
-
-export default CodexPage;

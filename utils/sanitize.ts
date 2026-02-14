@@ -2,24 +2,63 @@
  * Basic HTML sanitizer removing script tags and event handler attributes.
  * This prevents template content from executing arbitrary JavaScript.
  */
-import { JSDOM } from "jsdom";
-
 const INVISIBLE_SEPARATORS =
   /[\s\u0000-\u001F\u200B-\u200D\u2060-\u206F\uFEFF]+/g;
 
-const DECODER_DOCUMENT =
+const ENTITY_DECODER =
   typeof document !== "undefined" &&
   typeof document.createElement === "function"
-    ? document
-    : new JSDOM("").window.document;
+    ? document.createElement("textarea")
+    : null;
 
-const ENTITY_DECODER = DECODER_DOCUMENT.createElement("textarea");
+const NAMED_ENTITIES: Record<string, string> = {
+  amp: "&",
+  lt: "<",
+  gt: ">",
+  quot: '"',
+  apos: "'",
+};
+
+function decodeEntitiesFallback(value: string): string {
+  return value.replace(
+    /&(#x[0-9a-f]+|#\d+|[a-z][a-z0-9]+);?/gi,
+    (_match, entity: string) => {
+      const lower = entity.toLowerCase();
+      if (lower.startsWith("#x")) {
+        const codePoint = Number.parseInt(lower.slice(2), 16);
+        if (Number.isFinite(codePoint)) {
+          try {
+            return String.fromCodePoint(codePoint);
+          } catch {
+            return "";
+          }
+        }
+        return "";
+      }
+      if (lower.startsWith("#")) {
+        const codePoint = Number.parseInt(lower.slice(1), 10);
+        if (Number.isFinite(codePoint)) {
+          try {
+            return String.fromCodePoint(codePoint);
+          } catch {
+            return "";
+          }
+        }
+        return "";
+      }
+      return NAMED_ENTITIES[lower] ?? `&${entity};`;
+    },
+  );
+}
 
 function decodeEntities(value: string): string {
-  ENTITY_DECODER.innerHTML = value;
-  const decoded = ENTITY_DECODER.value || ENTITY_DECODER.textContent || "";
-  ENTITY_DECODER.innerHTML = "";
-  return decoded;
+  if (ENTITY_DECODER) {
+    ENTITY_DECODER.innerHTML = value;
+    const decoded = ENTITY_DECODER.value || ENTITY_DECODER.textContent || "";
+    ENTITY_DECODER.innerHTML = "";
+    return decoded;
+  }
+  return decodeEntitiesFallback(value);
 }
 
 const CSS_ESCAPE_HEX_RE = /\\([0-9a-f]{1,6})(\s)?/gi;
@@ -130,9 +169,11 @@ export function sanitizeNode(root: ParentNode): void {
 }
 
 export function sanitizeHtml(html: string): string {
-  const Parser =
-    typeof DOMParser !== "undefined" ? DOMParser : new JSDOM("").window.DOMParser;
-  const doc = new Parser().parseFromString(html, "text/html");
+  if (typeof DOMParser === "undefined") {
+    // Safe fallback when no DOM APIs are available.
+    return html.replace(/<[^>]*>/g, "");
+  }
+  const doc = new DOMParser().parseFromString(html, "text/html");
   sanitizeNode(doc);
   return doc.body.innerHTML;
 }

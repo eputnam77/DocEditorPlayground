@@ -6,16 +6,16 @@ import CommentTrack from "../../components/CommentTrack";
 describe("CommentTrack", () => {
   it("adds comments", () => {
     render(<CommentTrack />);
-    const input = screen.getByPlaceholderText(/enter comment/i);
+    const input = screen.getByPlaceholderText(/add a comment/i);
     fireEvent.change(input, { target: { value: "hello" } });
-    fireEvent.click(screen.getByText("Add"));
+    fireEvent.click(screen.getByText("Add comment"));
     expect(screen.getByText("hello").textContent).toBe("hello");
   });
 
   it("handles rapid sequential additions", () => {
     render(<CommentTrack />);
-    const input = screen.getByPlaceholderText(/enter comment/i) as HTMLInputElement;
-    const button = screen.getByText("Add");
+    const input = screen.getByPlaceholderText(/add a comment/i) as HTMLInputElement;
+    const button = screen.getByText("Add comment");
     act(() => {
       fireEvent.change(input, { target: { value: "one" } });
       button.dispatchEvent(new MouseEvent("click", { bubbles: true }));
@@ -28,8 +28,8 @@ describe("CommentTrack", () => {
 
   it("avoids losing comments on concurrent adds", () => {
     render(<CommentTrack />);
-    const input = screen.getByPlaceholderText(/enter comment/i) as HTMLInputElement;
-    const button = screen.getByText("Add");
+    const input = screen.getByPlaceholderText(/add a comment/i) as HTMLInputElement;
+    const button = screen.getByText("Add comment");
     fireEvent.change(input, { target: { value: "hi" } });
     act(() => {
       button.dispatchEvent(new MouseEvent("click", { bubbles: true }));
@@ -41,9 +41,9 @@ describe("CommentTrack", () => {
 
   it("ignores comments containing only zero-width characters", () => {
     render(<CommentTrack />);
-    const input = screen.getByPlaceholderText(/enter comment/i);
+    const input = screen.getByPlaceholderText(/add a comment/i);
     fireEvent.change(input, { target: { value: "\u200B\u200C" } });
-    fireEvent.click(screen.getByText("Add"));
+    fireEvent.click(screen.getByText("Add comment"));
     expect(screen.queryByRole("listitem")).toBeNull();
   });
 });

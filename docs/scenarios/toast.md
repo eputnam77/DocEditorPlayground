@@ -1,37 +1,21 @@
-# Toast UI Usage Scenarios
+# Toast UI Scenario Guide
 
-Toast UI Editor was removed from active development but the playground keeps a placeholder page for reference.
+Use `/toast` to test plugin-driven markdown/WYSIWYG behavior.
 
-## Track changes
+## Core flow
 
-1. Visit `/toast`.
-2. Integrate the Toast UI Editor package to enable editing.
-3. The **Track Changes** component will then summarize modifications below.
+1. Open `/toast`.
+2. Type in the full-page editor area.
+3. Open **Plugins** and toggle features such as `CodeSyntax` or `TableMerge`.
+4. Run **Run validation** to inspect rule results.
 
-## Add comments
+## Template flow
 
-Use the **Add Comment** field to keep notes with the document.
+1. Use **Load template**.
+2. Select any template, for example **Software Release Notes**.
+3. Confirm content loads in the editor.
+4. Select **Clear template** to reset.
 
-## Lock down headings
+## Comparison flow
 
-Implement a custom plugin that restricts allowed heading levels if you integrate the full editor.
-
-## Yjs collaboration
-
-Pair Toast UI with Yjs by broadcasting editor events through a provider service. Collaboration is not included out of the box.
-
-## Section nodes
-
-Wrap content in movable blocks labeled with Heading&nbsp;2 if you need reordering.
-
-## Custom watermark
-
-Insert an overlay element containing the watermark text.
-
-## Indentation
-
-Utilize built-in list or block quote indentation options once the real editor is installed.
-
-## Structure enforcement
-
-Validate your markdown output to ensure headings appear in the desired order.
+Switch to another editor from the top navigation and repeat the same test steps.

@@ -1,36 +1,21 @@
-# Slate Usage Scenarios
+# Slate Scenario Guide
 
-Slate's composable plugins let you build rich behavior. Integrate the actual editor package to enable editing functionality.
+Use `/slate` to test Slate commands in a full-page editor shell.
 
-## Track changes
+## Core flow
 
-1. Head to `/slate`.
-2. The page displays placeholder controls only; integrate Slate to enable editing.
+1. Open `/slate`.
+2. Enter text in the editor canvas.
+3. Apply toolbar actions like **Bold**, **Italic**, or list buttons.
+4. Open **Plugins** and toggle `History` or `Lists`.
+5. Run **Run validation** and inspect status output.
 
-## Add comments
+## Template flow
 
-Use the **Add Comment** widget to leave feedback for later review.
+1. Use **Load template**.
+2. Select a sample document.
+3. Confirm editor content changes.
 
-## Lock down headings
+## Notes
 
-Wrap the editor with a custom plugin that blocks disallowed heading levels.
-
-## Yjs collaboration
-
-Use `slate-yjs` with a provider such as WebSocket to sync operations between editors.
-
-## Section nodes
-
-Create a container element that groups a Heading&nbsp;2 with its following blocks so it can be reordered.
-
-## Custom watermark
-
-Overlay an absolutely positioned element for the watermark and exclude it when saving.
-
-## Indentation
-
-Implement commands that manipulate list or paragraph indent properties.
-
-## Structure enforcement
-
-Validate node structure on each change to keep the document outline correct.
+The page includes the same comments and status panels used by other editors so behavior can be compared consistently.

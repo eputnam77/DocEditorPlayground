@@ -31,12 +31,12 @@ describe("NavBar", () => {
   it("renders and highlights the active editor link", () => {
     render(<NavBar />);
     const active = screen.getByRole("link", { name: "TipTap" });
-    expect(active.className).toMatch(/bg-gradient/);
+    expect(active.className).toMatch(/bg-sky-500/);
   });
 
   it("prefetches routes when hovering inactive links", () => {
     render(<NavBar />);
-    const toastLink = screen.getByText("Toast Editor");
+    const toastLink = screen.getByText("Toast UI Editor");
     fireEvent.mouseEnter(toastLink);
     expect(prefetchMock).toHaveBeenCalledWith("/toast");
   });

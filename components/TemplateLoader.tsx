@@ -115,7 +115,7 @@ export default function TemplateLoader({
 
   return (
     <select
-      className="px-3 py-1 border rounded bg-gray-50 hover:bg-gray-200"
+      className="rounded-md border border-slate-300 bg-white px-3 py-2 text-sm text-slate-900 hover:bg-slate-100 dark:border-slate-600 dark:bg-slate-900 dark:text-slate-100 dark:hover:bg-slate-800"
       title="Load Template"
       aria-label="Templates"
       disabled={disabled}
@@ -123,14 +123,14 @@ export default function TemplateLoader({
       defaultValue=""
     >
       <option value="" disabled>
-        Templates
+        Load template
       </option>
       {validTemplates.map((tpl) => (
         <option key={tpl.filename} value={tpl.filename}>
           {tpl.label}
         </option>
       ))}
-      <option value="__clear__">Clear</option>
+      <option value="__clear__">Clear template</option>
     </select>
   );
 }

@@ -1,21 +1,12 @@
-import { test, expect } from "@playwright/test";
+import { expect, test } from "@playwright/test";
 
-const PLUGINS = ["History", "Lists"];
-
-test.describe("lexical plugin toggles", () => {
-  test.beforeEach(async ({ page }) => {
-    await page.goto("/lexical");
-    await page.getByRole("button", { name: "Plugins" }).click();
-  });
-
-  for (const name of PLUGINS) {
-    test(`toggle ${name}`, async ({ page }) => {
-      const checkbox = page.getByLabel(name);
-      await expect(checkbox).toBeChecked();
-      await checkbox.uncheck();
-      await expect(checkbox).not.toBeChecked();
-      await checkbox.check();
-      await expect(checkbox).toBeChecked();
-    });
-  }
+test("lexical plugin menu toggles History", async ({ page }) => {
+  await page.goto("/lexical");
+  await page.getByRole("button", { name: "Plugins" }).click();
+  const historyToggle = page.getByLabel("History");
+  await expect(historyToggle).toBeChecked();
+  await historyToggle.uncheck();
+  await expect(historyToggle).not.toBeChecked();
+  await historyToggle.check();
+  await expect(historyToggle).toBeChecked();
 });

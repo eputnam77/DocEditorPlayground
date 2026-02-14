@@ -1,37 +1,20 @@
-# Editor.js Usage Scenarios
+# Editor.js Scenario Guide
 
-Editor.js pages share common helpers such as commenting and change tracking. Advanced features require custom tools.
+Use `/codex` to validate block-editor behavior in a shared workspace.
 
-## Track changes
+## Core flow
 
-1. Visit `/codex`.
-2. Integrate the Editor.js package to enable editing functionality.
-3. The **Track Changes** component will then show a running character diff.
+1. Open `/codex`.
+2. Type content in the editor canvas.
+3. Open **Plugins** and toggle `Header` or `List`.
+4. Run **Run validation** to confirm results appear in the status panel.
 
-## Add comments
+## Template and review flow
 
-Use the **Add Comment** box to store notes alongside the document.
+1. Load a template from **Load template**.
+2. Add comments in the right-side comments panel.
+3. Review the track-changes summary in the status area.
 
-## Lock down headings
+## Comparison flow
 
-Implement a custom tool that limits heading levels. See the TipTap scenario for a reference approach.
-
-## Yjs collaboration
-
-Integrate the Yjs client and broadcast updates through your preferred backend. This demo does not ship collaboration by default.
-
-## Section nodes
-
-Create a tool that wraps blocks inside a draggable container with a Heading&nbsp;2 label.
-
-## Custom watermark
-
-Inject a DOM element positioned over the editor surface to render a watermark.
-
-## Indentation
-
-Use block-level tools that manage nested lists or paragraphs.
-
-## Structure enforcement
-
-Validate the output JSON before saving to ensure required headings appear in order.
+Jump to `/slate` or `/lexical` from the top navigation to compare tool behavior against block editing.

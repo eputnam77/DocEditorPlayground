@@ -1,37 +1,20 @@
-# Lexical Usage Scenarios
+# Lexical Scenario Guide
 
-Lexical is extremely modular. The playground omits the editor bundle but you can integrate it to match our TipTap demo.
+Use `/lexical` to evaluate Lexical command behavior with the shared workspace controls.
 
-## Track changes
+## Core flow
 
 1. Open `/lexical`.
-2. Integrate the Lexical editor package to enable editing.
-3. The **Track Changes** readout will then update immediately.
+2. Type content in the editor canvas.
+3. Use toolbar actions:
+   - Bold
+   - Italic
+   - Bullet list
+   - Numbered list
+   - Undo / Redo
+4. Open **Plugins** and toggle `History` or `Lists`.
+5. Run **Run validation** and review the status output.
 
-## Add comments
+## Comparison flow
 
-Enter notes in the **Add Comment** field to simulate inline feedback.
-
-## Lock down headings
-
-Create a custom node that limits heading changes and registers with the `LexicalComposer` config.
-
-## Yjs collaboration
-
-Combine the Lexical Yjs package with your own provider to broadcast updates between sessions.
-
-## Section nodes
-
-Model sections as draggable nodes wrapping a Heading&nbsp;2 plus its children.
-
-## Custom watermark
-
-Render an absolutely positioned component over the editor surface with your watermark text.
-
-## Indentation
-
-Use commands like `insertIndent` or implement your own indent node for paragraphs.
-
-## Structure enforcement
-
-Run validation on editor state to prevent consecutive headings before saving.
+Move to `/ckeditor` or `/slate` using the same nav bar and repeat the same flow to compare editing behavior.

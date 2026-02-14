@@ -6,8 +6,8 @@ import ToastPage from "../../pages/toast";
 describe("ToastPage", () => {
   it("renders heading", () => {
     render(<ToastPage />);
-    expect(screen.getByText("Toast UI Editor")).toBeTruthy();
-    expect(screen.getByLabelText("Add Comment")).toBeTruthy();
+    expect(screen.getByRole("heading", { level: 1, name: "Toast UI Editor" })).toBeTruthy();
+    expect(screen.getByText("Comments")).toBeTruthy();
   });
 
   it("accepts input", () => {
