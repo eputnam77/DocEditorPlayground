@@ -1,6 +1,9 @@
 # Lexical Scenario Guide
 
-Use `/lexical` to evaluate Lexical command behavior with the shared workspace controls.
+Lexical is Meta's extensible React editor framework optimized for speed and reliability.
+
+- Route: `/lexical`
+- GitHub: https://github.com/facebook/lexical
 
 ## Core flow
 
@@ -12,8 +15,8 @@ Use `/lexical` to evaluate Lexical command behavior with the shared workspace co
    - Bullet list
    - Numbered list
    - Undo / Redo
-4. Open **Plugins** and toggle `History` or `Lists`.
-5. Run **Run validation** and review the status output.
+4. Confirm active-state button styling updates with selection changes.
+5. Click **Run diagnostics** and review the status output.
 
 ## Comparison flow
 

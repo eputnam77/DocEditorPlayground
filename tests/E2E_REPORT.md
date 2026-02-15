@@ -4,23 +4,20 @@
 
 ## Current result
 
-- Playwright suite: `39` tests passed
+- Playwright smoke suite: `5` tests passed
 - Browser: Chromium (`playwright install chromium`)
 - Configuration: dedicated local server on port `3101`
 
 ## Covered areas
 
-- Home and route availability
-- Cross-page navigation between all editor routes
-- Dark mode behavior on home and editor pages
-- Editor typing and validation workflows for each editor
-- Plugin/feature toggles, including TipTap sidebar controls
-- Cross-editor workflow transition scenarios
-- Shared cross-editor contract checks (navigation, theme persistence, workspace shell, LTR direction)
+- LTR typing behavior for each editor page
+- Bold, heading, bullet list, and numbered list formatting per editor
+- Editor-specific output checks for list/heading markup structure
+- Smoke-level confidence for the current production-aligned integrations
 
 ## Run command
 
 ```bash
 npx playwright install chromium
-npm run test:e2e
+npm run test:e2e:smoke
 ```

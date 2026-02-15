@@ -1,122 +1,353 @@
 import React, { useEffect, useRef, useState } from "react";
-import EditorJS from "@editorjs/editorjs";
-import Header from "@editorjs/header";
-import List from "@editorjs/list";
+import dynamic from "next/dynamic";
+import {
+  Bold,
+  Heading2,
+  List as ListIcon,
+  ListOrdered,
+  Pilcrow,
+} from "lucide-react";
 import EditorIntegrationInfo from "../components/EditorIntegrationInfo";
-import PluginManager from "../components/PluginManager";
 import TemplateLoader from "../components/TemplateLoader";
 import sanitizeHtml from "../utils/sanitize";
 import ValidationStatus, {
-  ValidationResult,
+  type ValidationResult,
 } from "../components/ValidationStatus";
 import CommentTrack from "../components/CommentTrack";
 import TrackChanges from "../components/TrackChanges";
-import { validateDocument } from "../utils/validation";
 import { TEMPLATES } from "../utils/templates";
 import EditorWorkspace from "../components/EditorWorkspace";
+import FormatToggleButton from "../components/FormatToggleButton";
+import { EDITOR_BY_ID } from "../components/editorCatalog";
+import { runEditorDiagnostics } from "../utils/editorDiagnostics";
 
-const PLUGINS = [
-  { name: "header", label: "Header" },
-  { name: "list", label: "List" },
-];
+type OutputData = {
+  blocks: Array<{ id?: string; type: string; data?: Record<string, unknown> }>;
+};
 
-export default function CodexPage() {
-  const [enabled, setEnabled] = useState<string[]>(PLUGINS.map((p) => p.name));
+function flattenListItems(items: unknown): string {
+  if (!Array.isArray(items)) {
+    return "";
+  }
+  return items
+    .map((item) => {
+      if (typeof item === "string") {
+        return item;
+      }
+      if (item && typeof item === "object") {
+        const rec = item as Record<string, unknown>;
+        const content = typeof rec.content === "string" ? rec.content : "";
+        return `${content} ${flattenListItems(rec.items)}`.trim();
+      }
+      return "";
+    })
+    .filter(Boolean)
+    .join(" ");
+}
+
+function outputToText(data: OutputData): string {
+  return data.blocks
+    .map((block) => {
+      if (block.type === "header" || block.type === "paragraph") {
+        return String(block.data?.text || "");
+      }
+      if (block.type === "list") {
+        return flattenListItems(block.data?.items);
+      }
+      return "";
+    })
+    .join(" ")
+    .replace(/\s+/g, " ")
+    .trim();
+}
+
+function CodexPage() {
+  const holderRef = useRef<HTMLDivElement>(null);
+  const editorRef = useRef<any>(null);
+  const savedDataRef = useRef<OutputData>({ blocks: [] });
+  const [savedData, setSavedData] = useState<OutputData>({ blocks: [] });
   const [content, setContent] = useState("");
   const [validationResults, setValidationResults] = useState<ValidationResult[]>([]);
-  const holderRef = useRef<HTMLDivElement>(null);
-  const editorRef = useRef<EditorJS | null>(null);
+  const [active, setActive] = useState({
+    bold: false,
+    paragraph: true,
+    heading: false,
+    bulletList: false,
+    numberedList: false,
+  });
+
+  function getEditable(): HTMLElement | null {
+    return (
+      holderRef.current?.querySelector(".ce-block--focused [contenteditable='true']") ||
+      holderRef.current?.querySelector("[contenteditable='true']") ||
+      null
+    ) as HTMLElement | null;
+  }
+
+  function tagEditableNodes() {
+    holderRef.current
+      ?.querySelectorAll("[contenteditable='true']")
+      .forEach((node) => {
+        const editable = node as HTMLElement;
+        if (!editable.hasAttribute("data-testid")) {
+          editable.setAttribute("data-testid", "codex-input");
+        }
+        if (editable.getAttribute("dir") !== "ltr") {
+          editable.setAttribute("dir", "ltr");
+        }
+        if (editable.style.direction !== "ltr") {
+          editable.style.direction = "ltr";
+        }
+        if (editable.style.unicodeBidi !== "plaintext") {
+          editable.style.unicodeBidi = "plaintext";
+        }
+        if (editable.style.textAlign !== "left") {
+          editable.style.textAlign = "left";
+        }
+      });
+  }
+
+  async function syncEditorState(editor: any) {
+    const data = (await editor.save()) as OutputData;
+    savedDataRef.current = data;
+    setSavedData(data);
+    setContent(outputToText(data));
+    tagEditableNodes();
+  }
+
+  function refreshActiveState() {
+    try {
+      const editor = editorRef.current;
+      if (!editor || !editor.blocks) {
+        return;
+      }
+      let bold = false;
+      const editable = getEditable();
+      const selection = typeof window !== "undefined" ? window.getSelection() : null;
+      if (
+        editable &&
+        selection?.anchorNode &&
+        editable.contains(selection.anchorNode) &&
+        typeof document.queryCommandState === "function"
+      ) {
+        bold = document.queryCommandState("bold");
+      }
+
+      const index =
+        typeof editor.blocks?.getCurrentBlockIndex === "function"
+          ? editor.blocks.getCurrentBlockIndex()
+          : 0;
+      const current = savedDataRef.current.blocks[index];
+      const listStyle = String(current?.data?.style || "");
+      setActive({
+        bold,
+        paragraph: current?.type === "paragraph",
+        heading: current?.type === "header",
+        bulletList: current?.type === "list" && listStyle === "unordered",
+        numberedList: current?.type === "list" && listStyle === "ordered",
+      });
+    } catch {
+      // Avoid blocking editor startup if the API surface is not ready yet.
+    }
+  }
 
   useEffect(() => {
-    const tools: Record<string, any> = {};
-    if (enabled.includes("header")) tools.header = Header;
-    if (enabled.includes("list")) tools.list = List;
+    if (!holderRef.current || editorRef.current) {
+      return;
+    }
 
-    const editor = new EditorJS({
-      holder: holderRef.current!,
-      tools,
-      async onChange() {
-        const data = await editor.save();
-        const text = data.blocks
-          .map((b: any) => {
-            if (b?.data?.text) {
-              return b.data.text;
-            }
-            if (Array.isArray(b?.data?.items)) {
-              return b.data.items.join(" ");
-            }
-            return "";
-          })
-          .join("\n");
-        setContent(text);
-      },
+    let mutationObserver: MutationObserver | null = null;
+    let isMounted = true;
+
+    void Promise.all([
+      import("@editorjs/editorjs"),
+      import("@editorjs/header"),
+      import("@editorjs/list"),
+      import("@editorjs/paragraph"),
+    ]).then(async ([editorModule, headerModule, listModule, paragraphModule]) => {
+      if (!isMounted || !holderRef.current) {
+        return;
+      }
+
+      const EditorJS = editorModule.default;
+      const Header = headerModule.default;
+      const List = listModule.default;
+      const Paragraph = paragraphModule.default;
+
+      const editor = new EditorJS({
+        holder: holderRef.current,
+        autofocus: true,
+        placeholder: "Start writing...",
+        data: {
+          blocks: [{ type: "paragraph", data: { text: "" } }],
+        },
+        tools: {
+          paragraph: {
+            class: Paragraph as any,
+            inlineToolbar: true,
+          },
+          header: {
+            class: Header as any,
+            inlineToolbar: true,
+            config: {
+              levels: [1, 2, 3, 4],
+              defaultLevel: 2,
+            },
+          },
+          list: {
+            class: List as any,
+            inlineToolbar: true,
+            config: {
+              defaultStyle: "unordered",
+            },
+          },
+        },
+        async onReady() {
+          tagEditableNodes();
+          await syncEditorState(editor);
+        },
+        async onChange() {
+          await syncEditorState(editor);
+          refreshActiveState();
+        },
+      });
+
+      editorRef.current = editor;
+      (window as unknown as Record<string, unknown>).editor = editor;
+
+      mutationObserver = new MutationObserver(() => {
+        tagEditableNodes();
+      });
+      mutationObserver.observe(holderRef.current, {
+        subtree: true,
+        childList: true,
+      });
     });
-    editorRef.current = editor;
-    (window as any).editor = editor;
+
     return () => {
-      editor.destroy();
+      isMounted = false;
+      mutationObserver?.disconnect();
+      const editor = editorRef.current;
+      if (editor) {
+        editor.destroy();
+      }
       editorRef.current = null;
     };
-  }, [enabled]);
+  }, []);
 
   async function loadTemplate(filename: string) {
     try {
       const res = await fetch(`/templates/${filename}`);
-      if (!res.ok) throw new Error("fetch failed");
-      const html = await res.text();
-      const sanitized = sanitizeHtml(html);
-      await editorRef.current?.blocks.renderFromHTML(sanitized);
+      if (!res.ok) {
+        throw new Error("fetch failed");
+      }
+      const html = sanitizeHtml(await res.text());
+      await editorRef.current?.blocks?.renderFromHTML?.(html);
+      if (editorRef.current) {
+        await syncEditorState(editorRef.current);
+        refreshActiveState();
+      }
     } catch {
       alert(`Failed to load template: ${filename}`);
     }
   }
 
-  function runValidation() {
+  async function convertCurrentBlock(
+    type: "paragraph" | "header" | "list",
+    data: Record<string, unknown>,
+  ) {
+    const editor = editorRef.current;
+    if (!editor) {
+      return;
+    }
     try {
-      const passed = validateDocument({ content });
-      setValidationResults([
-        {
-          id: 1,
-          label: "Document",
-          passed,
-          detail: "Checks that the editor content contains non-whitespace text.",
-        },
-      ]);
+      const currentIndex =
+        typeof editor.blocks?.getCurrentBlockIndex === "function"
+          ? editor.blocks.getCurrentBlockIndex()
+          : 0;
+      const block =
+        typeof editor.blocks?.getBlockByIndex === "function"
+          ? editor.blocks.getBlockByIndex(currentIndex)
+          : null;
+      if (!block) {
+        editor.blocks.insert(type, data);
+      } else {
+        if (typeof editor.blocks?.convert === "function") {
+          await editor.blocks.convert(block.id, type, data);
+        } else {
+          editor.blocks.insert(type, data);
+        }
+      }
+      await syncEditorState(editor);
+      refreshActiveState();
     } catch {
-      alert("Validation failed.");
+      alert("Unable to update the selected block.");
     }
   }
 
-  async function insertBlock(type: "paragraph" | "header" | "list", data: Record<string, any>) {
-    try {
-      await editorRef.current?.blocks.insert(type, data);
-    } catch {
-      alert("Could not insert block.");
+  function applyBold() {
+    const editable = getEditable();
+    if (!editable) {
+      return;
     }
+    editable.focus();
+    if (typeof document.execCommand === "function") {
+      document.execCommand("bold");
+      refreshActiveState();
+    }
+  }
+
+  function runDiagnostics() {
+    const editor = editorRef.current;
+    const editable = getEditable();
+    if (!editor) {
+      return;
+    }
+    setValidationResults(
+      runEditorDiagnostics({
+        editorName: "Editor.js",
+        capabilities: {
+          heading: true,
+          bulletList: true,
+          numberedList: true,
+        },
+        getContent: () => ({
+          text: content,
+          html: holderRef.current?.innerHTML || "",
+          json: savedData,
+        }),
+        getDirection: () =>
+          editable ? window.getComputedStyle(editable).direction : null,
+        getSelectionFormatState: () => ({
+          bold: active.bold,
+          heading: active.heading,
+          bulletList: active.bulletList,
+          numberedList: active.numberedList,
+        }),
+      }),
+    );
   }
 
   return (
     <EditorWorkspace
       title="Editor.js"
-      description="Test block-based authoring, plugin toggles, and content updates in one full-page canvas."
+      description="Official block editor setup with Header/List/Paragraph tools, inline text formatting, and block conversion controls."
+      toolDescription={EDITOR_BY_ID.codex.toolDescription}
+      toolRepoUrl={EDITOR_BY_ID.codex.githubRepoUrl}
       controls={
         <>
           <TemplateLoader
             templates={TEMPLATES}
             onLoad={loadTemplate}
-            onClear={() => editorRef.current?.blocks.renderFromHTML("")}
-            onError={(e) => alert(String(e))}
-          />
-          <PluginManager
-            plugins={PLUGINS}
-            enabled={enabled}
-            onChange={setEnabled}
+            onClear={() => editorRef.current?.blocks?.clear?.()}
+            onError={(error) => alert(String(error))}
           />
           <button
+            type="button"
             className="rounded-md bg-sky-600 px-3 py-2 text-sm font-semibold text-white hover:bg-sky-700"
-            onClick={runValidation}
+            onClick={runDiagnostics}
           >
-            Run validation
+            Run diagnostics
           </button>
         </>
       }
@@ -140,54 +371,59 @@ export default function CodexPage() {
     >
       <div className="h-full p-3">
         <p className="mb-2 text-xs text-slate-600 dark:text-slate-300">
-          Press Enter in the editor to create a new paragraph block.
+          Editor.js is block-based: use these controls to convert the current block type and use inline selection tools for bold/italic.
         </p>
         <div className="mb-3 flex flex-wrap gap-2">
-          <button
-            className="rounded-md border border-slate-300 bg-white px-3 py-2 text-sm font-semibold hover:bg-slate-100 dark:border-slate-600 dark:bg-slate-900 dark:hover:bg-slate-800"
-            onMouseDown={(e) => {
-              e.preventDefault();
-              void insertBlock("paragraph", { text: "" });
+          <FormatToggleButton
+            label="Bold"
+            active={active.bold}
+            onMouseDown={(event) => {
+              event.preventDefault();
+              applyBold();
             }}
           >
-            Paragraph
-          </button>
-          <button
-            className="rounded-md border border-slate-300 bg-white px-3 py-2 text-sm font-semibold hover:bg-slate-100 disabled:opacity-50 dark:border-slate-600 dark:bg-slate-900 dark:hover:bg-slate-800"
-            disabled={!enabled.includes("header")}
-            onMouseDown={(e) => {
-              e.preventDefault();
-              void insertBlock("header", { text: "Heading", level: 2 });
+            <Bold size={16} />
+          </FormatToggleButton>
+          <FormatToggleButton
+            label="Paragraph"
+            active={active.paragraph}
+            onMouseDown={(event) => {
+              event.preventDefault();
+              void convertCurrentBlock("paragraph", {});
             }}
           >
-            Heading
-          </button>
-          <button
-            className="rounded-md border border-slate-300 bg-white px-3 py-2 text-sm font-semibold hover:bg-slate-100 disabled:opacity-50 dark:border-slate-600 dark:bg-slate-900 dark:hover:bg-slate-800"
-            disabled={!enabled.includes("list")}
-            onMouseDown={(e) => {
-              e.preventDefault();
-              void insertBlock("list", {
-                style: "unordered",
-                items: [content.trim() || "List item"],
-              });
+            <Pilcrow size={16} />
+          </FormatToggleButton>
+          <FormatToggleButton
+            label="Heading"
+            active={active.heading}
+            onMouseDown={(event) => {
+              event.preventDefault();
+              void convertCurrentBlock("header", { level: 2 });
             }}
           >
-            Bullet list
-          </button>
-          <button
-            className="rounded-md border border-slate-300 bg-white px-3 py-2 text-sm font-semibold hover:bg-slate-100 disabled:opacity-50 dark:border-slate-600 dark:bg-slate-900 dark:hover:bg-slate-800"
-            disabled={!enabled.includes("list")}
-            onMouseDown={(e) => {
-              e.preventDefault();
-              void insertBlock("list", {
-                style: "ordered",
-                items: [content.trim() || "List item"],
-              });
+            <Heading2 size={16} />
+          </FormatToggleButton>
+          <FormatToggleButton
+            label="Bullet list"
+            active={active.bulletList}
+            onMouseDown={(event) => {
+              event.preventDefault();
+              void convertCurrentBlock("list", { style: "unordered", items: [""] });
             }}
           >
-            Numbered list
-          </button>
+            <ListIcon size={16} />
+          </FormatToggleButton>
+          <FormatToggleButton
+            label="Numbered list"
+            active={active.numberedList}
+            onMouseDown={(event) => {
+              event.preventDefault();
+              void convertCurrentBlock("list", { style: "ordered", items: [""] });
+            }}
+          >
+            <ListOrdered size={16} />
+          </FormatToggleButton>
         </div>
         <div
           id="codex-editor"
@@ -200,3 +436,8 @@ export default function CodexPage() {
     </EditorWorkspace>
   );
 }
+
+export default
+  typeof process !== "undefined" && process.env.NODE_ENV === "test"
+    ? CodexPage
+    : dynamic(() => Promise.resolve(CodexPage), { ssr: false });

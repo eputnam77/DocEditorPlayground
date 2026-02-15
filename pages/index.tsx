@@ -24,17 +24,33 @@ export default function HomePage() {
 
         <section className="grid gap-4 md:grid-cols-2 xl:grid-cols-3">
           {EDITOR_CATALOG.map((editor) => (
-            <Link
+            <article
               key={editor.id}
-              href={editor.path}
               className="workspace-panel flex min-h-44 flex-col justify-between transition hover:-translate-y-0.5 hover:border-sky-300"
             >
               <div>
-                <h2 className="text-xl font-semibold text-slate-900 dark:text-slate-100">{editor.name}</h2>
+                <h2 className="text-xl font-semibold text-slate-900 dark:text-slate-100">
+                  <Link href={editor.path} className="hover:underline">
+                    {editor.name}
+                  </Link>
+                </h2>
                 <p className="mt-2 text-sm text-slate-700 dark:text-slate-200">{editor.summary}</p>
+                <p className="mt-2 text-sm text-slate-700 dark:text-slate-200">{editor.toolDescription}</p>
               </div>
-              <p className="mt-4 text-sm font-semibold text-sky-700 dark:text-sky-300">Open editor</p>
-            </Link>
+              <div className="mt-4 flex flex-wrap items-center gap-4 text-sm">
+                <Link href={editor.path} className="font-semibold text-sky-700 dark:text-sky-300">
+                  Open editor
+                </Link>
+                <a
+                  href={editor.githubRepoUrl}
+                  target="_blank"
+                  rel="noreferrer"
+                  className="font-semibold text-sky-700 underline dark:text-sky-300"
+                >
+                  GitHub repo
+                </a>
+              </div>
+            </article>
           ))}
         </section>
       </div>

@@ -5,6 +5,8 @@ import NavBar from "./NavBar";
 interface EditorWorkspaceProps {
   title: string;
   description: string;
+  toolDescription?: string;
+  toolRepoUrl?: string;
   controls?: React.ReactNode;
   children: React.ReactNode;
   statusPanel?: React.ReactNode;
@@ -14,6 +16,8 @@ interface EditorWorkspaceProps {
 export default function EditorWorkspace({
   title,
   description,
+  toolDescription,
+  toolRepoUrl,
   controls,
   children,
   statusPanel,
@@ -44,6 +48,25 @@ export default function EditorWorkspace({
           <div className="workspace-panel-header">
             <h1 className="workspace-title">{title}</h1>
             <p className="workspace-description">{description}</p>
+            {(toolDescription || toolRepoUrl) && (
+              <p className="mt-2 text-sm text-slate-700 dark:text-slate-200">
+                {toolDescription}
+                {toolDescription && toolRepoUrl ? " " : ""}
+                {toolRepoUrl && (
+                  <>
+                    Repository:{" "}
+                    <a
+                      href={toolRepoUrl}
+                      target="_blank"
+                      rel="noreferrer"
+                      className="font-semibold text-sky-700 underline dark:text-sky-300"
+                    >
+                      {toolRepoUrl}
+                    </a>
+                  </>
+                )}
+              </p>
+            )}
           </div>
           {controls && (
             <div className="workspace-controls" data-testid="workspace-controls">

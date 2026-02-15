@@ -7,6 +7,7 @@ import "../styles/lexical.css";
 import "../styles/slate.css";
 import "../styles/tiptap.css";
 import "../styles/toast.css";
+import "@toast-ui/editor/dist/toastui-editor.css";
 
 /**
  * Root application component that imports global styles.

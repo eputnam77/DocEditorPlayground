@@ -1,13 +1,16 @@
 # Toast UI Scenario Guide
 
-Use `/toast` to test plugin-driven markdown/WYSIWYG behavior.
+Toast UI Editor is an open-source Markdown and WYSIWYG authoring tool.
+
+- Route: `/toast`
+- GitHub: https://github.com/nhn/tui.editor
 
 ## Core flow
 
 1. Open `/toast`.
-2. Type in the full-page editor area.
-3. Open **Plugins** and toggle features such as `CodeSyntax` or `TableMerge`.
-4. Run **Run validation** to inspect rule results.
+2. Type in the editor canvas and confirm left-to-right insertion.
+3. Use the built-in toolbar for bold, headings, bullet list, and numbered list.
+4. Click **Run diagnostics** and review pass/fail output in the status panel.
 
 ## Template flow
 

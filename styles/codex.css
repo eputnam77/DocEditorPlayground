@@ -1,8 +1,24 @@
-/* Placeholder overrides for CodeX Editor */
+/* Editor.js overrides */
 
 #codex-editor,
 #codex-editor .ce-block__content,
-#codex-editor .ce-paragraph {
+#codex-editor .ce-paragraph,
+#codex-editor [contenteditable="true"] {
   direction: ltr;
+  unicode-bidi: plaintext;
   text-align: left;
+}
+
+#codex-editor ul,
+#codex-editor ol {
+  margin: 0.25rem 0;
+  padding-left: 1.5rem;
+}
+
+#codex-editor ul {
+  list-style-type: disc;
+}
+
+#codex-editor ol {
+  list-style-type: decimal;
 }

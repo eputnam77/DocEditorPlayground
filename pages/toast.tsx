@@ -1,104 +1,165 @@
-import React, { useEffect, useMemo, useRef, useState } from "react";
+import React, { useEffect, useRef, useState } from "react";
 import dynamic from "next/dynamic";
-import { Editor } from "@toast-ui/react-editor";
-import codeSyntaxHighlight from "@toast-ui/editor-plugin-code-syntax-highlight";
-import tableMergedCell from "@toast-ui/editor-plugin-table-merged-cell";
-import colorSyntax from "@toast-ui/editor-plugin-color-syntax";
-import chart from "@toast-ui/editor-plugin-chart";
 import EditorIntegrationInfo from "../components/EditorIntegrationInfo";
-import PluginManager from "../components/PluginManager";
 import TemplateLoader from "../components/TemplateLoader";
 import sanitizeHtml from "../utils/sanitize";
 import ValidationStatus, {
-  ValidationResult,
+  type ValidationResult,
 } from "../components/ValidationStatus";
 import CommentTrack from "../components/CommentTrack";
 import TrackChanges from "../components/TrackChanges";
-import { validateDocument } from "../utils/validation";
 import { TEMPLATES } from "../utils/templates";
 import EditorWorkspace from "../components/EditorWorkspace";
+import { EDITOR_BY_ID } from "../components/editorCatalog";
+import { runEditorDiagnostics } from "../utils/editorDiagnostics";
 
-const PLUGINS = [
-  { name: "CodeSyntax", label: "CodeSyntax", plugin: codeSyntaxHighlight },
-  { name: "TableMerge", label: "TableMerge", plugin: tableMergedCell },
-  { name: "ColorSyntax", label: "ColorSyntax", plugin: colorSyntax },
-  { name: "Chart", label: "Chart", plugin: chart },
-];
+function htmlToText(html: string): string {
+  if (typeof window === "undefined") {
+    return html.replace(/<[^>]+>/g, " ").replace(/\s+/g, " ").trim();
+  }
+  const doc = new DOMParser().parseFromString(html, "text/html");
+  return (doc.body.textContent || "").replace(/\s+/g, " ").trim();
+}
 
 function ToastPage() {
-  const editorRef = useRef<Editor>(null);
-  const [enabled, setEnabled] = useState<string[]>(PLUGINS.map((p) => p.name));
+  const hostRef = useRef<HTMLDivElement>(null);
+  const editorRef = useRef<any>(null);
   const [content, setContent] = useState("");
   const [validationResults, setValidationResults] = useState<ValidationResult[]>([]);
 
-  const activePlugins = useMemo(
-    () => PLUGINS.filter((p) => enabled.includes(p.name)).map((p) => p.plugin),
-    [enabled],
-  );
+  function tagEditableSurface() {
+    const editable = hostRef.current?.querySelector(
+      '.toastui-editor-ww-container [contenteditable="true"]',
+    ) as HTMLElement | null;
+    if (!editable) {
+      return;
+    }
+    editable.setAttribute("data-testid", "toast-editor");
+    editable.setAttribute("dir", "ltr");
+    editable.style.direction = "ltr";
+    editable.style.unicodeBidi = "plaintext";
+    editable.style.textAlign = "left";
+  }
+
+  useEffect(() => {
+    if (!hostRef.current || editorRef.current) {
+      return;
+    }
+
+    let mounted = true;
+    void import("@toast-ui/editor").then((module) => {
+      if (!mounted || !hostRef.current) {
+        return;
+      }
+
+      const ToastEditor = module.default;
+      const editor = new ToastEditor({
+        el: hostRef.current,
+        height: "58vh",
+        initialEditType: "wysiwyg",
+        previewStyle: "vertical",
+        initialValue: "",
+        usageStatistics: false,
+        toolbarItems: [
+          ["heading"],
+          ["bold", "italic"],
+          ["ul", "ol"],
+          ["link"],
+        ],
+        events: {
+          change: () => {
+            const html = editor.getHTML();
+            setContent(html);
+            tagEditableSurface();
+          },
+        },
+      });
+
+      editorRef.current = editor;
+      (window as unknown as Record<string, unknown>).toastEditor = editor;
+      tagEditableSurface();
+    });
+
+    return () => {
+      mounted = false;
+      const editor = editorRef.current;
+      if (editor) {
+        editor.destroy();
+      }
+      editorRef.current = null;
+    };
+  }, []);
 
   async function loadTemplate(filename: string) {
     try {
       const res = await fetch(`/templates/${filename}`);
-      if (!res.ok) throw new Error("fetch failed");
+      if (!res.ok) {
+        throw new Error("fetch failed");
+      }
       const html = sanitizeHtml(await res.text());
+      editorRef.current?.setHTML(html);
       setContent(html);
-      editorRef.current?.getInstance().setHTML(html);
+      tagEditableSurface();
     } catch {
       alert(`Failed to load template: ${filename}`);
     }
   }
 
-  function runValidation() {
-    try {
-      const passed = validateDocument({ content });
-      setValidationResults([
-        {
-          id: 1,
-          label: "Document",
-          passed,
-          detail: "Checks that the editor content contains non-whitespace text.",
+  function runDiagnostics() {
+    if (!editorRef.current) {
+      return;
+    }
+    const html = editorRef.current.getHTML();
+    const markdown = editorRef.current.getMarkdown();
+    const editable = hostRef.current?.querySelector(
+      '.toastui-editor-ww-container [contenteditable="true"]',
+    ) as HTMLElement | null;
+    setValidationResults(
+      runEditorDiagnostics({
+        editorName: "Toast UI Editor",
+        capabilities: {
+          heading: true,
+          bulletList: true,
+          numberedList: true,
         },
-      ]);
-    } catch {
-      alert("Validation failed.");
-    }
+        getContent: () => ({
+          text: htmlToText(html),
+          html,
+          json: { markdown },
+        }),
+        getDirection: () =>
+          editable ? window.getComputedStyle(editable).direction : null,
+        getSelectionFormatState: () => ({
+          bold: !!hostRef.current?.querySelector(".toastui-editor-toolbar-icons.bold.active"),
+          italic: !!hostRef.current?.querySelector(".toastui-editor-toolbar-icons.italic.active"),
+        }),
+      }),
+    );
   }
-
-  function runCommand(command: string, data?: unknown) {
-    editorRef.current?.getInstance().exec(command, data);
-  }
-
-  useEffect(() => {
-    if (typeof window !== "undefined" && editorRef.current) {
-      (window as any).toastEditor = editorRef.current.getInstance();
-    }
-  }, []);
 
   return (
     <EditorWorkspace
       title="Toast UI Editor"
-      description="Review plugin toggles and markdown-style formatting in a full-page Toast UI workspace."
+      description="Official Toast UI WYSIWYG integration with built-in icon toolbar and active-state formatting controls."
+      toolDescription={EDITOR_BY_ID.toast.toolDescription}
+      toolRepoUrl={EDITOR_BY_ID.toast.githubRepoUrl}
       controls={
         <>
           <TemplateLoader
             templates={TEMPLATES}
             onLoad={loadTemplate}
             onClear={() => {
+              editorRef.current?.setHTML("");
               setContent("");
-              editorRef.current?.getInstance().setHTML("");
             }}
-            onError={(e) => alert(String(e))}
-          />
-          <PluginManager
-            plugins={PLUGINS}
-            enabled={enabled}
-            onChange={setEnabled}
+            onError={(error) => alert(String(error))}
           />
           <button
+            type="button"
             className="rounded-md bg-sky-600 px-3 py-2 text-sm font-semibold text-white hover:bg-sky-700"
-            onClick={runValidation}
+            onClick={runDiagnostics}
           >
-            Run validation
+            Run diagnostics
           </button>
         </>
       }
@@ -122,86 +183,13 @@ function ToastPage() {
     >
       <div className="h-full p-3">
         <p className="mb-2 text-xs text-slate-600 dark:text-slate-300">
-          Press Enter in the editor to create a new paragraph.
+          Use the editor&apos;s built-in icon toolbar for heading, bold/italic, and list formatting.
         </p>
-        <div className="mb-3 flex flex-wrap gap-2">
-          <button
-            aria-label="Bold"
-            className="rounded-md border border-slate-300 bg-white px-3 py-2 text-sm font-semibold hover:bg-slate-100 dark:border-slate-600 dark:bg-slate-900 dark:hover:bg-slate-800"
-            onMouseDown={(e) => {
-              e.preventDefault();
-              runCommand("bold");
-            }}
-          >
-            Bold
-          </button>
-          <button
-            aria-label="Italic"
-            className="rounded-md border border-slate-300 bg-white px-3 py-2 text-sm font-semibold hover:bg-slate-100 dark:border-slate-600 dark:bg-slate-900 dark:hover:bg-slate-800"
-            onMouseDown={(e) => {
-              e.preventDefault();
-              runCommand("italic");
-            }}
-          >
-            Italic
-          </button>
-          <button
-            aria-label="Heading"
-            className="rounded-md border border-slate-300 bg-white px-3 py-2 text-sm font-semibold hover:bg-slate-100 dark:border-slate-600 dark:bg-slate-900 dark:hover:bg-slate-800"
-            onMouseDown={(e) => {
-              e.preventDefault();
-              runCommand("heading");
-            }}
-          >
-            Heading
-          </button>
-          <button
-            aria-label="Bullet List"
-            className="rounded-md border border-slate-300 bg-white px-3 py-2 text-sm font-semibold hover:bg-slate-100 dark:border-slate-600 dark:bg-slate-900 dark:hover:bg-slate-800"
-            onMouseDown={(e) => {
-              e.preventDefault();
-              runCommand("insertUnorderedList");
-            }}
-          >
-            Bullet list
-          </button>
-          <button
-            aria-label="Numbered List"
-            className="rounded-md border border-slate-300 bg-white px-3 py-2 text-sm font-semibold hover:bg-slate-100 dark:border-slate-600 dark:bg-slate-900 dark:hover:bg-slate-800"
-            onMouseDown={(e) => {
-              e.preventDefault();
-              runCommand("insertOrderedList");
-            }}
-          >
-            Numbered list
-          </button>
-          <button
-            aria-label="Paragraph"
-            className="rounded-md border border-slate-300 bg-white px-3 py-2 text-sm font-semibold hover:bg-slate-100 dark:border-slate-600 dark:bg-slate-900 dark:hover:bg-slate-800"
-            onMouseDown={(e) => {
-              e.preventDefault();
-              runCommand("insertParagraph");
-            }}
-          >
-            Paragraph
-          </button>
-        </div>
         <div
           dir="ltr"
           className="toast-editor-shell h-[58vh] overflow-auto rounded-md border border-slate-300 bg-white p-2 text-left dark:border-slate-600 dark:bg-slate-900"
         >
-          <Editor
-            ref={editorRef}
-            initialValue={content}
-            plugins={activePlugins}
-            height="100%"
-            previewStyle="vertical"
-            usageStatistics={false}
-            onChange={() => {
-              const html = editorRef.current?.getInstance().getHTML() ?? "";
-              setContent(html);
-            }}
-          />
+          <div ref={hostRef} />
         </div>
       </div>
     </EditorWorkspace>

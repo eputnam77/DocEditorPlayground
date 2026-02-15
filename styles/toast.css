@@ -1,9 +1,34 @@
-/* Placeholder overrides for Toast UI Editor */
+/* Toast UI Editor overrides */
 
 .toast-editor-shell,
 .toast-editor-shell .toastui-editor-contents,
 .toast-editor-shell [contenteditable="true"],
+.toast-editor-shell .ProseMirror,
 .toastui-editor-contents {
   direction: ltr;
+  unicode-bidi: plaintext;
   text-align: left;
+}
+
+.toast-editor-shell .toastui-editor-contents ul,
+.toast-editor-shell .toastui-editor-contents ol,
+.toast-editor-shell .ProseMirror ul,
+.toast-editor-shell .ProseMirror ol {
+  margin: 0.25rem 0;
+  padding-left: 1.5rem;
+}
+
+.toast-editor-shell .toastui-editor-contents ul,
+.toast-editor-shell .ProseMirror ul {
+  list-style-type: disc;
+}
+
+.toast-editor-shell .toastui-editor-contents ol,
+.toast-editor-shell .ProseMirror ol {
+  list-style-type: decimal;
+}
+
+.toast-editor-shell .toastui-editor-toolbar-icons.active {
+  background: #dbeafe;
+  border-color: #60a5fa;
 }

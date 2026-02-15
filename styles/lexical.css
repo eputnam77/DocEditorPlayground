@@ -1,6 +1,21 @@
-/* Placeholder overrides for Lexical */
+/* Lexical overrides */
 
 [data-testid="lexical-editor"] {
   direction: ltr;
+  unicode-bidi: plaintext;
   text-align: left;
+}
+
+[data-testid="lexical-editor"] ul,
+[data-testid="lexical-editor"] ol {
+  margin: 0.25rem 0;
+  padding-left: 1.5rem;
+}
+
+[data-testid="lexical-editor"] ul {
+  list-style-type: disc;
+}
+
+[data-testid="lexical-editor"] ol {
+  list-style-type: decimal;
 }

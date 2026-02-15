@@ -1,6 +1,21 @@
-/* Placeholder overrides for Slate Editor */
+/* Slate overrides */
 
 [data-testid="slate-editor"] {
   direction: ltr;
+  unicode-bidi: plaintext;
   text-align: left;
+}
+
+[data-testid="slate-editor"] ul,
+[data-testid="slate-editor"] ol {
+  margin: 0.25rem 0;
+  padding-left: 1.5rem;
+}
+
+[data-testid="slate-editor"] ul {
+  list-style-type: disc;
+}
+
+[data-testid="slate-editor"] ol {
+  list-style-type: decimal;
 }

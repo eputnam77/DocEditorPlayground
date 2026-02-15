@@ -1,13 +1,17 @@
 # Editor.js Scenario Guide
 
-Use `/codex` to validate block-editor behavior in a shared workspace.
+Editor.js is a block-styled editor that stores content as structured blocks.
+
+- Route: `/codex`
+- GitHub: https://github.com/codex-team/editor.js
 
 ## Core flow
 
 1. Open `/codex`.
-2. Type content in the editor canvas.
-3. Open **Plugins** and toggle `Header` or `List`.
-4. Run **Run validation** to confirm results appear in the status panel.
+2. Type content in the block editor and confirm left-to-right insertion.
+3. Use toolbar controls to convert the current block to paragraph, heading, bullet list, and numbered list.
+4. Apply **Bold** to selection.
+5. Click **Run diagnostics** and review the results.
 
 ## Template and review flow
 

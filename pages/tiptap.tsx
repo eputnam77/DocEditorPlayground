@@ -18,6 +18,7 @@ import sanitizeHtml from "../utils/sanitize";
 import { TEMPLATES } from "../utils/templates";
 import DarkModeToggle from "../components/DarkModeToggle";
 import NavBar from "../components/NavBar";
+import { EDITOR_BY_ID } from "../components/editorCatalog";
 
 // Custom TipTap extensions
 import { tiptapHeadingLock } from "../extensions/tiptapHeadingLock";
@@ -762,6 +763,17 @@ export default function TipTapEditorPage() {
             <p className="workspace-brand">Document Editor Playground</p>
             <p className="workspace-brand-subtitle">
               TipTap advanced authoring workspace
+            </p>
+            <p className="mt-1 text-sm text-slate-700 dark:text-slate-200">
+              {EDITOR_BY_ID.tiptap.toolDescription} Repository:{" "}
+              <a
+                href={EDITOR_BY_ID.tiptap.githubRepoUrl}
+                target="_blank"
+                rel="noreferrer"
+                className="font-semibold text-sky-700 underline dark:text-sky-300"
+              >
+                {EDITOR_BY_ID.tiptap.githubRepoUrl}
+              </a>
             </p>
           </div>
           <DarkModeToggle />

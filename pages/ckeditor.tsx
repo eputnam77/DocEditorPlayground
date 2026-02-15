@@ -1,88 +1,110 @@
-import React, { useMemo, useRef, useState } from "react";
-import { CKEditor } from "@ckeditor/ckeditor5-react";
-import ClassicEditor from "@ckeditor/ckeditor5-build-classic";
+import React, { useRef, useState } from "react";
+import dynamic from "next/dynamic";
 import EditorIntegrationInfo from "../components/EditorIntegrationInfo";
-import PluginManager from "../components/PluginManager";
 import TemplateLoader from "../components/TemplateLoader";
 import sanitizeHtml from "../utils/sanitize";
 import ValidationStatus, {
-  ValidationResult,
+  type ValidationResult,
 } from "../components/ValidationStatus";
 import CommentTrack from "../components/CommentTrack";
 import TrackChanges from "../components/TrackChanges";
-import { validateDocument } from "../utils/validation";
 import { TEMPLATES } from "../utils/templates";
 import EditorWorkspace from "../components/EditorWorkspace";
+import { EDITOR_BY_ID } from "../components/editorCatalog";
+import { runEditorDiagnostics } from "../utils/editorDiagnostics";
 
-const PLUGINS = [
-  { name: "bold", label: "Bold" },
-  { name: "italic", label: "Italic" },
-  { name: "underline", label: "Underline" },
-  { name: "heading", label: "Heading" },
-  { name: "paragraph", label: "Paragraph" },
-  { name: "bulletedList", label: "Bullet list" },
-  { name: "numberedList", label: "Numbered list" },
-];
+function htmlToText(html: string): string {
+  if (typeof window === "undefined") {
+    return html.replace(/<[^>]+>/g, " ").replace(/\s+/g, " ").trim();
+  }
+  const doc = new DOMParser().parseFromString(html, "text/html");
+  return (doc.body.textContent || "").replace(/\s+/g, " ").trim();
+}
 
-export default function CkeditorPage() {
+function CkeditorPage() {
   const editorRef = useRef<any>(null);
-  const [enabled, setEnabled] = useState<string[]>(PLUGINS.map((p) => p.name));
+  const [editorConstructor, setEditorConstructor] = useState<any>(null);
   const [content, setContent] = useState("");
   const [validationResults, setValidationResults] = useState<ValidationResult[]>([]);
 
-  const toolbarItems = useMemo(() => [...enabled, "undo", "redo"], [enabled]);
+  React.useEffect(() => {
+    let mounted = true;
+    void import("@ckeditor/ckeditor5-build-classic").then((module) => {
+      if (mounted) {
+        setEditorConstructor(() => module.default);
+      }
+    });
+    return () => {
+      mounted = false;
+    };
+  }, []);
 
   async function loadTemplate(filename: string) {
     try {
-      const res = await fetch(`/templates/${filename}`);
-      if (!res.ok) throw new Error("fetch failed");
-      const html = await res.text();
-      const sanitized = sanitizeHtml(html);
-      setContent(sanitized);
-      editorRef.current?.setData(sanitized);
+      const response = await fetch(`/templates/${filename}`);
+      if (!response.ok) {
+        throw new Error("fetch failed");
+      }
+      const html = sanitizeHtml(await response.text());
+      editorRef.current?.setData(html);
+      setContent(html);
     } catch {
       alert(`Failed to load template: ${filename}`);
     }
   }
 
-  function runValidation() {
-    try {
-      const passed = validateDocument({ content });
-      setValidationResults([
-        {
-          id: 1,
-          label: "Document",
-          passed,
-          detail: "Checks that the editor content contains non-whitespace text.",
+  function runDiagnostics() {
+    const editor = editorRef.current;
+    const editable = editor?.ui?.getEditableElement?.() ?? null;
+    setValidationResults(
+      runEditorDiagnostics({
+        editorName: "CKEditor 5",
+        capabilities: {
+          heading: true,
+          bulletList: true,
+          numberedList: true,
         },
-      ]);
-    } catch {
-      alert("Validation failed.");
-    }
+        getContent: () => ({
+          text: htmlToText(content),
+          html: content,
+          json: editor?.getData ? { html: editor.getData() } : null,
+        }),
+        getDirection: () =>
+          editable ? window.getComputedStyle(editable).direction : null,
+        getSelectionFormatState: () => ({
+          bold: Boolean(editor?.commands?.get("bold")?.value),
+          italic: Boolean(editor?.commands?.get("italic")?.value),
+          heading: Boolean(editor?.commands?.get("heading")?.value),
+          bulletList: Boolean(editor?.commands?.get("bulletedList")?.value),
+          numberedList: Boolean(editor?.commands?.get("numberedList")?.value),
+        }),
+      }),
+    );
   }
 
   return (
     <EditorWorkspace
       title="CKEditor 5"
-      description="Evaluate classic rich-text commands and plugin toggles in a full-page CKEditor flow."
+      description="Official Classic build configuration with icon toolbar, active command states, and paragraph/list/heading support."
+      toolDescription={EDITOR_BY_ID.ckeditor.toolDescription}
+      toolRepoUrl={EDITOR_BY_ID.ckeditor.githubRepoUrl}
       controls={
         <>
           <TemplateLoader
             templates={TEMPLATES}
             onLoad={loadTemplate}
-            onClear={() => setContent("")}
-            onError={(e) => alert(String(e))}
-          />
-          <PluginManager
-            plugins={PLUGINS}
-            enabled={enabled}
-            onChange={setEnabled}
+            onClear={() => {
+              editorRef.current?.setData("");
+              setContent("");
+            }}
+            onError={(error) => alert(String(error))}
           />
           <button
+            type="button"
             className="rounded-md bg-sky-600 px-3 py-2 text-sm font-semibold text-white hover:bg-sky-700"
-            onClick={runValidation}
+            onClick={runDiagnostics}
           >
-            Run validation
+            Run diagnostics
           </button>
         </>
       }
@@ -106,36 +128,68 @@ export default function CkeditorPage() {
     >
       <div className="h-full p-3">
         <p className="mb-2 text-xs text-slate-600 dark:text-slate-300">
-          Press Enter in the editor to create a new paragraph.
+          Use CKEditor&apos;s built-in toolbar for heading, bold/italic, and list formatting with automatic active indicators.
         </p>
         <div
           dir="ltr"
           className="ckeditor-editor-shell h-[58vh] overflow-auto rounded-md border border-slate-300 bg-white p-2 text-left dark:border-slate-600 dark:bg-slate-900"
         >
-          <CKEditor
-            editor={ClassicEditor}
-            data={content}
-            key={enabled.join(",")}
-            onReady={(editor: any) => {
-              editorRef.current = editor;
-              const editableElement =
-                editor?.ui?.getEditableElement?.() ??
-                editor?.ui?.view?.editable?.element ??
-                null;
-              if (editableElement && editableElement.setAttribute) {
-                editableElement.setAttribute("dir", "ltr");
-                editableElement.setAttribute("data-testid", "ckeditor-editable");
-                editableElement.style.direction = "ltr";
-                editableElement.style.textAlign = "left";
-              }
-            }}
-            onChange={(event, editor: any) => {
-              setContent(editor.getData());
-            }}
-            config={{ toolbar: { items: toolbarItems } }}
-          />
+          {editorConstructor && (
+            <ClientCKEditor
+              editor={editorConstructor}
+              data={content}
+              onReady={(editor: any) => {
+                editorRef.current = editor;
+                (window as unknown as Record<string, unknown>).ckeditorEditor = editor;
+                const editable =
+                  editor?.ui?.getEditableElement?.() ??
+                  editor?.ui?.view?.editable?.element ??
+                  null;
+                if (editable) {
+                  editable.setAttribute("dir", "ltr");
+                  editable.setAttribute("data-testid", "ckeditor-editable");
+                  editable.style.direction = "ltr";
+                  editable.style.unicodeBidi = "plaintext";
+                  editable.style.textAlign = "left";
+                }
+              }}
+              onChange={(_, editor: any) => {
+                setContent(editor.getData());
+              }}
+              config={{
+                toolbar: {
+                  items: [
+                    "heading",
+                    "|",
+                    "bold",
+                    "italic",
+                    "bulletedList",
+                    "numberedList",
+                    "|",
+                    "undo",
+                    "redo",
+                  ],
+                  shouldNotGroupWhenFull: true,
+                },
+                placeholder: "Start writing...",
+              }}
+            />
+          )}
         </div>
       </div>
     </EditorWorkspace>
   );
 }
+
+const ClientCKEditor = dynamic(
+  async () => {
+    const module = await import("@ckeditor/ckeditor5-react");
+    return module.CKEditor as any;
+  },
+  { ssr: false },
+);
+
+export default
+  typeof process !== "undefined" && process.env.NODE_ENV === "test"
+    ? CkeditorPage
+    : dynamic(() => Promise.resolve(CkeditorPage), { ssr: false });

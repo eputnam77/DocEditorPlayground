@@ -5,8 +5,19 @@ Compare multiple open-source authoring editors in one consistent, full-page UI.
 ## What this app does
 
 - Provides dedicated pages for `TipTap`, `Toast UI Editor`, `Editor.js`, `Slate`, `Lexical`, and `CKEditor 5`.
-- Uses a shared workspace shell for navigation, theme toggle, controls, validation, and comments.
-- Lets users move editor to editor with the same test flow: type content, toggle plugins, run validation, and compare behavior.
+- Uses a shared workspace shell for navigation, theme toggle, controls, diagnostics, and comments.
+- Lets users move editor to editor with the same test flow: type content, apply formatting, run diagnostics, and compare behavior.
+
+## Authoring tools
+
+| Tool | Brief description | GitHub |
+| --- | --- | --- |
+| TipTap | Headless ProseMirror-based editor framework for deeply customized authoring UX. | https://github.com/ueberdosis/tiptap |
+| Toast UI Editor | Open-source Markdown + WYSIWYG editor with practical built-in formatting tools. | https://github.com/nhn/tui.editor |
+| Editor.js | Block-styled editor that stores content as structured blocks. | https://github.com/codex-team/editor.js |
+| Slate | Framework for building custom rich-text editors with full schema and command control. | https://github.com/ianstormtaylor/slate |
+| Lexical | Extensible React editor framework from Meta, optimized for speed and reliability. | https://github.com/facebook/lexical |
+| CKEditor 5 | Production-ready rich-text editor framework with a polished authoring experience. | https://github.com/ckeditor/ckeditor5 |
 
 ## Editor routes
 
@@ -56,8 +67,8 @@ npm run test:e2e
 
 ## Test coverage status
 
-- Unit tests: `139` passing
-- E2E tests: `39` passing
+- Unit tests: `138` passing
+- E2E smoke suite: `5` passing
 
 ## Editor text direction contract
 
@@ -81,4 +92,4 @@ See `tests/E2E_REPORT.md` for current E2E notes.
 
 ## Notes
 
-- Some editor integrations are intentionally lightweight to keep local startup and tests deterministic.
+- Editor integrations in scope use upstream packages and recommended setup patterns.

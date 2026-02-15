@@ -1,14 +1,17 @@
 # Slate Scenario Guide
 
-Use `/slate` to test Slate commands in a full-page editor shell.
+Slate is a customizable rich-text framework where the app defines schema and commands.
+
+- Route: `/slate`
+- GitHub: https://github.com/ianstormtaylor/slate
 
 ## Core flow
 
 1. Open `/slate`.
 2. Enter text in the editor canvas.
-3. Apply toolbar actions like **Bold**, **Italic**, or list buttons.
-4. Open **Plugins** and toggle `History` or `Lists`.
-5. Run **Run validation** and inspect status output.
+3. Apply toolbar actions like **Bold**, **Italic**, **Heading**, and list buttons.
+4. Confirm toolbar active states reflect the current selection/block.
+5. Click **Run diagnostics** and inspect status output.
 
 ## Template flow
 

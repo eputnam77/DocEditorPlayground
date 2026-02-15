@@ -1,13 +1,16 @@
 # TipTap Scenario Guide
 
-Use `/tiptap` when you want to evaluate advanced extension behavior.
+TipTap is a headless ProseMirror-based editor framework for advanced customization.
+
+- Route: `/tiptap`
+- GitHub: https://github.com/ueberdosis/tiptap
 
 ## Core flow
 
 1. Open `/tiptap`.
 2. Type in the main editor canvas.
 3. Use the top toolbar for bold, italic, lists, tables, images, undo, redo, and save.
-4. Click **Open sidebar** to manage advanced toggles.
+4. Click **Open sidebar** to manage advanced feature toggles.
 
 ## Sidebar flow
 

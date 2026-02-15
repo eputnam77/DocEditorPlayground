@@ -22,9 +22,9 @@ export default function ValidationStatus({
   return (
     <div className="max-h-[70vh] overflow-y-auto rounded-lg border border-slate-300 bg-slate-50 p-4 shadow-sm dark:border-slate-700 dark:bg-slate-900/60">
       <div className="mb-3 flex items-center justify-between">
-        <span className="text-sm font-semibold text-slate-800 dark:text-slate-100">Validation results</span>
+        <span className="text-sm font-semibold text-slate-800 dark:text-slate-100">Diagnostics results</span>
         {onClear && (
-          <button className="text-xs font-semibold text-sky-700 underline dark:text-sky-300" onClick={onClear} aria-label="Clear validation results">
+          <button className="text-xs font-semibold text-sky-700 underline dark:text-sky-300" onClick={onClear} aria-label="Clear diagnostics results">
             Clear
           </button>
         )}

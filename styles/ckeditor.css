@@ -1,8 +1,27 @@
-/* Placeholder overrides for CKEditor */
+/* CKEditor overrides */
 
 .ckeditor-editor-shell,
 .ckeditor-editor-shell .ck-editor__editable,
 [data-testid="ckeditor-editable"] {
   direction: ltr;
+  unicode-bidi: plaintext;
   text-align: left;
+}
+
+.ckeditor-editor-shell .ck-content ul,
+.ckeditor-editor-shell .ck-content ol,
+[data-testid="ckeditor-editable"] ul,
+[data-testid="ckeditor-editable"] ol {
+  margin: 0.25rem 0;
+  padding-left: 1.5rem;
+}
+
+.ckeditor-editor-shell .ck-content ul,
+[data-testid="ckeditor-editable"] ul {
+  list-style-type: disc;
+}
+
+.ckeditor-editor-shell .ck-content ol,
+[data-testid="ckeditor-editable"] ol {
+  list-style-type: decimal;
 }

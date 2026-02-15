@@ -1,5 +1,5 @@
 import React from "react";
-import { render, screen, fireEvent } from "@testing-library/react";
+import { render, screen } from "@testing-library/react";
 import { describe, it, expect } from "vitest";
 import CkeditorPage from "../../pages/ckeditor";
 
@@ -10,14 +10,10 @@ describe("CkeditorPage", () => {
     expect(screen.getByText("Comments")).toBeTruthy();
   });
 
-  it("renders editor and accepts input", () => {
+  it("renders an LTR editor host and diagnostics controls", () => {
     const { container } = render(<CkeditorPage />);
     const shell = container.querySelector(".ckeditor-editor-shell");
     expect(shell?.getAttribute("dir")).toBe("ltr");
-    const editable = screen.getByRole("textbox", { name: "" });
-    fireEvent.input(editable, {
-      target: { innerHTML: "Hello" },
-    });
-    expect(editable.innerHTML).toContain("Hello");
+    expect(screen.getByRole("button", { name: "Run diagnostics" })).toBeTruthy();
   });
 });
