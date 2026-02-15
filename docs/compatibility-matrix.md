@@ -13,6 +13,7 @@ This matrix is the current baseline for this playground.
 | Comment panel | Yes | Yes | Yes | Yes | Yes | Yes |
 | Track changes summary | Yes | Yes | Yes | Yes | Yes | Yes |
 | Plugin/extension toggles | Yes (sidebar) | Yes | Yes | Yes | Yes | Yes |
+| Left-to-right typing baseline | Yes | Yes | Yes | Yes | Yes | Yes |
 | E2E baseline coverage | Yes | Yes | Yes | Yes | Yes | Yes |
 
 ## Notes

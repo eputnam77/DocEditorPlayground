@@ -98,6 +98,8 @@ body {
 
 .workspace-editor {
   min-height: 60vh;
+  direction: ltr;
+  text-align: left;
   border-radius: 12px;
   border: 1px solid color-mix(in srgb, #64748b 35%, transparent 65%);
   background: color-mix(in srgb, var(--surface-card) 96%, #f8fbff 4%);

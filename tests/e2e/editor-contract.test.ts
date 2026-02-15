@@ -20,6 +20,15 @@ const ALL_EDITOR_ROUTES = [
 
 const WORKSPACE_ROUTES = ["/toast", "/codex", "/slate", "/lexical", "/ckeditor"];
 
+const DIRECTION_SELECTORS: Record<string, string> = {
+  "/tiptap": ".tiptap-content",
+  "/toast": ".toast-editor-shell",
+  "/codex": "#codex-editor",
+  "/slate": "[data-testid='slate-editor']",
+  "/lexical": "[data-testid='lexical-editor']",
+  "/ckeditor": ".ckeditor-editor-shell",
+};
+
 test("contract: navigation is available across editor routes", async ({ page }) => {
   for (const route of ALL_EDITOR_ROUTES) {
     await page.goto(route);
@@ -49,5 +58,14 @@ test("contract: shared workspace shell is present for baseline editors", async (
     await expect(page.getByTestId("workspace-controls")).toBeVisible();
     await expect(page.getByTestId("workspace-editor")).toBeVisible();
     await expect(page.getByTestId("comment-track")).toBeVisible();
+  }
+});
+
+test("contract: editor input direction is left-to-right", async ({ page }) => {
+  for (const [route, selector] of Object.entries(DIRECTION_SELECTORS)) {
+    await page.goto(route);
+    const editorSurface = page.locator(selector).first();
+    await expect(editorSurface).toBeVisible();
+    await expect(editorSurface).toHaveCSS("direction", "ltr");
   }
 });

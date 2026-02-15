@@ -11,7 +11,9 @@ describe("CkeditorPage", () => {
   });
 
   it("renders editor and accepts input", () => {
-    render(<CkeditorPage />);
+    const { container } = render(<CkeditorPage />);
+    const shell = container.querySelector(".ckeditor-editor-shell");
+    expect(shell?.getAttribute("dir")).toBe("ltr");
     const editable = screen.getByRole("textbox", { name: "" });
     fireEvent.input(editable, {
       target: { innerHTML: "Hello" },

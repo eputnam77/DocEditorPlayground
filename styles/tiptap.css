@@ -1,6 +1,8 @@
 /* Placeholder overrides for TipTap */
 .tiptap-content {
   min-height: 200px;
+  direction: ltr;
+  text-align: left;
   border: 1px solid #d1d5db; /* Tailwind gray-300 */
   border-radius: 0.5rem;
   padding: 1rem;

@@ -11,7 +11,9 @@ describe("ToastPage", () => {
   });
 
   it("accepts input", () => {
-    render(<ToastPage />);
+    const { container } = render(<ToastPage />);
+    const shell = container.querySelector(".toast-editor-shell");
+    expect(shell?.getAttribute("dir")).toBe("ltr");
     const editor = screen.getByTestId("toast-editor");
     fireEvent.input(editor, { target: { innerHTML: "Hello" } });
     expect(editor.innerHTML).toContain("Hello");

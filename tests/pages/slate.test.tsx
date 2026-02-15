@@ -13,6 +13,7 @@ describe("SlatePage", () => {
   it("accepts user input", () => {
     render(<SlatePage />);
     const editor = screen.getByTestId("slate-editor");
+    expect(editor.getAttribute("dir")).toBe("ltr");
     editor.textContent = "Hello";
     fireEvent.input(editor);
     expect(editor.textContent).toBe("Hello");

@@ -6,5 +6,6 @@ test("lexical responds to bold and list controls", async ({ page }) => {
   await editor.click();
   await page.keyboard.type("List item");
   await page.getByRole("button", { name: "Bullet list" }).click();
+  await expect(editor.locator("ul li")).toHaveCount(1);
   await expect(editor).toContainText("List item");
 });

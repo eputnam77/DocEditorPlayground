@@ -103,7 +103,14 @@ export default function SlatePage() {
   function runValidation() {
     try {
       const passed = validateDocument({ content });
-      setValidationResults([{ id: 1, label: "Document", passed }]);
+      setValidationResults([
+        {
+          id: 1,
+          label: "Document",
+          passed,
+          detail: "Checks that the editor content contains non-whitespace text.",
+        },
+      ]);
     } catch {
       alert("Validation failed.");
     }
@@ -166,7 +173,8 @@ export default function SlatePage() {
         >
           <SlateToolbar enabled={enabled} />
           <Editable
-            className="h-[58vh] w-full rounded-md border border-slate-300 bg-white p-3 text-slate-900 outline-none dark:border-slate-600 dark:bg-slate-900 dark:text-slate-100"
+            dir="ltr"
+            className="h-[58vh] w-full rounded-md border border-slate-300 bg-white p-3 text-left text-slate-900 outline-none dark:border-slate-600 dark:bg-slate-900 dark:text-slate-100"
           />
         </Slate>
       </div>

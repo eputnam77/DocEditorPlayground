@@ -6,6 +6,7 @@ import {
   UNDO_COMMAND,
   REDO_COMMAND,
 } from './lexical';
+import { runContentEditableCommand } from '../utils/contentEditableCommands';
 
 interface Editor {
   rootRef: React.RefObject<HTMLDivElement>;
@@ -47,20 +48,24 @@ export function LexicalComposer({
     dispatchCommand(command: string, payload?: any) {
       const el = rootRef.current;
       if (!el) return;
-      const exec = (cmd: string) => {
-        if (typeof document.execCommand === 'function') {
-          document.execCommand(cmd);
-        }
-      };
       switch (command) {
         case FORMAT_TEXT_COMMAND:
-          exec(payload);
+          runContentEditableCommand({
+            command: String(payload || ''),
+            root: el,
+          });
           break;
         case INSERT_UNORDERED_LIST_COMMAND:
-          exec('insertUnorderedList');
+          runContentEditableCommand({
+            command: 'insertUnorderedList',
+            root: el,
+          });
           break;
         case INSERT_ORDERED_LIST_COMMAND:
-          exec('insertOrderedList');
+          runContentEditableCommand({
+            command: 'insertOrderedList',
+            root: el,
+          });
           break;
         case UNDO_COMMAND:
           if (indexRef.current > 0) {

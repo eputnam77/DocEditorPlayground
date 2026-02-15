@@ -1,1 +1,6 @@
 /* Placeholder overrides for Slate Editor */
+
+[data-testid="slate-editor"] {
+  direction: ltr;
+  text-align: left;
+}

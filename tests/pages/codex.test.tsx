@@ -9,6 +9,7 @@ describe("CodexPage", () => {
     expect(screen.getByRole("heading", { level: 1, name: "Editor.js" })).toBeTruthy();
     expect(screen.getByText("Comments")).toBeTruthy();
     const editor = screen.getByTestId("codex-editor");
+    expect(editor.getAttribute("dir")).toBe("ltr");
     await act(async () => {
       editor.innerText = "Hello";
       fireEvent.input(editor);

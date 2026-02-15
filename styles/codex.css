@@ -1,1 +1,8 @@
 /* Placeholder overrides for CodeX Editor */
+
+#codex-editor,
+#codex-editor .ce-block__content,
+#codex-editor .ce-paragraph {
+  direction: ltr;
+  text-align: left;
+}

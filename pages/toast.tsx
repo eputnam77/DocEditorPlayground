@@ -51,10 +51,21 @@ function ToastPage() {
   function runValidation() {
     try {
       const passed = validateDocument({ content });
-      setValidationResults([{ id: 1, label: "Document", passed }]);
+      setValidationResults([
+        {
+          id: 1,
+          label: "Document",
+          passed,
+          detail: "Checks that the editor content contains non-whitespace text.",
+        },
+      ]);
     } catch {
       alert("Validation failed.");
     }
+  }
+
+  function runCommand(command: string, data?: unknown) {
+    editorRef.current?.getInstance().exec(command, data);
   }
 
   useEffect(() => {
@@ -110,7 +121,75 @@ function ToastPage() {
       }
     >
       <div className="h-full p-3">
-        <div className="h-[58vh] overflow-auto rounded-md border border-slate-300 bg-white p-2 dark:border-slate-600 dark:bg-slate-900">
+        <p className="mb-2 text-xs text-slate-600 dark:text-slate-300">
+          Press Enter in the editor to create a new paragraph.
+        </p>
+        <div className="mb-3 flex flex-wrap gap-2">
+          <button
+            aria-label="Bold"
+            className="rounded-md border border-slate-300 bg-white px-3 py-2 text-sm font-semibold hover:bg-slate-100 dark:border-slate-600 dark:bg-slate-900 dark:hover:bg-slate-800"
+            onMouseDown={(e) => {
+              e.preventDefault();
+              runCommand("bold");
+            }}
+          >
+            Bold
+          </button>
+          <button
+            aria-label="Italic"
+            className="rounded-md border border-slate-300 bg-white px-3 py-2 text-sm font-semibold hover:bg-slate-100 dark:border-slate-600 dark:bg-slate-900 dark:hover:bg-slate-800"
+            onMouseDown={(e) => {
+              e.preventDefault();
+              runCommand("italic");
+            }}
+          >
+            Italic
+          </button>
+          <button
+            aria-label="Heading"
+            className="rounded-md border border-slate-300 bg-white px-3 py-2 text-sm font-semibold hover:bg-slate-100 dark:border-slate-600 dark:bg-slate-900 dark:hover:bg-slate-800"
+            onMouseDown={(e) => {
+              e.preventDefault();
+              runCommand("heading");
+            }}
+          >
+            Heading
+          </button>
+          <button
+            aria-label="Bullet List"
+            className="rounded-md border border-slate-300 bg-white px-3 py-2 text-sm font-semibold hover:bg-slate-100 dark:border-slate-600 dark:bg-slate-900 dark:hover:bg-slate-800"
+            onMouseDown={(e) => {
+              e.preventDefault();
+              runCommand("insertUnorderedList");
+            }}
+          >
+            Bullet list
+          </button>
+          <button
+            aria-label="Numbered List"
+            className="rounded-md border border-slate-300 bg-white px-3 py-2 text-sm font-semibold hover:bg-slate-100 dark:border-slate-600 dark:bg-slate-900 dark:hover:bg-slate-800"
+            onMouseDown={(e) => {
+              e.preventDefault();
+              runCommand("insertOrderedList");
+            }}
+          >
+            Numbered list
+          </button>
+          <button
+            aria-label="Paragraph"
+            className="rounded-md border border-slate-300 bg-white px-3 py-2 text-sm font-semibold hover:bg-slate-100 dark:border-slate-600 dark:bg-slate-900 dark:hover:bg-slate-800"
+            onMouseDown={(e) => {
+              e.preventDefault();
+              runCommand("insertParagraph");
+            }}
+          >
+            Paragraph
+          </button>
+        </div>
+        <div
+          dir="ltr"
+          className="toast-editor-shell h-[58vh] overflow-auto rounded-md border border-slate-300 bg-white p-2 text-left dark:border-slate-600 dark:bg-slate-900"
+        >
           <Editor
             ref={editorRef}
             initialValue={content}

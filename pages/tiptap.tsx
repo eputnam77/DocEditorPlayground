@@ -621,8 +621,10 @@ export default function TipTapEditorPage() {
       immediatelyRender: false,
       editorProps: {
         attributes: {
+          dir: "ltr",
+          style: "direction:ltr;text-align:left;",
           class:
-            "tiptap-content focus:outline-none w-full h-full min-h-[400px] max-w-[860px] mx-auto",
+            "tiptap-content focus:outline-none w-full h-full min-h-[400px] max-w-[860px] mx-auto text-left",
         },
       },
       onUpdate: ({ editor }) => setContent(editor.getHTML()),

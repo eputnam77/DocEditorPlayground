@@ -1,1 +1,6 @@
 /* Placeholder overrides for Lexical */
+
+[data-testid="lexical-editor"] {
+  direction: ltr;
+  text-align: left;
+}

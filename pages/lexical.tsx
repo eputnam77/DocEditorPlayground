@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import {
   LexicalComposer,
   RichTextPlugin,
@@ -32,52 +32,112 @@ const PLUGINS = [{ name: "history", label: "History" }, { name: "lists", label: 
 
 function Toolbar({ enabled }: { enabled: string[] }) {
   const [editor] = useLexicalComposerContext();
+  const [active, setActive] = useState({
+    bold: false,
+    italic: false,
+  });
+
+  const refreshActive = () => {
+    if (typeof document === "undefined" || typeof document.queryCommandState !== "function") {
+      return;
+    }
+    const root = editor.rootRef?.current ?? null;
+    const selection =
+      typeof window !== "undefined" ? window.getSelection() : null;
+    const inEditor = !!root && !!selection?.anchorNode && root.contains(selection.anchorNode);
+    if (!inEditor) {
+      setActive({ bold: false, italic: false });
+      return;
+    }
+    setActive({
+      bold: document.queryCommandState("bold"),
+      italic: document.queryCommandState("italic"),
+    });
+  };
+
+  useEffect(() => {
+    refreshActive();
+    if (typeof document === "undefined") {
+      return;
+    }
+    document.addEventListener("selectionchange", refreshActive);
+    return () => document.removeEventListener("selectionchange", refreshActive);
+  }, []);
+
+  const baseButtonClass =
+    "rounded-md border px-3 py-2 text-sm font-semibold disabled:opacity-50";
+  const inactiveButtonClass =
+    "border-slate-300 bg-white hover:bg-slate-100 dark:border-slate-600 dark:bg-slate-900 dark:hover:bg-slate-800";
+  const activeButtonClass =
+    "border-sky-500 bg-sky-100 text-sky-900 hover:bg-sky-200 dark:border-sky-400 dark:bg-sky-900/40 dark:text-sky-100 dark:hover:bg-sky-900/60";
 
   return (
     <div className="mb-3 flex flex-wrap gap-2">
       <button
         aria-label="Bold"
-        className="rounded-md border border-slate-300 bg-white px-3 py-2 text-sm font-semibold hover:bg-slate-100 dark:border-slate-600 dark:bg-slate-900 dark:hover:bg-slate-800"
-        onClick={() => editor.dispatchCommand(FORMAT_TEXT_COMMAND, "bold")}
+        aria-pressed={active.bold}
+        className={`${baseButtonClass} ${active.bold ? activeButtonClass : inactiveButtonClass}`}
+        onMouseDown={(e) => {
+          e.preventDefault();
+          editor.dispatchCommand(FORMAT_TEXT_COMMAND, "bold");
+          refreshActive();
+        }}
       >
         Bold
       </button>
       <button
         aria-label="Italic"
-        className="rounded-md border border-slate-300 bg-white px-3 py-2 text-sm font-semibold hover:bg-slate-100 dark:border-slate-600 dark:bg-slate-900 dark:hover:bg-slate-800"
-        onClick={() => editor.dispatchCommand(FORMAT_TEXT_COMMAND, "italic")}
+        aria-pressed={active.italic}
+        className={`${baseButtonClass} ${active.italic ? activeButtonClass : inactiveButtonClass}`}
+        onMouseDown={(e) => {
+          e.preventDefault();
+          editor.dispatchCommand(FORMAT_TEXT_COMMAND, "italic");
+          refreshActive();
+        }}
       >
         Italic
       </button>
       <button
         aria-label="Bullet List"
-        className="rounded-md border border-slate-300 bg-white px-3 py-2 text-sm font-semibold hover:bg-slate-100 disabled:opacity-50 dark:border-slate-600 dark:bg-slate-900 dark:hover:bg-slate-800"
+        className={`${baseButtonClass} ${inactiveButtonClass}`}
         disabled={!enabled.includes("lists")}
-        onClick={() => editor.dispatchCommand(INSERT_UNORDERED_LIST_COMMAND)}
+        onMouseDown={(e) => {
+          e.preventDefault();
+          editor.dispatchCommand(INSERT_UNORDERED_LIST_COMMAND);
+        }}
       >
         Bullet list
       </button>
       <button
         aria-label="Numbered List"
-        className="rounded-md border border-slate-300 bg-white px-3 py-2 text-sm font-semibold hover:bg-slate-100 disabled:opacity-50 dark:border-slate-600 dark:bg-slate-900 dark:hover:bg-slate-800"
+        className={`${baseButtonClass} ${inactiveButtonClass}`}
         disabled={!enabled.includes("lists")}
-        onClick={() => editor.dispatchCommand(INSERT_ORDERED_LIST_COMMAND)}
+        onMouseDown={(e) => {
+          e.preventDefault();
+          editor.dispatchCommand(INSERT_ORDERED_LIST_COMMAND);
+        }}
       >
         Numbered list
       </button>
       <button
         aria-label="Undo"
-        className="rounded-md border border-slate-300 bg-white px-3 py-2 text-sm font-semibold hover:bg-slate-100 disabled:opacity-50 dark:border-slate-600 dark:bg-slate-900 dark:hover:bg-slate-800"
+        className={`${baseButtonClass} ${inactiveButtonClass}`}
         disabled={!enabled.includes("history")}
-        onClick={() => editor.dispatchCommand(UNDO_COMMAND)}
+        onMouseDown={(e) => {
+          e.preventDefault();
+          editor.dispatchCommand(UNDO_COMMAND);
+        }}
       >
         Undo
       </button>
       <button
         aria-label="Redo"
-        className="rounded-md border border-slate-300 bg-white px-3 py-2 text-sm font-semibold hover:bg-slate-100 disabled:opacity-50 dark:border-slate-600 dark:bg-slate-900 dark:hover:bg-slate-800"
+        className={`${baseButtonClass} ${inactiveButtonClass}`}
         disabled={!enabled.includes("history")}
-        onClick={() => editor.dispatchCommand(REDO_COMMAND)}
+        onMouseDown={(e) => {
+          e.preventDefault();
+          editor.dispatchCommand(REDO_COMMAND);
+        }}
       >
         Redo
       </button>
@@ -104,7 +164,14 @@ export default function LexicalPage() {
   function runValidation() {
     try {
       const passed = validateDocument({ content });
-      setValidationResults([{ id: 1, label: "Document", passed }]);
+      setValidationResults([
+        {
+          id: 1,
+          label: "Document",
+          passed,
+          detail: "Checks that the editor content contains non-whitespace text.",
+        },
+      ]);
     } catch {
       alert("Validation failed.");
     }
@@ -160,7 +227,8 @@ export default function LexicalPage() {
             contentEditable={
               <ContentEditable
                 data-testid="lexical-editor"
-                className="h-[58vh] w-full rounded-md border border-slate-300 bg-white p-3 text-slate-900 outline-none dark:border-slate-600 dark:bg-slate-900 dark:text-slate-100"
+                dir="ltr"
+                className="h-[58vh] w-full rounded-md border border-slate-300 bg-white p-3 text-left text-slate-900 outline-none dark:border-slate-600 dark:bg-slate-900 dark:text-slate-100"
               />
             }
           />

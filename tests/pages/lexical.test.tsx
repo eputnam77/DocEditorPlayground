@@ -13,6 +13,7 @@ describe("LexicalPage", () => {
   it("accepts user input", async () => {
     render(<LexicalPage />);
     const editor = screen.getByTestId("lexical-editor");
+    expect(editor.getAttribute("dir")).toBe("ltr");
     await new Promise((r) => setTimeout(r, 0));
     editor.textContent = "Hello";
     fireEvent.input(editor);

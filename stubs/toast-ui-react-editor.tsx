@@ -1,4 +1,5 @@
 import React, { useRef, useImperativeHandle, forwardRef } from 'react';
+import { runContentEditableCommand } from '../utils/contentEditableCommands';
 
 export interface EditorProps {
   initialValue?: string;
@@ -20,6 +21,42 @@ export interface EditorHandle {
 const Editor = forwardRef<EditorHandle, EditorProps>(({ initialValue = '', onChange }, ref) => {
   const divRef = useRef<HTMLDivElement>(null);
 
+  const runCommand = (command: string, data?: any) => {
+    if (!divRef.current) {
+      return;
+    }
+    if (command === 'addTable') {
+      const rows = data?.rowCount ?? 2;
+      const cols = data?.columnCount ?? 2;
+      let html = '<table><tbody>';
+      for (let r = 0; r < rows; r++) {
+        html += '<tr>';
+        for (let c = 0; c < cols; c++) {
+          html += '<td></td>';
+        }
+        html += '</tr>';
+      }
+      html += '</tbody></table>';
+      divRef.current.innerHTML += html;
+      onChange?.();
+      return;
+    }
+    if (command === 'heading') {
+      runContentEditableCommand({
+        command: 'formatBlock',
+        value: 'h2',
+        root: divRef.current,
+      });
+      onChange?.();
+      return;
+    }
+    runContentEditableCommand({
+      command,
+      root: divRef.current,
+    });
+    onChange?.();
+  };
+
   useImperativeHandle(ref, () => ({
     getInstance() {
       return {
@@ -33,25 +70,7 @@ const Editor = forwardRef<EditorHandle, EditorProps>(({ initialValue = '', onCha
           }
         },
         exec(command: string, data?: any) {
-          if (command === 'addTable') {
-            const rows = data?.rowCount ?? 2;
-            const cols = data?.columnCount ?? 2;
-            let html = '<table><tbody>';
-            for (let r = 0; r < rows; r++) {
-              html += '<tr>';
-              for (let c = 0; c < cols; c++) {
-                html += '<td></td>';
-              }
-              html += '</tr>';
-            }
-            html += '</tbody></table>';
-            if (divRef.current) {
-              divRef.current.innerHTML += html;
-              onChange?.();
-            }
-          } else {
-            document.execCommand(command);
-          }
+          runCommand(command, data);
         },
       };
     },
@@ -61,33 +80,77 @@ const Editor = forwardRef<EditorHandle, EditorProps>(({ initialValue = '', onCha
     onChange?.();
   };
 
-  const insertTable = () => {
-    const instance = {
-      rowCount: 2,
-      columnCount: 2,
-    };
-    let html = '<table><tbody>';
-    for (let r = 0; r < instance.rowCount; r++) {
-      html += '<tr>';
-      for (let c = 0; c < instance.columnCount; c++) {
-        html += '<td></td>';
-      }
-      html += '</tr>';
-    }
-    html += '</tbody></table>';
-    if (divRef.current) {
-      divRef.current.innerHTML += html;
-      onChange?.();
-    }
-  };
-
   return (
     <div className="toastui-editor-stub">
-      <div role="toolbar">
-        <button type="button" aria-label="Bold" onClick={() => document.execCommand('bold')}>
+      <div role="toolbar" className="mb-2 flex flex-wrap gap-2">
+        <button
+          type="button"
+          aria-label="Bold"
+          onMouseDown={(e) => {
+            e.preventDefault();
+            runCommand('bold');
+          }}
+        >
           Bold
         </button>
-        <button type="button" aria-label="Table" onClick={insertTable}>
+        <button
+          type="button"
+          aria-label="Italic"
+          onMouseDown={(e) => {
+            e.preventDefault();
+            runCommand('italic');
+          }}
+        >
+          Italic
+        </button>
+        <button
+          type="button"
+          aria-label="Heading"
+          onMouseDown={(e) => {
+            e.preventDefault();
+            runCommand('heading');
+          }}
+        >
+          Heading
+        </button>
+        <button
+          type="button"
+          aria-label="Bullet List"
+          onMouseDown={(e) => {
+            e.preventDefault();
+            runCommand('insertUnorderedList');
+          }}
+        >
+          Bullet list
+        </button>
+        <button
+          type="button"
+          aria-label="Numbered List"
+          onMouseDown={(e) => {
+            e.preventDefault();
+            runCommand('insertOrderedList');
+          }}
+        >
+          Numbered list
+        </button>
+        <button
+          type="button"
+          aria-label="Paragraph"
+          onMouseDown={(e) => {
+            e.preventDefault();
+            runCommand('insertParagraph');
+          }}
+        >
+          Paragraph
+        </button>
+        <button
+          type="button"
+          aria-label="Table"
+          onMouseDown={(e) => {
+            e.preventDefault();
+            runCommand('addTable', { rowCount: 2, columnCount: 2 });
+          }}
+        >
           Table
         </button>
       </div>
@@ -95,6 +158,8 @@ const Editor = forwardRef<EditorHandle, EditorProps>(({ initialValue = '', onCha
         ref={divRef}
         className="toastui-editor-contents"
         data-testid="toast-editor"
+        dir="ltr"
+        style={{ direction: 'ltr', textAlign: 'left' }}
         contentEditable
         suppressContentEditableWarning
         onInput={handleInput}

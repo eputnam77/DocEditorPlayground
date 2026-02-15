@@ -1,3 +1,5 @@
+import { runContentEditableCommand } from "../utils/contentEditableCommands";
+
 export interface Editor {
   rootRef: { current: HTMLDivElement | null };
   exec(command: string, value?: string): void;
@@ -10,9 +12,11 @@ export function createEditor(): Editor {
   return {
     rootRef,
     exec(command: string, value?: string) {
-      if (typeof document !== 'undefined' && typeof (document as any).execCommand === 'function') {
-        (document as any).execCommand(command, false, value);
-      }
+      runContentEditableCommand({
+        command,
+        value,
+        root: rootRef.current,
+      });
     },
     getHTML() {
       return rootRef.current?.innerHTML || '';

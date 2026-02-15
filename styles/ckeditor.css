@@ -1,1 +1,8 @@
 /* Placeholder overrides for CKEditor */
+
+.ckeditor-editor-shell,
+.ckeditor-editor-shell .ck-editor__editable,
+[data-testid="ckeditor-editable"] {
+  direction: ltr;
+  text-align: left;
+}

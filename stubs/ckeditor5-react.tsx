@@ -1,4 +1,5 @@
 import React, { useRef, useEffect } from 'react';
+import { runContentEditableCommand } from '../utils/contentEditableCommands';
 
 interface Editor {
   setData(data: string): void;
@@ -39,7 +40,12 @@ export const CKEditor: React.FC<CKEditorProps> = ({
 
   const toolbarItems = config?.toolbar?.items ?? [];
 
-  const exec = (command: string) => document.execCommand(command);
+  const exec = (command: string, value?: string) =>
+    runContentEditableCommand({
+      command,
+      value,
+      root: ref.current,
+    });
 
   const handleInput = () => {
     onChange?.({}, editor);
@@ -49,12 +55,26 @@ export const CKEditor: React.FC<CKEditorProps> = ({
     <div className="ck-stub">
       <div role="toolbar">
         {toolbarItems.includes('bold') && (
-          <button type="button" aria-label="Bold" onClick={() => exec('bold')}>
+          <button
+            type="button"
+            aria-label="Bold"
+            onMouseDown={(e) => {
+              e.preventDefault();
+              exec('bold');
+            }}
+          >
             Bold
           </button>
         )}
         {toolbarItems.includes('italic') && (
-          <button type="button" aria-label="Italic" onClick={() => exec('italic')}>
+          <button
+            type="button"
+            aria-label="Italic"
+            onMouseDown={(e) => {
+              e.preventDefault();
+              exec('italic');
+            }}
+          >
             Italic
           </button>
         )}
@@ -62,15 +82,69 @@ export const CKEditor: React.FC<CKEditorProps> = ({
           <button
             type="button"
             aria-label="Underline"
-            onClick={() => exec('underline')}
+            onMouseDown={(e) => {
+              e.preventDefault();
+              exec('underline');
+            }}
           >
             Underline
+          </button>
+        )}
+        {toolbarItems.includes('heading') && (
+          <button
+            type="button"
+            aria-label="Heading"
+            onMouseDown={(e) => {
+              e.preventDefault();
+              exec('formatBlock', 'h2');
+            }}
+          >
+            Heading
+          </button>
+        )}
+        {toolbarItems.includes('paragraph') && (
+          <button
+            type="button"
+            aria-label="Paragraph"
+            onMouseDown={(e) => {
+              e.preventDefault();
+              exec('insertParagraph');
+            }}
+          >
+            Paragraph
+          </button>
+        )}
+        {toolbarItems.includes('bulletedList') && (
+          <button
+            type="button"
+            aria-label="Bullet List"
+            onMouseDown={(e) => {
+              e.preventDefault();
+              exec('insertUnorderedList');
+            }}
+          >
+            Bullet list
+          </button>
+        )}
+        {toolbarItems.includes('numberedList') && (
+          <button
+            type="button"
+            aria-label="Numbered List"
+            onMouseDown={(e) => {
+              e.preventDefault();
+              exec('insertOrderedList');
+            }}
+          >
+            Numbered list
           </button>
         )}
       </div>
       <div
         ref={ref}
         role="textbox"
+        data-testid="ckeditor-editable"
+        dir="ltr"
+        style={{ direction: 'ltr', textAlign: 'left' }}
         contentEditable
         suppressContentEditableWarning
         onInput={handleInput}

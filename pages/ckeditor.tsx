@@ -18,6 +18,10 @@ const PLUGINS = [
   { name: "bold", label: "Bold" },
   { name: "italic", label: "Italic" },
   { name: "underline", label: "Underline" },
+  { name: "heading", label: "Heading" },
+  { name: "paragraph", label: "Paragraph" },
+  { name: "bulletedList", label: "Bullet list" },
+  { name: "numberedList", label: "Numbered list" },
 ];
 
 export default function CkeditorPage() {
@@ -44,7 +48,14 @@ export default function CkeditorPage() {
   function runValidation() {
     try {
       const passed = validateDocument({ content });
-      setValidationResults([{ id: 1, label: "Document", passed }]);
+      setValidationResults([
+        {
+          id: 1,
+          label: "Document",
+          passed,
+          detail: "Checks that the editor content contains non-whitespace text.",
+        },
+      ]);
     } catch {
       alert("Validation failed.");
     }
@@ -94,13 +105,29 @@ export default function CkeditorPage() {
       }
     >
       <div className="h-full p-3">
-        <div className="h-[58vh] overflow-auto rounded-md border border-slate-300 bg-white p-2 dark:border-slate-600 dark:bg-slate-900">
+        <p className="mb-2 text-xs text-slate-600 dark:text-slate-300">
+          Press Enter in the editor to create a new paragraph.
+        </p>
+        <div
+          dir="ltr"
+          className="ckeditor-editor-shell h-[58vh] overflow-auto rounded-md border border-slate-300 bg-white p-2 text-left dark:border-slate-600 dark:bg-slate-900"
+        >
           <CKEditor
             editor={ClassicEditor}
             data={content}
             key={enabled.join(",")}
             onReady={(editor: any) => {
               editorRef.current = editor;
+              const editableElement =
+                editor?.ui?.getEditableElement?.() ??
+                editor?.ui?.view?.editable?.element ??
+                null;
+              if (editableElement && editableElement.setAttribute) {
+                editableElement.setAttribute("dir", "ltr");
+                editableElement.setAttribute("data-testid", "ckeditor-editable");
+                editableElement.style.direction = "ltr";
+                editableElement.style.textAlign = "left";
+              }
             }}
             onChange={(event, editor: any) => {
               setContent(editor.getData());

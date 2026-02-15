@@ -1,1 +1,9 @@
 /* Placeholder overrides for Toast UI Editor */
+
+.toast-editor-shell,
+.toast-editor-shell .toastui-editor-contents,
+.toast-editor-shell [contenteditable="true"],
+.toastui-editor-contents {
+  direction: ltr;
+  text-align: left;
+}

@@ -4,7 +4,7 @@
 
 ## Current result
 
-- Playwright suite: `38` tests passed
+- Playwright suite: `39` tests passed
 - Browser: Chromium (`playwright install chromium`)
 - Configuration: dedicated local server on port `3101`
 
@@ -16,7 +16,7 @@
 - Editor typing and validation workflows for each editor
 - Plugin/feature toggles, including TipTap sidebar controls
 - Cross-editor workflow transition scenarios
-- Shared cross-editor contract checks (navigation, theme persistence, workspace shell)
+- Shared cross-editor contract checks (navigation, theme persistence, workspace shell, LTR direction)
 
 ## Run command
 

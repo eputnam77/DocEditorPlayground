@@ -56,8 +56,14 @@ npm run test:e2e
 
 ## Test coverage status
 
-- Unit tests: `138` passing
-- E2E tests: `38` passing
+- Unit tests: `139` passing
+- E2E tests: `39` passing
+
+## Editor text direction contract
+
+- Every editor page enforces left-to-right input for English workflows.
+- Editable surfaces are explicitly set to `dir="ltr"` with left-aligned text.
+- Contract test: `tests/e2e/editor-contract.test.ts` verifies LTR direction across all editor routes.
 
 See `tests/E2E_REPORT.md` for current E2E notes.
 
