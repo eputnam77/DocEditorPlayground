@@ -1,142 +1,77 @@
 # AGENTS.md
 
-*Authoritative playbook for the OpenAI Codex multi-agent workflow in this repository*
+Codex workflow for this repository. Keep this file aligned with `CLAUDE.md` and `.claude/settings.json` when shared repo rules change.
 
----
+## Scope
 
-## 0 · Global Settings
+- This repo is a Next.js + TypeScript playground for comparing six rich-text editors in one shared workspace UI.
+- Use the active shell from the local environment. Command examples assume `npm` from the repo root.
+- Treat `package-lock.json` as authoritative. Use `npm` only.
+- Node version is `20.19.3` LTS, as pinned in `.nvmrc`.
 
-| Key                  | Value                                  |
-| -------------------- | -------------------------------------- |
-| Default shell        | `bash` (Linux)                         |
-| Node.js version      | **20 LTS**                             |
-| Package manager      | **npm** (local)                        |
-| Test runner          | **Vitest**                             |
-| Code formatter       | **Prettier**                           |
-| Linter               | **ESLint + @typescript-eslint**        |
-| Static-type checker  | **TypeScript** (`tsc --noEmit`)        |
-| Docs generator       | **TypeDoc** (manual, optional)         |
-| Commit message style | **Conventional Commits**               |
-| CI provider          | **GitHub Actions** *(manual triggers)* |
-
-> **Scope**   These settings cover the entire repository. Agents only run the tools listed above unless a task explicitly requires something else.
-
----
-
-## 1 · Agents & Execution Order
-
-This repo uses a simplified agent chain that only relies on commands runnable inside the sandbox.
-
-| #  | Agent ID     | Purpose                                                            | Auto-trigger        |
-| -- | ------------ | ------------------------------------------------------------------ | ------------------- |
-| 0  | `planner`    | Parse project requirements → build actionable issues.             | manual              |
-| 1  | `architect`  | Confirm repo layout, document decisions.                          | after `planner` PR  |
-| 2  | `scaffolder` | Create skeleton code and baseline tests.                          | after `architect`   |
-| 3  | `builder`    | Implement features and maintain unit test coverage.               | after `scaffolder`  |
-| 4  | `tester`     | Run lint, type-check, and Vitest suites.                          | after `builder`     |
-| 5  | `fixer`      | Address any failures from the tester step.                        | on tester failure   |
-| 6  | `docwriter`  | Update docs and changelog when the feature set stabilises.        | after `tester` pass |
-| 7  | `reviewer`   | Human review.                                                      | after docs ready    |
-| 8  | `releasebot` | Prepare release notes and version bumps once merged to `main`.    | post-merge          |
-
-> **Note**   Agents referencing tools like Playwright, Stryker, or Lighthouse have been removed. Tasks that require browsers or external services must be broken down for manual handling.
-
----
-
-## 2 · Quality Gates
-
-### Dev Gate (feature branches)
-
-All commands are expected to run locally in the sandbox and should pass before handing work to the next agent.
+## Primary Commands
 
 ```bash
-npm run lint
-npm run typecheck
-npm run test
-```
-
-### Release Gate (`main`)
-
-For `main`, we keep the same checks plus a production build to ensure deployability.
-
-```bash
-npm run lint
-npm run typecheck
-npm run test:coverage
+npm run dev
 npm run build
+npm run lint
+npm run lint -- --fix
+npm run typecheck
+npm test
+npm run test:watch
+npm run test:coverage
+npm run test:e2e
+npm run test:e2e:smoke
+npx vitest run tests/components/NavBar.test.tsx
 ```
 
-If any command fails, control returns to the **fixer** agent.
+Use the smallest command that proves the change. Escalate to the full gate before handoff.
 
----
+## Verification Workflow
 
-## 3 · TypeScript Project Structure
+1. Read the relevant page, component, utility, and test files before editing.
+2. Make the smallest change that fixes the issue or implements the feature.
+3. Run targeted verification first.
+4. Before a PR or handoff, run:
 
-The repository follows a standard Next.js layout:
-
-```
-doceditorplayground/
-├── src/                # Reusable modules
-├── pages/              # Next.js pages
-├── components/         # React components
-├── tests/              # Vitest unit/integration tests
-├── public/             # Static assets
-└── styles/             # Tailwind and global CSS
+```bash
+npm run lint
+npm run typecheck
+npm test
 ```
 
-### Documentation Guidance
+5. Run `npm run build` when the change affects production bundling, Next.js config, or deployability.
+6. Run `npm run test:e2e` or `npm run test:e2e:smoke` when the change affects browser behavior, editor contracts, routing, or shared UI flows.
 
-- Keep README and docs aligned with shipped features.
-- Use clear terminology and include usage examples for new APIs.
-- Update `CHANGELOG.md` following [Keep a Changelog](https://keepachangelog.com/) conventions when releasing.
+If a command fails, fix the failure or explain why it could not be resolved locally.
 
----
+## Project Anchors
 
-## 4 · Branch & Commit Policy
+- `pages/`: one page per editor plus `index.tsx`
+- `components/EditorWorkspace.tsx`: shared shell for every editor page
+- `components/editorCatalog.ts`: single source of truth for editor IDs, routes, names, and GitHub URLs
+- `extensions/`: TipTap-only ProseMirror extensions
+- `utils/`: sanitization, templates, validation, diagnostics, and contenteditable helpers
+- `pages/api/ai-suggest.ts`: stub AI endpoint that returns uppercased text
+- `styles/`: shared globals plus per-editor styles
+- `stubs/`: lightweight test and bundling substitutes for heavy editor libraries
+- `.dev/`: planning and workflow docs, including this file
 
-* **Branches** `plan/<slug>` · `feat/<slug>` · `fix/<issue>` · `docs/<topic>`
-* **Commits** follow Conventional Commits, e.g.
+## Repo Conventions
 
-  ```
-  feat(editor): add table support
-  fix(editor): prevent crash on empty document
-  chore(ci): adjust lint configuration
-  ```
+- Commits use Conventional Commits such as `feat(editor): add table support`.
+- Every editor page must set `dir="ltr"` on its editable surface. `tests/e2e/editor-contract.test.ts` verifies this.
+- Update `components/editorCatalog.ts` whenever editors are added, removed, or renamed.
+- Unit tests run in jsdom via Vitest. E2E tests run in Chromium via Playwright.
+- Keep README and shipped docs aligned with user-visible behavior.
 
-Default merge strategy: **squash-merge**, with required checks defined above.
+## Working Set Guidance
 
----
+- Ignore generated and dependency-heavy paths unless the task requires them: `node_modules/`, `.next/`, `build/`, `dist/`, `.git/`, `playwright-report/`, `test-results/`, `lighthouse.html`.
+- Avoid reading or rewriting `package-lock.json` unless the change actually updates dependencies.
+- After edits, check lint output early so formatting or obvious syntax issues do not compound.
 
-## 5 · Environment Setup
+## Delivery Standard
 
-1. `nvm install --lts`
-2. `npm install`
-3. Run the dev server with `npm run dev` when working on UI features.
-4. Use `npm run lint`, `npm run typecheck`, and `npm run test` before opening PRs.
-
-Playwright, mutation testing, and other heavy tooling are intentionally excluded from this workflow to keep tasks compatible with the sandbox.
-
----
-
-## 6 · Failure-Recovery Matrix
-
-| Problem            | Responsible Agent | Remedy                   |
-| ------------------ | ----------------- | ------------------------ |
-| Lint error         | fixer             | Run `npm run lint -- --fix` or patch manually |
-| Type error         | fixer             | Update types or code     |
-| Unit test failure  | fixer             | Adjust implementation or tests |
-| Docs out of date   | docwriter         | Refresh docs/changelog   |
-
----
-
-## 7 · References
-
-- [Next.js](https://nextjs.org/)
-- [Vitest](https://vitest.dev/)
-- [TypeScript](https://www.typescriptlang.org/)
-- [ESLint](https://eslint.org/)
-- [Prettier](https://prettier.io/)
-
----
-
-*End of AGENTS.md*
+- Summarize the change, note the verification commands you ran, and call out any gaps.
+- If behavior changed, update the relevant docs in the same pass.
