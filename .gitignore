@@ -4,6 +4,7 @@ out/
 dist/
 *.tsbuildinfo
 coverage/
+reports/
 test-results/
 playwright-report/
 *.log

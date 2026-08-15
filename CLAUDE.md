@@ -51,7 +51,7 @@ Custom ProseMirror extensions for TipTap: heading lock, indentation, section nod
 - `ai-suggest.ts` — stub POST endpoint; returns uppercased text. Replace the body with a real LLM call to activate AI suggestions in TipTap.
 
 ### Planning docs (`.dev/`)
-Non-shipped AI workflow files: `PRD.md` (requirements), `AGENTS.md` (agent chain spec), `TASKS.md`, `ISSUES.md`, `VERIFICATION_REPORT.md`. Reference these when scoping new features or understanding original design intent.
+Non-shipped AI workflow files: `PRD.md` (requirements), `AGENTS.md` (agent chain spec). Reference these when scoping new features or understanding original design intent.
 
 ### Styles (`styles/`)
 Each editor has a dedicated CSS file (`tiptap.css`, `toast.css`, `codex.css`, `slate.css`, `lexical.css`, `ckeditor.css`) plus `globals.css` for shared Tailwind and workspace styles.
