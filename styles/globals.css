@@ -2,24 +2,65 @@
 @tailwind components;
 @tailwind utilities;
 
+/* ==========================================================================
+   Document Editor Playground - "Marked Up"
+   A playground about document editing, set like a document under review.
+   Accent = proofreader red. Rules = hairlines. Surfaces = paper.
+   ========================================================================== */
+
+/* ---- Tokens -------------------------------------------------------------- */
 :root {
-  --font-ui: "Poppins", "Avenir Next", "Segoe UI", sans-serif;
-  --font-accent: "Work Sans", "Segoe UI", sans-serif;
-  --surface: #f3f6fb;
-  --surface-card: #ffffff;
-  --surface-soft: #e8eef8;
-  --text-main: #0f172a;
-  --text-muted: #334155;
+  --paper: #faf8f3;
+  --paper-sunk: #f1ece1;
+  --paper-card: #fffdf9;
+  --paper-raised: #ffffff;
+
+  --ink: #17130f;
+  --ink-80: rgba(23, 19, 15, 0.8);
+  --ink-60: rgba(23, 19, 15, 0.6);
+  --ink-42: rgba(23, 19, 15, 0.42);
+  --ink-16: rgba(23, 19, 15, 0.16);
+  --ink-08: rgba(23, 19, 15, 0.08);
+  --ink-04: rgba(23, 19, 15, 0.04);
+
+  --mark: #be3a21;
+  --mark-soft: rgba(190, 58, 33, 0.1);
+  --mark-line: rgba(190, 58, 33, 0.34);
+
+  --pass: #1c6b45;
+  --fail: #b23a2f;
+
+  --serif: "Newsreader", "Iowan Old Style", Georgia, serif;
+  --sans: "Public Sans", "Helvetica Neue", Helvetica, Arial, sans-serif;
+  --mono: "IBM Plex Mono", ui-monospace, "SF Mono", Menlo, monospace;
+
+  --measure: 68ch;
+  --ease: cubic-bezier(0.2, 0.7, 0.25, 1);
 }
 
 .dark {
-  --surface: #0a1220;
-  --surface-card: #111c2f;
-  --surface-soft: #1f2d47;
-  --text-main: #e2e8f0;
-  --text-muted: #cbd5e1;
+  --paper: #14120f;
+  --paper-sunk: #1d1a16;
+  --paper-card: #1a1714;
+  --paper-raised: #201c18;
+
+  --ink: #f2ede4;
+  --ink-80: rgba(242, 237, 228, 0.8);
+  --ink-60: rgba(242, 237, 228, 0.58);
+  --ink-42: rgba(242, 237, 228, 0.4);
+  --ink-16: rgba(242, 237, 228, 0.16);
+  --ink-08: rgba(242, 237, 228, 0.08);
+  --ink-04: rgba(242, 237, 228, 0.05);
+
+  --mark: #e9704f;
+  --mark-soft: rgba(233, 112, 79, 0.12);
+  --mark-line: rgba(233, 112, 79, 0.4);
+
+  --pass: #6cc79a;
+  --fail: #f08d7d;
 }
 
+/* ---- Base ---------------------------------------------------------------- */
 html,
 body,
 #__next {
@@ -27,81 +68,1091 @@ body,
 }
 
 body {
-  font-family: var(--font-ui);
-  background:
-    radial-gradient(circle at 18% 16%, rgba(2, 132, 199, 0.2), transparent 34%),
-    radial-gradient(circle at 80% 10%, rgba(14, 165, 233, 0.18), transparent 30%),
-    linear-gradient(145deg, var(--surface) 0%, #dce8fa 44%, #edf3fd 100%);
-  color: var(--text-main);
+  background: var(--paper);
+  color: var(--ink);
+  font-family: var(--sans);
+  font-size: 16px;
+  line-height: 1.6;
+  font-feature-settings: "kern" 1;
+  -webkit-font-smoothing: antialiased;
 }
 
-.dark body {
-  background:
-    radial-gradient(circle at 20% 15%, rgba(3, 105, 161, 0.28), transparent 38%),
-    radial-gradient(circle at 85% 18%, rgba(56, 189, 248, 0.16), transparent 34%),
-    linear-gradient(160deg, var(--surface) 0%, #0e1a30 46%, #111827 100%);
+/* Paper grain - a single inline SVG, no network request. */
+body::before {
+  content: "";
+  position: fixed;
+  inset: 0;
+  z-index: 0;
+  pointer-events: none;
+  opacity: 0.035;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='160' height='160'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.85' numOctaves='3'/%3E%3C/filter%3E%3Crect width='160' height='160' filter='url(%23n)'/%3E%3C/svg%3E");
 }
 
-.workspace-shell {
-  color: var(--text-main);
+.dark body::before {
+  opacity: 0.06;
 }
 
-.workspace-top-bar {
-  background: color-mix(in srgb, var(--surface-card) 88%, #f8fbff 12%);
-  backdrop-filter: blur(6px);
+::selection {
+  background: var(--mark-soft);
 }
 
-.workspace-brand {
-  font-family: var(--font-accent);
-  font-size: 1rem;
-  font-weight: 700;
-  letter-spacing: 0.03em;
+:focus-visible {
+  outline: 2px solid var(--mark);
+  outline-offset: 2px;
+}
+
+/* ---- Shell --------------------------------------------------------------- */
+.dep-shell {
+  position: relative;
+  z-index: 1;
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+}
+
+.dep-wrap {
+  width: 100%;
+  max-width: 1380px;
+  margin-inline: auto;
+  padding-inline: clamp(1rem, 4vw, 2.5rem);
+}
+
+.dep-topbar {
+  border-bottom: 1px solid var(--ink-16);
+  background: color-mix(in srgb, var(--paper) 84%, transparent);
+  backdrop-filter: blur(8px);
+  position: sticky;
+  top: 0;
+  z-index: 30;
+}
+
+.dep-brand {
+  font-family: var(--sans);
+  font-size: 0.72rem;
+  font-weight: 600;
+  letter-spacing: 0.16em;
   text-transform: uppercase;
+  color: var(--ink-60);
 }
 
-.workspace-brand-subtitle {
-  font-size: 0.85rem;
-  color: var(--text-muted);
+.dep-brand strong {
+  color: var(--ink);
+  font-weight: 600;
 }
 
-.workspace-panel {
-  background: color-mix(in srgb, var(--surface-card) 88%, var(--surface-soft) 12%);
-  border: 1px solid color-mix(in srgb, #94a3b8 40%, transparent 60%);
-  border-radius: 16px;
-  padding: 1rem;
-  box-shadow: 0 16px 45px -26px rgba(2, 6, 23, 0.45);
+.dep-brand-mark {
+  color: var(--mark);
 }
 
-.workspace-panel-header {
-  margin-bottom: 0.75rem;
+/* ---- Type -------------------------------------------------------------- */
+.dep-display {
+  font-family: var(--serif);
+  font-weight: 400;
+  font-size: clamp(2rem, 5vw, 3.4rem);
+  line-height: 1.06;
+  letter-spacing: -0.02em;
+  color: var(--ink);
 }
 
-.workspace-title {
-  font-family: var(--font-accent);
-  font-size: clamp(1.3rem, 2vw, 1.75rem);
+.dep-title {
+  font-family: var(--serif);
+  font-weight: 400;
+  font-size: clamp(1.6rem, 3vw, 2.3rem);
+  line-height: 1.1;
+  letter-spacing: -0.015em;
+  color: var(--ink);
+}
+
+.dep-subtitle {
+  font-family: var(--serif);
+  font-size: 1.15rem;
+  font-weight: 400;
+  color: var(--ink);
+}
+
+.dep-lede {
+  font-size: 1.02rem;
+  color: var(--ink-80);
+  max-width: var(--measure);
+}
+
+.dep-muted {
+  color: var(--ink-60);
+  font-size: 0.9rem;
+}
+
+.dep-eyebrow {
+  font-size: 0.68rem;
+  font-weight: 600;
+  letter-spacing: 0.16em;
+  text-transform: uppercase;
+  color: var(--ink-42);
+}
+
+.dep-num {
+  font-family: var(--mono);
+  font-size: 0.72rem;
+  color: var(--ink-42);
+  font-variant-numeric: tabular-nums;
+}
+
+.dep-mono {
+  font-family: var(--mono);
+  font-size: 0.8rem;
+}
+
+.dep-link {
+  color: var(--ink);
+  text-decoration: underline;
+  text-decoration-thickness: 1px;
+  text-underline-offset: 3px;
+  text-decoration-color: var(--mark-line);
+  transition: color 0.2s var(--ease);
+}
+
+.dep-link:hover {
+  color: var(--mark);
+  text-decoration-color: var(--mark);
+}
+
+/* A vertical change bar, the way a revised paragraph is flagged. */
+.dep-changebar {
+  border-left: 2px solid var(--mark);
+  padding-left: 1rem;
+}
+
+/* ---- Cards & panels ------------------------------------------------------ */
+.dep-card {
+  background: var(--paper-card);
+  border: 1px solid var(--ink-16);
+  border-radius: 3px;
+  padding: clamp(1rem, 2vw, 1.5rem);
+}
+
+.dep-card--sunk {
+  background: var(--paper-sunk);
+  border-color: transparent;
+}
+
+.dep-card--flush {
+  padding: 0;
+  overflow: hidden;
+}
+
+.dep-rule {
+  border: 0;
+  border-top: 1px solid var(--ink-16);
+  margin: 0;
+}
+
+/* ---- Nav ----------------------------------------------------------------- */
+.dep-nav {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 0.4rem;
+}
+
+.dep-navlink {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.45rem;
+  padding: 0.45rem 0.8rem;
+  border: 1px solid transparent;
+  border-radius: 2px;
+  font-size: 0.86rem;
+  font-weight: 600;
+  color: var(--ink-60);
+  text-decoration: none;
+  white-space: nowrap;
+  transition:
+    color 0.18s var(--ease),
+    background 0.18s var(--ease),
+    border-color 0.18s var(--ease);
+}
+
+.dep-navlink:hover {
+  color: var(--ink);
+  background: var(--mark-soft);
+}
+
+.dep-navlink[aria-current="page"] {
+  color: var(--ink);
+  border-color: var(--ink-16);
+  background: var(--paper-card);
+  box-shadow: inset 0 -2px 0 var(--mark);
+}
+
+.dep-navlink--home {
+  color: var(--ink);
+  border-color: var(--ink-16);
+}
+
+.dep-navlink--home:hover {
+  border-color: var(--mark-line);
+}
+
+.dep-navlink__index {
+  font-family: var(--mono);
+  font-size: 0.66rem;
+  color: var(--ink-42);
+}
+
+.dep-navlink[aria-current="page"] .dep-navlink__index {
+  color: var(--mark);
+}
+
+/* ---- Buttons ------------------------------------------------------------- */
+.dep-btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.45rem;
+  padding: 0.5rem 0.95rem;
+  border: 1px solid var(--ink-16);
+  border-radius: 2px;
+  background: var(--paper-card);
+  color: var(--ink);
+  font-family: var(--sans);
+  font-size: 0.84rem;
+  font-weight: 600;
+  line-height: 1.2;
+  cursor: pointer;
+  transition:
+    background 0.18s var(--ease),
+    border-color 0.18s var(--ease),
+    color 0.18s var(--ease);
+}
+
+.dep-btn:hover:not(:disabled) {
+  border-color: var(--ink);
+  background: var(--ink);
+  color: var(--paper);
+}
+
+.dep-btn:disabled {
+  opacity: 0.45;
+  cursor: not-allowed;
+}
+
+.dep-btn--mark {
+  border-color: var(--mark);
+  color: var(--mark);
+}
+
+.dep-btn--mark:hover:not(:disabled) {
+  background: var(--mark);
+  border-color: var(--mark);
+  color: #fff;
+}
+
+.dep-btn--quiet {
+  border-color: transparent;
+  background: transparent;
+  color: var(--ink-60);
+  padding-inline: 0.5rem;
+}
+
+.dep-btn--quiet:hover:not(:disabled) {
+  background: var(--mark-soft);
+  border-color: transparent;
+  color: var(--ink);
+}
+
+.dep-btn--icon {
+  width: 2.1rem;
+  height: 2.1rem;
+  padding: 0;
+}
+
+/* ---- Form controls ------------------------------------------------------- */
+.dep-select,
+.dep-input {
+  appearance: none;
+  padding: 0.5rem 2rem 0.5rem 0.7rem;
+  border: 1px solid var(--ink-16);
+  border-radius: 2px;
+  background-color: var(--paper-card);
+  color: var(--ink);
+  font-family: var(--sans);
+  font-size: 0.84rem;
+  font-weight: 600;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='10' height='6'%3E%3Cpath d='M1 1l4 4 4-4' fill='none' stroke='%23BE3A21' stroke-width='1.6'/%3E%3C/svg%3E");
+  background-repeat: no-repeat;
+  background-position: right 0.65rem center;
+  cursor: pointer;
+}
+
+.dep-input {
+  padding-right: 0.7rem;
+  background-image: none;
+  font-weight: 400;
+  cursor: text;
+}
+
+.dep-select:hover,
+.dep-input:focus {
+  border-color: var(--mark-line);
+}
+
+/* ---- Tags ---------------------------------------------------------------- */
+.dep-tags {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.35rem;
+}
+
+.dep-tag {
+  display: inline-block;
+  padding: 0.14rem 0.5rem;
+  border: 1px solid var(--ink-16);
+  border-radius: 2px;
+  font-family: var(--mono);
+  font-size: 0.66rem;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  color: var(--ink-60);
+  white-space: nowrap;
+}
+
+.dep-tag--mark {
+  color: var(--mark);
+  border-color: var(--mark-line);
+}
+
+/* ---- Toolbars ------------------------------------------------------------ */
+.dep-toolbar {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 0.3rem;
+  padding: 0.45rem 0.55rem;
+  border: 1px solid var(--ink-16);
+  border-radius: 2px;
+  background: var(--paper-sunk);
+}
+
+.dep-toolbar__group {
+  display: flex;
+  align-items: center;
+  gap: 0.15rem;
+}
+
+.dep-toolbar__sep {
+  width: 1px;
+  align-self: stretch;
+  margin-inline: 0.35rem;
+  background: var(--ink-16);
+}
+
+.dep-toolbar__label {
+  font-size: 0.68rem;
+  font-weight: 600;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  color: var(--ink-42);
+  margin-right: 0.15rem;
+}
+
+/* A tool button that names itself on hover, so an icon is never a guess. */
+.dep-tool {
+  position: relative;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.35rem;
+  min-width: 2.1rem;
+  height: 2.1rem;
+  padding-inline: 0.4rem;
+  border: 1px solid transparent;
+  border-radius: 2px;
+  background: transparent;
+  color: var(--ink-80);
+  cursor: pointer;
+  transition:
+    background 0.15s var(--ease),
+    color 0.15s var(--ease),
+    border-color 0.15s var(--ease);
+}
+
+.dep-tool:hover:not(:disabled) {
+  background: var(--paper-raised);
+  border-color: var(--ink-16);
+  color: var(--ink);
+}
+
+.dep-tool[aria-pressed="true"] {
+  background: var(--mark-soft);
+  border-color: var(--mark-line);
+  color: var(--mark);
+}
+
+.dep-tool:disabled {
+  opacity: 0.4;
+  cursor: not-allowed;
+}
+
+.dep-tool__text {
+  font-size: 0.78rem;
+  font-weight: 600;
+}
+
+/* Tooltip: shows the tool name and its keyboard shortcut on hover/focus. */
+.dep-tool__tip {
+  position: absolute;
+  top: calc(100% + 6px);
+  left: 50%;
+  transform: translateX(-50%) translateY(-3px);
+  z-index: 40;
+  padding: 0.3rem 0.5rem;
+  border-radius: 2px;
+  background: var(--ink);
+  color: var(--paper);
+  font-family: var(--sans);
+  font-size: 0.7rem;
+  font-weight: 600;
+  line-height: 1.3;
+  white-space: nowrap;
+  opacity: 0;
+  pointer-events: none;
+  transition:
+    opacity 0.14s var(--ease),
+    transform 0.14s var(--ease);
+}
+
+.dep-tool__tip kbd {
+  font-family: var(--mono);
+  font-size: 0.65rem;
+  color: var(--paper);
+  opacity: 0.7;
+  margin-left: 0.3rem;
+}
+
+.dep-tool:hover .dep-tool__tip,
+.dep-tool:focus-visible .dep-tool__tip {
+  opacity: 1;
+  transform: translateX(-50%) translateY(0);
+}
+
+/* ---- Tabs ---------------------------------------------------------------- */
+.dep-tabs {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.15rem;
+  border-bottom: 1px solid var(--ink-16);
+}
+
+.dep-tab {
+  padding: 0.4rem 0.8rem;
+  border: 1px solid transparent;
+  border-bottom: 0;
+  border-radius: 2px 2px 0 0;
+  margin-bottom: -1px;
+  background: transparent;
+  color: var(--ink-60);
+  font-family: var(--sans);
+  font-size: 0.78rem;
+  font-weight: 600;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+  cursor: pointer;
+  transition:
+    color 0.15s var(--ease),
+    background 0.15s var(--ease);
+}
+
+.dep-tab:hover {
+  color: var(--ink);
+  background: var(--mark-soft);
+}
+
+.dep-tab[aria-selected="true"] {
+  color: var(--ink);
+  border-color: var(--ink-16);
+  border-bottom: 1px solid var(--paper-card);
+  background: var(--paper-card);
+}
+
+/* ---- Code / output ------------------------------------------------------- */
+.dep-code {
+  margin: 0;
+  padding: 0.9rem;
+  max-height: 22rem;
+  overflow: auto;
+  background: var(--paper-sunk);
+  border: 1px solid var(--ink-16);
+  border-top: 0;
+  font-family: var(--mono);
+  font-size: 0.76rem;
+  line-height: 1.6;
+  color: var(--ink-80);
+  white-space: pre-wrap;
+  word-break: break-word;
+  tab-size: 2;
+}
+
+/* ---- Diagnostics --------------------------------------------------------- */
+.dep-check {
+  display: flex;
+  align-items: baseline;
+  gap: 0.5rem;
+  padding: 0.35rem 0;
+  border-top: 1px solid var(--ink-08);
+  font-size: 0.84rem;
+}
+
+.dep-check:first-child {
+  border-top: 0;
+}
+
+.dep-check__flag {
+  font-family: var(--mono);
+  font-size: 0.7rem;
+  font-weight: 500;
+  letter-spacing: 0.06em;
+  flex-shrink: 0;
+  width: 3.4rem;
+}
+
+.dep-check--pass .dep-check__flag {
+  color: var(--pass);
+}
+
+.dep-check--fail .dep-check__flag {
+  color: var(--fail);
+}
+
+.dep-check__label {
+  font-weight: 600;
+  color: var(--ink);
+}
+
+.dep-check__detail {
+  color: var(--ink-60);
+  font-size: 0.8rem;
+}
+
+/* ---- Callout ------------------------------------------------------------- */
+.dep-callout {
+  border-left: 2px solid var(--mark);
+  background: var(--mark-soft);
+  padding: 0.7rem 0.9rem;
+  font-size: 0.86rem;
+  color: var(--ink-80);
+}
+
+.dep-callout strong {
+  color: var(--ink);
+  font-weight: 600;
+}
+
+/* ==========================================================================
+   Editable document surface
+   Tailwind's preflight strips heading sizes and list markers, which made
+   "make this a heading" and "make this a list" produce no visible change in
+   the editors that ship no CSS of their own (Slate, Lexical, Editor.js).
+   .dep-doc restores document typography inside every editing surface.
+   ========================================================================== */
+.dep-doc {
+  font-family: var(--serif);
+  font-size: 1.02rem;
+  line-height: 1.7;
+  color: var(--ink);
+}
+
+.dep-doc h1,
+.dep-doc h2,
+.dep-doc h3,
+.dep-doc h4,
+.dep-doc h5,
+.dep-doc h6 {
+  font-family: var(--serif);
+  font-weight: 600;
+  line-height: 1.2;
+  margin: 1.4em 0 0.5em;
+  color: var(--ink);
+}
+
+.dep-doc > :first-child {
+  margin-top: 0;
+}
+
+.dep-doc h1 {
+  font-size: 1.95em;
+  letter-spacing: -0.02em;
+}
+
+.dep-doc h2 {
+  font-size: 1.55em;
+  letter-spacing: -0.015em;
+}
+
+.dep-doc h3 {
+  font-size: 1.28em;
+}
+
+.dep-doc h4 {
+  font-size: 1.12em;
+}
+
+.dep-doc h5,
+.dep-doc h6 {
+  font-size: 1em;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  font-family: var(--sans);
+}
+
+.dep-doc p {
+  margin: 0 0 0.9em;
+}
+
+.dep-doc p:last-child {
+  margin-bottom: 0;
+}
+
+.dep-doc strong,
+.dep-doc b {
   font-weight: 700;
-  letter-spacing: 0.01em;
 }
 
-.workspace-description {
-  margin-top: 0.2rem;
-  font-size: 0.95rem;
-  color: var(--text-muted);
+.dep-doc em,
+.dep-doc i {
+  font-style: italic;
+}
+
+.dep-doc u {
+  text-decoration: underline;
+  text-underline-offset: 2px;
+}
+
+.dep-doc s,
+.dep-doc del,
+.dep-doc strike {
+  text-decoration: line-through;
+  text-decoration-color: var(--mark);
+}
+
+.dep-doc ul,
+.dep-doc ol {
+  margin: 0 0 0.9em;
+  padding-left: 1.6em;
+}
+
+.dep-doc ul {
+  list-style: disc;
+}
+
+.dep-doc ul ul {
+  list-style: circle;
+}
+
+.dep-doc ol {
+  list-style: decimal;
+}
+
+.dep-doc ol ol {
+  list-style: lower-alpha;
+}
+
+.dep-doc li {
+  margin: 0.25em 0;
+  display: list-item;
+}
+
+.dep-doc li > p {
+  margin: 0;
+}
+
+.dep-doc blockquote {
+  margin: 0 0 0.9em;
+  padding-left: 1rem;
+  border-left: 2px solid var(--mark);
+  color: var(--ink-80);
+  font-style: italic;
+}
+
+.dep-doc code {
+  font-family: var(--mono);
+  font-size: 0.86em;
+  padding: 0.1em 0.35em;
+  border-radius: 2px;
+  background: var(--ink-08);
+}
+
+.dep-doc pre {
+  margin: 0 0 0.9em;
+  padding: 0.8rem;
+  overflow-x: auto;
+  background: var(--paper-sunk);
+  border: 1px solid var(--ink-16);
+  border-radius: 2px;
+}
+
+.dep-doc pre code {
+  background: none;
+  padding: 0;
+}
+
+.dep-doc a {
+  color: var(--mark);
+  text-decoration: underline;
+  text-underline-offset: 2px;
+}
+
+.dep-doc hr {
+  border: 0;
+  border-top: 1px solid var(--ink-16);
+  margin: 1.4em 0;
+}
+
+.dep-doc table {
+  width: 100%;
+  border-collapse: collapse;
+  margin: 0 0 0.9em;
+  font-family: var(--sans);
+  font-size: 0.9em;
+}
+
+.dep-doc th,
+.dep-doc td {
+  border: 1px solid var(--ink-16);
+  padding: 0.4rem 0.55rem;
+  text-align: left;
+  vertical-align: top;
+}
+
+.dep-doc th {
+  background: var(--paper-sunk);
+  font-weight: 600;
+}
+
+.dep-doc img {
+  max-width: 100%;
+  height: auto;
+}
+
+/* The page-like sheet an editing surface sits on. */
+.dep-sheet {
+  background: var(--paper-raised);
+  border: 1px solid var(--ink-16);
+  border-radius: 2px;
+  direction: ltr;
+  text-align: left;
+}
+
+.dep-sheet:focus-within {
+  border-color: var(--mark-line);
+}
+
+/* ---- Motion ------------------------------------------------------------- */
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.001ms !important;
+    transition-duration: 0.001ms !important;
+  }
+}
+
+/* ==========================================================================
+   Legacy class aliases
+   The shell markup keeps its original `workspace-*` hooks so the e2e contract
+   tests and any external selectors continue to resolve. Styling now comes from
+   the `dep-*` system above; these rules only carry what the shell still needs.
+   ========================================================================== */
+.workspace-editor {
+  min-height: 58vh;
+  direction: ltr;
+  text-align: left;
+  border: 1px solid var(--ink-16);
+  border-radius: 2px;
+  background: var(--paper-raised);
+  overflow: hidden;
 }
 
 .workspace-controls {
-  display: flex;
-  flex-wrap: wrap;
-  gap: 0.5rem;
-  margin-bottom: 0.75rem;
+  align-items: center;
 }
 
-.workspace-editor {
-  min-height: 60vh;
-  direction: ltr;
+/* ==========================================================================
+   Home page: comparison table and the editor index
+   ========================================================================== */
+.dep-compare {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 0.88rem;
+  min-width: 60rem;
+}
+
+.dep-compare th,
+.dep-compare td {
+  border-top: 1px solid var(--ink-16);
+  padding: 0.7rem 0.9rem 0.7rem 0;
   text-align: left;
-  border-radius: 12px;
-  border: 1px solid color-mix(in srgb, #64748b 35%, transparent 65%);
-  background: color-mix(in srgb, var(--surface-card) 96%, #f8fbff 4%);
-  overflow: hidden;
+  vertical-align: top;
+}
+
+.dep-compare thead th {
+  border-top: 0;
+  border-bottom: 1px solid var(--ink);
+  padding-bottom: 0.45rem;
+  font-size: 0.68rem;
+  font-weight: 600;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  color: var(--ink-42);
+  white-space: nowrap;
+}
+
+.dep-compare tbody th {
+  font-weight: 600;
+  white-space: nowrap;
+  padding-right: 1.4rem;
+}
+
+.dep-compare tbody td {
+  color: var(--ink-80);
+}
+
+.dep-compare tbody tr:hover th,
+.dep-compare tbody tr:hover td {
+  background: var(--mark-soft);
+}
+
+.dep-index {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+}
+
+.dep-entry {
+  border-top: 1px solid var(--ink-16);
+}
+
+.dep-entry:last-child {
+  border-bottom: 1px solid var(--ink-16);
+}
+
+.dep-entry__link {
+  display: grid;
+  grid-template-columns: 3rem 1fr auto;
+  align-items: baseline;
+  gap: 1rem;
+  padding: 1.1rem 0.9rem 1.1rem 0.2rem;
+  text-decoration: none;
+  color: inherit;
+  transition: background 0.2s var(--ease);
+}
+
+.dep-entry__link:hover {
+  background: var(--mark-soft);
+}
+
+.dep-entry__num {
+  font-family: var(--mono);
+  font-size: 0.78rem;
+  color: var(--ink-42);
+  transition: color 0.2s var(--ease);
+}
+
+.dep-entry__link:hover .dep-entry__num {
+  color: var(--mark);
+}
+
+.dep-entry__body {
+  display: block;
+}
+
+.dep-entry__name {
+  display: block;
+  font-family: var(--serif);
+  font-size: 1.4rem;
+  line-height: 1.2;
+  letter-spacing: -0.01em;
+  background-image: linear-gradient(var(--mark), var(--mark));
+  background-repeat: no-repeat;
+  background-position: 0 100%;
+  background-size: 0 1.5px;
+  transition: background-size 0.3s var(--ease);
+}
+
+.dep-entry__link:hover .dep-entry__name {
+  background-size: 100% 1.5px;
+}
+
+.dep-entry__what {
+  display: block;
+  margin-top: 0.3rem;
+  color: var(--ink-80);
+  font-size: 0.94rem;
+  max-width: 62ch;
+}
+
+.dep-entry__only {
+  display: block;
+  margin-top: 0.4rem;
+  color: var(--ink-60);
+  font-size: 0.84rem;
+  max-width: 72ch;
+}
+
+.dep-entry__only strong {
+  color: var(--mark);
+  font-weight: 600;
+}
+
+.dep-entry__go {
+  font-family: var(--mono);
+  font-size: 0.76rem;
+  color: var(--ink-42);
+  white-space: nowrap;
+  transition: color 0.2s var(--ease);
+}
+
+.dep-entry__link:hover .dep-entry__go {
+  color: var(--mark);
+}
+
+@media (max-width: 720px) {
+  .dep-entry__link {
+    grid-template-columns: 2rem 1fr;
+  }
+
+  .dep-entry__go {
+    display: none;
+  }
+}
+
+.dep-foot {
+  border-top: 1px solid var(--ink-16);
+  padding-top: 1.2rem;
+  padding-bottom: 2rem;
+}
+
+/* ==========================================================================
+   Library chrome inside a document surface
+   The editable surfaces are wrapped in .dep-doc so the shared document
+   typography reaches library-owned DOM. Editor chrome that happens to live
+   inside that wrapper is reset back to the UI font, or it inherits the serif.
+   ========================================================================== */
+.dep-doc :is(
+    .ck-toolbar,
+    .ck-dropdown,
+    .ck-balloon-panel,
+    .ck-list,
+    .toastui-editor-toolbar,
+    .toastui-editor-mode-switch,
+    .toastui-editor-popup,
+    .toastui-editor-md-container .toastui-editor,
+    .ce-toolbar,
+    .ce-inline-toolbar,
+    .ce-conversion-toolbar,
+    .ce-popover,
+    .ce-settings
+  ) {
+  font-family: var(--sans);
+}
+
+/* Toast's Markdown pane is source code, so it should read as source code. */
+.dep-doc .toastui-editor-md-container .ProseMirror {
+  font-family: var(--mono);
+  font-size: 0.85rem;
+}
+
+/* Toast's mode switch is the point of that editor - make it visible instead of
+   a hairline strip clipped at the bottom of the container. */
+.toast-editor-shell .toastui-editor-mode-switch {
+  background: var(--paper-sunk);
+  border-top: 1px solid var(--ink-16);
+}
+
+.toast-editor-shell .toastui-editor-mode-switch .tab-item {
+  font-family: var(--sans);
+  font-size: 0.72rem;
+  font-weight: 600;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+}
+
+/* ==========================================================================
+   TipTap extensions drawer
+   ========================================================================== */
+.dep-extension-panel {
+  position: fixed;
+  top: 0;
+  right: 0;
+  z-index: 50;
+  height: 100%;
+  width: 21rem;
+  max-width: 90vw;
+  background: var(--paper-card);
+  border-left: 1px solid var(--ink-16);
+  box-shadow: -12px 0 40px -24px rgba(0, 0, 0, 0.5);
+  transform: translateX(100%);
+  transition: transform 0.24s var(--ease);
+}
+
+.dep-extension-panel.is-open {
+  transform: translateX(0);
+}
+
+/* ==========================================================================
+   TipTap slash-command menu
+   TipTap ships the suggestion plugin but no menu, so this is the app's UI.
+   It is appended to <body>, outside the editor, hence the fixed positioning.
+   ========================================================================== */
+.dep-slash-menu {
+  position: fixed;
+  z-index: 60;
+  min-width: 15rem;
+  max-height: 17rem;
+  overflow-y: auto;
+  padding: 0.25rem;
+  background: var(--paper-card);
+  border: 1px solid var(--ink-16);
+  border-radius: 2px;
+  box-shadow: 0 18px 40px -22px rgba(0, 0, 0, 0.45);
+  font-family: var(--sans);
+}
+
+.dep-slash-menu__item {
+  display: flex;
+  width: 100%;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: 0.75rem;
+  padding: 0.4rem 0.55rem;
+  border: 0;
+  border-radius: 2px;
+  background: transparent;
+  text-align: left;
+  cursor: pointer;
+}
+
+.dep-slash-menu__item[aria-selected="true"] {
+  background: var(--mark-soft);
+}
+
+.dep-slash-menu__label {
+  font-size: 0.86rem;
+  font-weight: 600;
+  color: var(--ink);
+}
+
+.dep-slash-menu__item[aria-selected="true"] .dep-slash-menu__label {
+  color: var(--mark);
+}
+
+.dep-slash-menu__hint {
+  font-size: 0.72rem;
+  color: var(--ink-42);
+  white-space: nowrap;
+}
+
+.dep-slash-menu__empty {
+  margin: 0;
+  padding: 0.5rem 0.55rem;
+  font-size: 0.82rem;
+  color: var(--ink-42);
 }

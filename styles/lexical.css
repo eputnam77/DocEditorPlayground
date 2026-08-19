@@ -1,21 +1,129 @@
-/* Lexical overrides */
+/* Lexical overrides
+ *
+ * Lexical emits semantic elements but applies no styling of its own, and its
+ * class names come from the theme object in pages/lexical.tsx. Without these
+ * rules Tailwind's preflight leaves an <h2> looking exactly like a <p>, so
+ * "make this a heading" appeared to do nothing.
+ */
 
 [data-testid="lexical-editor"] {
   direction: ltr;
   unicode-bidi: plaintext;
   text-align: left;
+  font-family: var(--serif);
+  font-size: 1.02rem;
+  line-height: 1.7;
 }
 
+.lexical-paragraph {
+  margin: 0 0 0.9em;
+}
+
+.lexical-paragraph:last-child {
+  margin-bottom: 0;
+}
+
+.lexical-h1,
+.lexical-h2,
+.lexical-h3,
+.lexical-h4,
+.lexical-h5,
+.lexical-h6 {
+  font-family: var(--serif);
+  font-weight: 600;
+  line-height: 1.2;
+  margin: 1.4em 0 0.5em;
+  color: var(--ink);
+}
+
+[data-testid="lexical-editor"] > *:first-child {
+  margin-top: 0;
+}
+
+.lexical-h1 {
+  font-size: 1.95em;
+  letter-spacing: -0.02em;
+}
+
+.lexical-h2 {
+  font-size: 1.55em;
+  letter-spacing: -0.015em;
+}
+
+.lexical-h3 {
+  font-size: 1.28em;
+}
+
+.lexical-h4 {
+  font-size: 1.12em;
+}
+
+.lexical-h5,
+.lexical-h6 {
+  font-family: var(--sans);
+  font-size: 1em;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+}
+
+.lexical-quote {
+  margin: 0 0 0.9em;
+  padding-left: 1rem;
+  border-left: 2px solid var(--mark);
+  color: var(--ink-80);
+  font-style: italic;
+}
+
+.lexical-ul,
+.lexical-ol,
 [data-testid="lexical-editor"] ul,
 [data-testid="lexical-editor"] ol {
-  margin: 0.25rem 0;
-  padding-left: 1.5rem;
+  margin: 0 0 0.9em;
+  padding-left: 1.6em;
 }
 
+.lexical-ul,
 [data-testid="lexical-editor"] ul {
-  list-style-type: disc;
+  list-style: disc;
 }
 
+.lexical-ol,
 [data-testid="lexical-editor"] ol {
-  list-style-type: decimal;
+  list-style: decimal;
+}
+
+.lexical-li {
+  margin: 0.25em 0;
+  display: list-item;
+}
+
+/* A nested list's own <li> wrapper carries no marker of its own. */
+.lexical-li-nested {
+  list-style: none;
+}
+
+.lexical-bold {
+  font-weight: 700;
+}
+
+.lexical-italic {
+  font-style: italic;
+}
+
+.lexical-underline {
+  text-decoration: underline;
+  text-underline-offset: 2px;
+}
+
+.lexical-strikethrough {
+  text-decoration: line-through;
+  text-decoration-color: var(--mark);
+}
+
+.lexical-code {
+  font-family: var(--mono);
+  font-size: 0.86em;
+  padding: 0.1em 0.35em;
+  border-radius: 2px;
+  background: var(--ink-08);
 }

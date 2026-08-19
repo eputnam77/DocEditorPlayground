@@ -7,7 +7,9 @@ import {
   ListOrdered,
   Pilcrow,
 } from "lucide-react";
-import EditorIntegrationInfo from "../components/EditorIntegrationInfo";
+import Head from "next/head";
+import EditorProfile from "../components/EditorProfile";
+import EditorOutputPanel from "../components/EditorOutputPanel";
 import TemplateLoader from "../components/TemplateLoader";
 import sanitizeHtml from "../utils/sanitize";
 import ValidationStatus, {
@@ -15,7 +17,7 @@ import ValidationStatus, {
 } from "../components/ValidationStatus";
 import CommentTrack from "../components/CommentTrack";
 import TrackChanges from "../components/TrackChanges";
-import { TEMPLATES } from "../utils/templates";
+import { TEMPLATES, getTemplateHtml } from "../utils/templates";
 import { LIPSUM_PARAGRAPHS } from "../utils/lipsum";
 import EditorWorkspace from "../components/EditorWorkspace";
 import FormatToggleButton from "../components/FormatToggleButton";
@@ -60,6 +62,80 @@ function outputToText(data: OutputData): string {
     .join(" ")
     .replace(/\s+/g, " ")
     .trim();
+}
+
+/**
+ * Convert template HTML into Editor.js blocks.
+ *
+ * Editor.js's own `blocks.renderFromHTML` only understands paragraphs, so a
+ * template imported through it arrived as a single line with every heading and
+ * list discarded. Mapping the HTML onto the block tools registered below keeps
+ * the document's structure - and makes the block model visible, since anything
+ * without a matching tool genuinely has nowhere to go.
+ */
+function htmlToBlocks(html: string): OutputData {
+  const doc = new DOMParser().parseFromString(html, "text/html");
+  const blocks: OutputData["blocks"] = [];
+
+  const inlineHtml = (element: Element) =>
+    element.innerHTML.replace(/\s+/g, " ").trim();
+
+  function walk(node: Node) {
+    if (node.nodeType === Node.TEXT_NODE) {
+      const text = (node.textContent || "").trim();
+      if (text) {
+        blocks.push({ type: "paragraph", data: { text } });
+      }
+      return;
+    }
+    if (node.nodeType !== Node.ELEMENT_NODE) {
+      return;
+    }
+    const element = node as HTMLElement;
+
+    switch (element.tagName) {
+      case "H1":
+      case "H2":
+      case "H3":
+      case "H4":
+      case "H5":
+      case "H6":
+        blocks.push({
+          type: "header",
+          data: {
+            text: inlineHtml(element),
+            level: Math.min(4, Number(element.tagName.slice(1))),
+          },
+        });
+        return;
+      case "UL":
+      case "OL":
+        blocks.push({
+          type: "list",
+          data: {
+            style: element.tagName === "OL" ? "ordered" : "unordered",
+            items: Array.from(element.querySelectorAll(":scope > li")).map((li) => ({
+              content: inlineHtml(li),
+              items: [],
+            })),
+          },
+        });
+        return;
+      case "P":
+      case "BLOCKQUOTE":
+      case "PRE":
+        blocks.push({ type: "paragraph", data: { text: inlineHtml(element) } });
+        return;
+      default:
+        Array.from(element.childNodes).forEach(walk);
+    }
+  }
+
+  Array.from(doc.body.childNodes).forEach(walk);
+
+  return {
+    blocks: blocks.length > 0 ? blocks : [{ type: "paragraph", data: { text: "" } }],
+  };
 }
 
 const INITIAL_BLOCKS: OutputData = {
@@ -239,20 +315,15 @@ function CodexPage() {
   }, []);
 
   async function loadTemplate(filename: string) {
-    try {
-      const res = await fetch(`/templates/${filename}`);
-      if (!res.ok) {
-        throw new Error("fetch failed");
-      }
-      const html = sanitizeHtml(await res.text());
-      await editorRef.current?.blocks?.renderFromHTML?.(html);
-      if (editorRef.current) {
-        await syncEditorState(editorRef.current);
-        refreshActiveState();
-      }
-    } catch {
-      alert(`Failed to load template: ${filename}`);
+    // Compiled into the bundle - see utils/templateContent.ts.
+    const html = sanitizeHtml(getTemplateHtml(filename));
+    const editor = editorRef.current;
+    if (!editor) {
+      return;
     }
+    await editor.blocks?.render?.(htmlToBlocks(html));
+    await syncEditorState(editor);
+    refreshActiveState();
   }
 
   async function convertCurrentBlock(
@@ -332,53 +403,76 @@ function CodexPage() {
   }
 
   return (
-    <EditorWorkspace
+    <>
+      <Head>
+        <title>Editor.js · Document Editor Playground</title>
+      </Head>
+      <EditorWorkspace
+      editorId="codex"
       title="Editor.js"
-      description="Official block editor setup with Header/List/Paragraph tools, inline text formatting, and block conversion controls."
+      description="A block editor, not an HTML editor. The document is an array of typed blocks, and the JSON tab below is the real document - the HTML is generated for display only."
       toolDescription={EDITOR_BY_ID.codex.toolDescription}
       toolRepoUrl={EDITOR_BY_ID.codex.githubRepoUrl}
+      surfaceNote={
+        <>
+          <strong>Look for:</strong> click into a paragraph and a{" "}
+          <span aria-hidden="true">⊕</span> plus a drag handle appear beside it -
+          Editor.js works one block at a time. Convert a block with the buttons below,
+          then open the <em>JSON</em> tab in the output panel: that array of typed blocks
+          <em> is</em> the document. There is no HTML source to inspect.
+        </>
+      }
       controls={
         <>
           <TemplateLoader
             templates={TEMPLATES}
             onLoad={loadTemplate}
             onClear={() => editorRef.current?.blocks?.clear?.()}
-            onError={(error) => alert(String(error))}
+            onError={(error) => alert(`Could not load template: ${String(error)}`)}
           />
           <button
             type="button"
-            className="rounded-md bg-sky-600 px-3 py-2 text-sm font-semibold text-white hover:bg-sky-700"
+            className="dep-btn dep-btn--mark"
             onClick={runDiagnostics}
           >
             Run diagnostics
           </button>
         </>
       }
+      diagnostics={
+        <ValidationStatus
+          results={validationResults}
+          onClear={() => setValidationResults([])}
+        />
+      }
       statusPanel={
         <div className="space-y-3">
+          <EditorOutputPanel
+            editorName="Editor.js"
+            nativeFormat={EDITOR_BY_ID.codex.nativeFormat}
+            available={["json", "html"]}
+            getters={{
+              json: () => JSON.stringify(savedData),
+              html: () => holderRef.current?.innerHTML ?? "",
+            }}
+          />
           <TrackChanges content={content} />
-          {validationResults.length > 0 && (
-            <ValidationStatus
-              results={validationResults}
-              onClear={() => setValidationResults([])}
-            />
-          )}
         </div>
       }
       sidePanel={
-        <div className="space-y-4">
+        <div className="space-y-5">
+          <EditorProfile editorId="codex" />
+          <hr className="dep-rule" />
           <CommentTrack />
-          <EditorIntegrationInfo editorName="Editor.js" />
         </div>
       }
     >
-      <div className="h-full p-3">
-        <p className="mb-2 text-xs text-slate-600 dark:text-slate-300">
-          Editor.js is block-based: use these controls to convert the current block type and use inline selection tools for bold/italic.
-        </p>
-        <div className="mb-3 flex flex-wrap gap-2">
+      <div className="dep-doc h-full p-3">
+        <div className="dep-toolbar mb-3">
+          <span className="dep-toolbar__label">Block</span>
           <FormatToggleButton
             label="Bold"
+            shortcut="Ctrl+B"
             active={active.bold}
             onMouseDown={(event) => {
               event.preventDefault();
@@ -389,6 +483,7 @@ function CodexPage() {
           </FormatToggleButton>
           <FormatToggleButton
             label="Paragraph"
+            showLabel
             active={active.paragraph}
             onMouseDown={(event) => {
               event.preventDefault();
@@ -399,6 +494,7 @@ function CodexPage() {
           </FormatToggleButton>
           <FormatToggleButton
             label="Heading"
+            showLabel
             active={active.heading}
             onMouseDown={(event) => {
               event.preventDefault();
@@ -409,6 +505,7 @@ function CodexPage() {
           </FormatToggleButton>
           <FormatToggleButton
             label="Bullet list"
+            showLabel
             active={active.bulletList}
             onMouseDown={(event) => {
               event.preventDefault();
@@ -419,6 +516,7 @@ function CodexPage() {
           </FormatToggleButton>
           <FormatToggleButton
             label="Numbered list"
+            showLabel
             active={active.numberedList}
             onMouseDown={(event) => {
               event.preventDefault();
@@ -433,10 +531,11 @@ function CodexPage() {
           data-testid="codex-editor"
           ref={holderRef}
           dir="ltr"
-          className="h-[58vh] w-full rounded-md border border-slate-300 bg-white p-3 text-left text-slate-900 outline-none dark:border-slate-600 dark:bg-slate-900 dark:text-slate-100"
+          className="dep-sheet h-[58vh] w-full overflow-auto p-3 outline-none"
         />
       </div>
-    </EditorWorkspace>
+      </EditorWorkspace>
+    </>
   );
 }
 

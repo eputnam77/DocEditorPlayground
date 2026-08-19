@@ -4,8 +4,10 @@ import * as SlateApi from "slate";
 import { createEditor, Element as SlateElement, Node, Transforms } from "slate";
 import { Slate, Editable, withReact, useSlate } from "slate-react";
 import { withHistory } from "slate-history";
-import { Bold, Heading2, Italic, List, ListOrdered } from "lucide-react";
-import EditorIntegrationInfo from "../components/EditorIntegrationInfo";
+import { Bold, Heading1, Heading2, Heading3, Italic, List, ListOrdered, Quote } from "lucide-react";
+import Head from "next/head";
+import EditorProfile from "../components/EditorProfile";
+import EditorOutputPanel from "../components/EditorOutputPanel";
 import TemplateLoader from "../components/TemplateLoader";
 import sanitizeHtml from "../utils/sanitize";
 import ValidationStatus, {
@@ -13,7 +15,7 @@ import ValidationStatus, {
 } from "../components/ValidationStatus";
 import CommentTrack from "../components/CommentTrack";
 import TrackChanges from "../components/TrackChanges";
-import { TEMPLATES } from "../utils/templates";
+import { TEMPLATES, getTemplateHtml } from "../utils/templates";
 import { LIPSUM_PARAGRAPHS } from "../utils/lipsum";
 import EditorWorkspace from "../components/EditorWorkspace";
 import FormatToggleButton from "../components/FormatToggleButton";
@@ -21,12 +23,27 @@ import { EDITOR_BY_ID } from "../components/editorCatalog";
 import { runEditorDiagnostics } from "../utils/editorDiagnostics";
 
 type CustomText = { text: string; bold?: boolean; italic?: boolean };
+/**
+ * Slate has no built-in schema - these are the only node types that exist here
+ * because this file declares them. Headings one through three and block quotes
+ * are included so an imported template keeps its structure instead of
+ * collapsing into paragraphs.
+ */
+type CustomElementType =
+  | "paragraph"
+  | "heading-one"
+  | "heading-two"
+  | "heading-three"
+  | "block-quote"
+  | "bulleted-list"
+  | "numbered-list"
+  | "list-item";
 type CustomElement = {
-  type: "paragraph" | "heading-two" | "bulleted-list" | "numbered-list" | "list-item";
-  children: CustomText[];
+  type: CustomElementType;
+  children: Array<CustomText | CustomElement>;
 };
 
-const LIST_TYPES: CustomElement["type"][] = ["bulleted-list", "numbered-list"];
+const LIST_TYPES: CustomElementType[] = ["bulleted-list", "numbered-list"];
 
 const INITIAL_VALUE: CustomElement[] = LIPSUM_PARAGRAPHS.map((text) => ({
   type: "paragraph",
@@ -121,6 +138,113 @@ function toggleBlock(editor: any, format: CustomElement["type"]) {
   }
 }
 
+const HTML_BLOCK_MAP: Record<string, CustomElementType> = {
+  H1: "heading-one",
+  H2: "heading-two",
+  H3: "heading-three",
+  H4: "heading-three",
+  H5: "heading-three",
+  H6: "heading-three",
+  BLOCKQUOTE: "block-quote",
+  UL: "bulleted-list",
+  OL: "numbered-list",
+  LI: "list-item",
+  P: "paragraph",
+  PRE: "paragraph",
+};
+
+// DOM node types as plain numbers: Slate exports a `Node` of its own, which
+// shadows the global DOM `Node` in this module, so `Node.TEXT_NODE` here would
+// silently be undefined.
+const DOM_ELEMENT_NODE = 1;
+const DOM_TEXT_NODE = 3;
+
+/**
+ * Convert template HTML into this file's node types.
+ *
+ * Slate provides no HTML deserializer, so one has to be written per schema.
+ * The previous version flattened the entire template into a single paragraph,
+ * which discarded every heading and list in the imported document.
+ */
+function deserializeHtml(html: string): CustomElement[] {
+  const doc = new DOMParser().parseFromString(html, "text/html");
+  const blocks: CustomElement[] = [];
+
+  function textOf(node: globalThis.Node, marks: Partial<CustomText> = {}): CustomText[] {
+    if (node.nodeType === DOM_TEXT_NODE) {
+      const text = (node.textContent || "").replace(/\s+/g, " ");
+      return text ? [{ text, ...marks }] : [];
+    }
+    if (node.nodeType !== DOM_ELEMENT_NODE) {
+      return [];
+    }
+    const element = node as HTMLElement;
+    const nextMarks: Partial<CustomText> = { ...marks };
+    if (element.tagName === "STRONG" || element.tagName === "B") {
+      nextMarks.bold = true;
+    }
+    if (element.tagName === "EM" || element.tagName === "I") {
+      nextMarks.italic = true;
+    }
+    return Array.from(element.childNodes).flatMap((child) => textOf(child, nextMarks));
+  }
+
+  function push(type: CustomElementType, node: globalThis.Node) {
+    const children = textOf(node);
+    if (children.length > 0) {
+      blocks.push({ type, children });
+    }
+  }
+
+
+  function walk(node: globalThis.Node) {
+    if (node.nodeType === DOM_TEXT_NODE) {
+      const text = (node.textContent || "").trim();
+      if (text) {
+        blocks.push({ type: "paragraph", children: [{ text }] });
+      }
+      return;
+    }
+    if (node.nodeType !== DOM_ELEMENT_NODE) {
+      return;
+    }
+    const element = node as HTMLElement;
+    const mapped = HTML_BLOCK_MAP[element.tagName];
+
+    if (mapped === "bulleted-list" || mapped === "numbered-list") {
+      // List items are children of the list, not siblings of it - a flat list
+      // fails Slate's normalization and the document comes out empty.
+      const items: CustomElement[] = [];
+      Array.from(element.children).forEach((child) => {
+        if (child.tagName === "LI") {
+          const children = textOf(child);
+          items.push({
+            type: "list-item",
+            children: children.length > 0 ? children : [{ text: "" }],
+          });
+        }
+      });
+      if (items.length > 0) {
+        blocks.push({ type: mapped, children: items });
+      }
+      return;
+    }
+
+    if (mapped && mapped !== "list-item") {
+      push(mapped, element);
+      return;
+    }
+
+    Array.from(element.childNodes).forEach(walk);
+  }
+
+  Array.from(doc.body.childNodes).forEach(walk);
+
+  return blocks.length > 0
+    ? blocks
+    : [{ type: "paragraph", children: [{ text: "" }] }];
+}
+
 function Element({
   attributes,
   children,
@@ -131,8 +255,14 @@ function Element({
   element: CustomElement;
 }) {
   switch (element.type) {
+    case "heading-one":
+      return <h1 {...attributes}>{children}</h1>;
     case "heading-two":
       return <h2 {...attributes}>{children}</h2>;
+    case "heading-three":
+      return <h3 {...attributes}>{children}</h3>;
+    case "block-quote":
+      return <blockquote {...attributes}>{children}</blockquote>;
     case "bulleted-list":
       return <ul {...attributes}>{children}</ul>;
     case "numbered-list":
@@ -169,7 +299,8 @@ function Toolbar() {
   const editor = useSlate();
 
   return (
-    <div className="mb-3 flex flex-wrap gap-2">
+    <div className="dep-toolbar mb-3">
+      <span className="dep-toolbar__label">Marks</span>
       <FormatToggleButton
         label="Bold"
         active={isMarkActive(editor, "bold")}
@@ -190,8 +321,20 @@ function Toolbar() {
       >
         <Italic size={16} />
       </FormatToggleButton>
+      <span aria-hidden="true" className="dep-toolbar__sep" />
+      <span className="dep-toolbar__label">Blocks</span>
       <FormatToggleButton
-        label="Heading"
+        label="Heading 1"
+        active={isBlockActive(editor, "heading-one")}
+        onMouseDown={(event) => {
+          event.preventDefault();
+          toggleBlock(editor, "heading-one");
+        }}
+      >
+        <Heading1 size={16} />
+      </FormatToggleButton>
+      <FormatToggleButton
+        label="Heading 2"
         active={isBlockActive(editor, "heading-two")}
         onMouseDown={(event) => {
           event.preventDefault();
@@ -199,6 +342,26 @@ function Toolbar() {
         }}
       >
         <Heading2 size={16} />
+      </FormatToggleButton>
+      <FormatToggleButton
+        label="Heading 3"
+        active={isBlockActive(editor, "heading-three")}
+        onMouseDown={(event) => {
+          event.preventDefault();
+          toggleBlock(editor, "heading-three");
+        }}
+      >
+        <Heading3 size={16} />
+      </FormatToggleButton>
+      <FormatToggleButton
+        label="Block quote"
+        active={isBlockActive(editor, "block-quote")}
+        onMouseDown={(event) => {
+          event.preventDefault();
+          toggleBlock(editor, "block-quote");
+        }}
+      >
+        <Quote size={16} />
       </FormatToggleButton>
       <FormatToggleButton
         label="Bullet List"
@@ -237,8 +400,17 @@ function SlatePage() {
         if (!SlateElement.isElement(node)) {
           return "";
         }
+        if (node.type === "heading-one") {
+          return `<h1>${Node.string(node)}</h1>`;
+        }
         if (node.type === "heading-two") {
           return `<h2>${Node.string(node)}</h2>`;
+        }
+        if (node.type === "heading-three") {
+          return `<h3>${Node.string(node)}</h3>`;
+        }
+        if (node.type === "block-quote") {
+          return `<blockquote>${Node.string(node)}</blockquote>`;
         }
         if (node.type === "bulleted-list") {
           const items = node.children
@@ -260,26 +432,36 @@ function SlatePage() {
       .join("");
   }
 
-  async function loadTemplate(filename: string) {
-    try {
-      const response = await fetch(`/templates/${filename}`);
-      if (!response.ok) {
-        throw new Error("fetch failed");
-      }
-      const html = sanitizeHtml(await response.text());
-      const doc = new DOMParser().parseFromString(html, "text/html");
-      const text = (doc.body.textContent || "").trim();
-      const nextValue: CustomElement[] = [
-        {
-          type: "paragraph",
-          children: [{ text }],
-        },
-      ];
-      setValue(nextValue);
-      setContent(text);
-    } catch {
-      alert(`Failed to load template: ${filename}`);
+  /**
+   * Replace the whole document.
+   *
+   * Assigning `editor.children` leaves slate-react's rendered tree stale, so
+   * the swap has to go through transforms: remove every top-level node, then
+   * insert the new ones. onChange then updates the mirrored React state.
+   */
+  function replaceDocument(nextValue: CustomElement[]) {
+    Transforms.deselect(editor);
+    // Insert first, then drop the old tail: emptying the document entirely
+    // makes Slate normalize in an empty state, and the insert that followed
+    // was discarded.
+    const previousLength = editor.children.length;
+    Transforms.insertNodes(editor, nextValue as never, { at: [0] });
+    for (let i = 0; i < previousLength; i++) {
+      Transforms.removeNodes(editor, { at: [nextValue.length] });
     }
+    setValue(editor.children as CustomElement[]);
+    setContent(
+      (editor.children as CustomElement[])
+        .map((node) => Node.string(node as unknown as Node))
+        .join(" ")
+        .replace(/\s+/g, " ")
+        .trim(),
+    );
+  }
+
+  function loadTemplate(filename: string) {
+    const html = sanitizeHtml(getTemplateHtml(filename));
+    replaceDocument(deserializeHtml(html));
   }
 
   function runDiagnostics() {
@@ -311,50 +493,70 @@ function SlatePage() {
   }
 
   return (
-    <EditorWorkspace
-      title="Slate editor"
-      description="Official Slate rich-text setup with custom schema rendering and active-state toolbar toggles."
+    <>
+      <Head>
+        <title>Slate · Document Editor Playground</title>
+      </Head>
+      <EditorWorkspace
+      editorId="slate"
+      title="Slate"
+      description="A toolkit rather than an editor. Every node type, every renderer, and the HTML importer used by the template picker are written in this page's source - Slate supplies none of them."
       toolDescription={EDITOR_BY_ID.slate.toolDescription}
       toolRepoUrl={EDITOR_BY_ID.slate.githubRepoUrl}
+      surfaceNote={
+        <>
+          <strong>Look for:</strong> this page declares exactly eight node types, so
+          those are the only things the document can contain. Loading a template runs a
+          hand-written HTML deserializer - anything it does not recognize is dropped,
+          because with Slate there is no default behavior to fall back on.
+        </>
+      }
       controls={
         <>
           <TemplateLoader
             templates={TEMPLATES}
             onLoad={loadTemplate}
-            onClear={() => {
-              setValue(INITIAL_VALUE);
-              setContent("");
-            }}
-            onError={(error) => alert(String(error))}
+            onClear={() => replaceDocument(INITIAL_VALUE)}
+            onError={(error) => alert(`Could not load template: ${String(error)}`)}
           />
           <button
             type="button"
-            className="rounded-md bg-sky-600 px-3 py-2 text-sm font-semibold text-white hover:bg-sky-700"
+            className="dep-btn dep-btn--mark"
             onClick={runDiagnostics}
           >
             Run diagnostics
           </button>
         </>
       }
+      diagnostics={
+        <ValidationStatus
+          results={validationResults}
+          onClear={() => setValidationResults([])}
+        />
+      }
       statusPanel={
         <div className="space-y-3">
+          <EditorOutputPanel
+            editorName="Slate"
+            nativeFormat={EDITOR_BY_ID.slate.nativeFormat}
+            available={["json", "html"]}
+            getters={{
+              json: () => JSON.stringify(value),
+              html: () => serializeToHtml(value),
+            }}
+          />
           <TrackChanges content={content} />
-          {validationResults.length > 0 && (
-            <ValidationStatus
-              results={validationResults}
-              onClear={() => setValidationResults([])}
-            />
-          )}
         </div>
       }
       sidePanel={
-        <div className="space-y-4">
+        <div className="space-y-5">
+          <EditorProfile editorId="slate" />
+          <hr className="dep-rule" />
           <CommentTrack />
-          <EditorIntegrationInfo editorName="Slate" />
         </div>
       }
     >
-      <div className="h-full p-3">
+      <div className="dep-doc h-full p-3">
         <Slate
           editor={editor}
           value={value}
@@ -378,7 +580,7 @@ function SlatePage() {
             dir="ltr"
             renderElement={(props) => <Element {...props} />}
             renderLeaf={(props) => <Leaf {...props} />}
-            className="h-[58vh] w-full rounded-md border border-slate-300 bg-white p-3 text-left text-slate-900 outline-none dark:border-slate-600 dark:bg-slate-900 dark:text-slate-100"
+            className="dep-sheet h-[58vh] w-full overflow-auto p-4 outline-none"
             style={{
               direction: "ltr",
               unicodeBidi: "plaintext",
@@ -387,7 +589,8 @@ function SlatePage() {
           />
         </Slate>
       </div>
-    </EditorWorkspace>
+      </EditorWorkspace>
+    </>
   );
 }
 

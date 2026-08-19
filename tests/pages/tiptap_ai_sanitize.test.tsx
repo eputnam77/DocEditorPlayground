@@ -46,7 +46,7 @@ describe("AiSuggestButton", () => {
 
     await act(async () => {
       fireEvent.click(
-        screen.getByTitle("AI Suggest (rewrite selection)") as HTMLButtonElement,
+        screen.getByRole("button", { name: "AI Suggest" }) as HTMLButtonElement,
       );
     });
 
@@ -81,7 +81,7 @@ describe("AiSuggestButton", () => {
 
     await act(async () => {
       fireEvent.click(
-        screen.getByTitle("AI Suggest (rewrite selection)") as HTMLButtonElement,
+        screen.getByRole("button", { name: "AI Suggest" }) as HTMLButtonElement,
       );
     });
 

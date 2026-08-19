@@ -3,6 +3,8 @@ import React from "react";
 export interface TemplateMeta {
   label: string;
   filename: string;
+  /** Optional one-liner on what the template exercises, shown as a tooltip. */
+  note?: string;
 }
 
 export interface TemplateLoaderProps {
@@ -51,7 +53,7 @@ export default function TemplateLoader({
     );
     return null;
   }
-  // Normalise input templates by trimming whitespace and dropping duplicates.
+  // Normalize input templates by trimming whitespace and dropping duplicates.
   // Previously templates with blank labels/filenames or extra whitespace would
   // slip through and even create duplicate entries in the dropdown. This could
   // leave the select stuck on the placeholder value or show the same template
@@ -85,7 +87,8 @@ export default function TemplateLoader({
       }
 
       seen.add(key);
-      const normalized: TemplateMeta = { label, filename };
+      const note = typeof tpl.note === "string" ? tpl.note : undefined;
+      const normalized: TemplateMeta = { label, filename, note };
       acc.push(normalized);
     } catch {
       console.warn("TemplateLoader: ignoring invalid template", tpl);
@@ -115,8 +118,8 @@ export default function TemplateLoader({
 
   return (
     <select
-      className="rounded-md border border-slate-300 bg-white px-3 py-2 text-sm text-slate-900 hover:bg-slate-100 dark:border-slate-600 dark:bg-slate-900 dark:text-slate-100 dark:hover:bg-slate-800"
-      title="Load Template"
+      className="dep-select"
+      title="Load a sample document into this editor"
       aria-label="Templates"
       disabled={disabled}
       onChange={handleChange}
@@ -126,7 +129,7 @@ export default function TemplateLoader({
         Load template
       </option>
       {validTemplates.map((tpl) => (
-        <option key={tpl.filename} value={tpl.filename}>
+        <option key={tpl.filename} value={tpl.filename} title={tpl.note}>
           {tpl.label}
         </option>
       ))}

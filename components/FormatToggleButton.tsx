@@ -4,14 +4,27 @@ interface FormatToggleButtonProps {
   label: string;
   active?: boolean;
   disabled?: boolean;
+  /** Keyboard shortcut shown in the tooltip, e.g. "Ctrl+B". */
+  shortcut?: string;
+  /** Render the label next to the icon instead of icon-only. */
+  showLabel?: boolean;
   onMouseDown: (event: any) => void;
   children: React.ReactNode;
 }
 
+/**
+ * A toolbar toggle that names itself.
+ *
+ * Icon-only buttons with nothing but a native `title` left users guessing what
+ * they were about to click, so every button carries a styled tooltip with its
+ * name and shortcut, plus `title` as the no-JS/no-hover fallback.
+ */
 export default function FormatToggleButton({
   label,
   active = false,
   disabled = false,
+  shortcut,
+  showLabel = false,
   onMouseDown,
   children,
 }: FormatToggleButtonProps) {
@@ -21,15 +34,16 @@ export default function FormatToggleButton({
       aria-label={label}
       aria-pressed={active}
       disabled={disabled}
+      title={shortcut ? `${label} (${shortcut})` : label}
       onMouseDown={onMouseDown}
-      className={`inline-flex h-9 w-9 items-center justify-center rounded-md border transition-colors disabled:opacity-50 ${
-        active
-          ? "border-sky-500 bg-sky-100 text-sky-900 dark:border-sky-400 dark:bg-sky-900/40 dark:text-sky-100"
-          : "border-slate-300 bg-white text-slate-800 hover:bg-slate-100 dark:border-slate-600 dark:bg-slate-900 dark:text-slate-100 dark:hover:bg-slate-800"
-      }`}
+      className="dep-tool"
     >
-      <span className="sr-only">{label}</span>
       {children}
+      {showLabel && <span className="dep-tool__text">{label}</span>}
+      <span className="dep-tool__tip" aria-hidden="true">
+        {label}
+        {shortcut && <kbd>{shortcut}</kbd>}
+      </span>
     </button>
   );
 }

@@ -103,7 +103,7 @@ export function sanitizeNode(root: ParentNode): void {
     const equiv = el.getAttribute("http-equiv");
     const decodedEquiv = equiv ? decodeEntities(equiv) : null;
     // Some browsers are tolerant of stray whitespace inside the value, so we
-    // normalise by removing all whitespace characters before comparison.
+    // normalize by removing all whitespace characters before comparison.
     if (
       decodedEquiv &&
       decodedEquiv

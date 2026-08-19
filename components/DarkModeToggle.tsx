@@ -58,8 +58,9 @@ export default function DarkModeToggle() {
       onClick={toggle}
       aria-label="Toggle dark mode"
       data-testid="dark-mode-toggle"
-      className="rounded-full border border-slate-300 bg-white px-3 py-2 text-xs font-semibold uppercase tracking-wide text-slate-700 transition hover:border-sky-300 hover:text-sky-700 dark:border-slate-600 dark:bg-slate-900 dark:text-slate-100 dark:hover:border-sky-500 dark:hover:text-sky-300"
+      className="dep-btn"
     >
+      <span aria-hidden="true">{enabled ? "☀" : "◐"}</span>
       {enabled ? "Light mode" : "Dark mode"}
     </button>
   );

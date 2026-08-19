@@ -18,6 +18,7 @@ npm run test:watch   # Vitest in watch mode
 npm run test:coverage
 npm run test:e2e     # Playwright E2E (auto-starts dev server on port 3101)
 npm run test:e2e:smoke  # Smoke suite only
+npm run templates:build # Regenerate utils/templateContent.ts from public/templates/
 ```
 
 To run a single Vitest test file:
@@ -30,11 +31,16 @@ Quality gate before PRs: `npm run lint && npm run typecheck && npm test`
 ## Architecture
 
 ### Pages (`pages/`)
-Each editor gets its own page (`tiptap.tsx`, `toast.tsx`, `codex.tsx`, `slate.tsx`, `lexical.tsx`, `ckeditor.tsx`). The home page (`index.tsx`) uses `EDITOR_CATALOG` for navigation. All pages wrap their editor in `EditorWorkspace` (the shared shell).
+Each editor gets its own page (`ckeditor.tsx`, `tiptap.tsx`, `toast.tsx`, `codex.tsx`, `slate.tsx`, `lexical.tsx`). The home page (`index.tsx`) uses `EDITOR_CATALOG` for the nav, the comparison table, and the editor index. Every page except `tiptap.tsx` wraps its editor in `EditorWorkspace`; TipTap composes `WorkspaceChrome` directly because it also owns an extensions drawer.
+
+Each page's job is to make its editor's *differences* visible: a `surfaceNote` callout saying what to look for, an `EditorOutputPanel` showing the live document as HTML/JSON/Markdown (with unsupported formats shown disabled), and an `EditorProfile` panel built from `EDITOR_CATALOG` metadata.
 
 ### Shared shell (`components/`)
-- `EditorWorkspace.tsx` — layout shell used by every editor page: header, `NavBar`, `DarkModeToggle`, optional controls/side/status panels
-- `editorCatalog.ts` — single source of truth for editor IDs, names, routes, and GitHub URLs; used by `NavBar` and the home page
+- `EditorWorkspace.tsx` — layout shell: exports `WorkspaceChrome` (top bar + `NavBar` + `DarkModeToggle`) and the default `EditorWorkspace` (chrome plus title block, controls, `diagnostics`, `surfaceNote`, editor, status/side panels). Diagnostics render directly under the controls, not at the bottom of the page, so "Run diagnostics" gives immediate feedback.
+- `editorCatalog.ts` — single source of truth for editor IDs, names, routes, GitHub URLs, and the comparison metadata (`dataModel`, `nativeFormat`, `outputs`, `toolbarStyle`, `distinctive`, `tradeoff`). Catalog order drives the nav and the home page.
+- `EditorOutputPanel.tsx` — HTML/JSON/Markdown tabs over live getters supplied by each page
+- `EditorProfile.tsx` — the "what makes this editor different" panel
+- `FormatToggleButton.tsx` — toolbar toggle with a styled hover tooltip (name + shortcut); never ship an icon-only control without one
 - Other components (`AdvancedToolbar`, `CommentTrack`, `PluginManager`, `TrackChanges`, `ValidationStatus`, etc.) are composed into editor pages as needed
 
 ### TipTap extensions (`extensions/`)
@@ -42,7 +48,9 @@ Custom ProseMirror extensions for TipTap: heading lock, indentation, section nod
 
 ### Utilities (`utils/`)
 - `sanitize.ts` — HTML sanitization used before inserting AI suggestions
-- `templates.ts` / `templateIntegration.ts` — loading and injecting document templates
+- `templateContent.ts` — **generated**; template bodies compiled into the bundle. Edit the HTML under `public/templates/`, then run `npm run templates:build`. Templates are imported, never fetched: a runtime `fetch("/templates/...")` failed whenever the host served that path differently (auth proxy, path prefix, cold CDN) and every editor showed "Failed to load template".
+- `templates.ts` — re-exports the generated template registry
+- `templateIntegration.ts` — validating and normalizing externally supplied templates
 - `validation.ts` — document structure validation
 - `editorDiagnostics.ts` — shared diagnostics helpers
 - `contentEditableCommands.ts` — helpers for `contenteditable` surfaces
@@ -54,7 +62,13 @@ Custom ProseMirror extensions for TipTap: heading lock, indentation, section nod
 Non-shipped AI workflow files: `PRD.md` (requirements), `AGENTS.md` (agent chain spec). Reference these when scoping new features or understanding original design intent.
 
 ### Styles (`styles/`)
-Each editor has a dedicated CSS file (`tiptap.css`, `toast.css`, `codex.css`, `slate.css`, `lexical.css`, `ckeditor.css`) plus `globals.css` for shared Tailwind and workspace styles.
+`globals.css` holds the design system: the "Marked Up" tokens (paper/ink/proofreader-red, Newsreader + Public Sans + IBM Plex Mono), the `dep-*` component classes, and `.dep-doc` — the shared document typography.
+
+`.dep-doc` matters: Tailwind's preflight strips heading sizes and list markers, so editors that ship no content CSS of their own (Slate, Lexical, Editor.js) rendered an `<h2>` identically to a `<p>`, and "make this a heading" looked broken. Every editable surface is wrapped in `.dep-doc`, whose descendant rules reach library-owned DOM.
+
+Each editor also has a dedicated file (`ckeditor.css`, `tiptap.css`, `toast.css`, `codex.css`, `slate.css`, `lexical.css`) for chrome its library owns — including dark-mode theming, which CKEditor takes through its own custom properties and Toast through a container class.
+
+Watch for cross-editor leaks: Toast UI's stylesheet is imported globally and contains a bare `.ProseMirror { color: #222 }`, which lands on TipTap's editable too.
 
 ### Stubs (`stubs/`)
 All heavy editor libraries (CKEditor, Editor.js, Slate, Lexical, Toast UI, Yjs, TipTap table extensions) are aliased to lightweight stubs in `vitest.config.ts` so unit tests run without a browser. The stubs are also used in `next.config.js` for the TipTap table extensions to avoid webpack issues.
@@ -66,4 +80,7 @@ All heavy editor libraries (CKEditor, Editor.js, Slate, Lexical, Toast UI, Yjs, 
 - **Unit tests** run in jsdom via Vitest; E2E tests run in Chromium via Playwright.
 - **Commit style**: Conventional Commits (`feat(editor): ...`, `fix(editor): ...`).
 - **LTR contract**: every editor page must set `dir="ltr"` on its editable surface; verified by `tests/e2e/editor-contract.test.ts`.
-- **`EDITOR_CATALOG`** in `components/editorCatalog.ts` is the single source of truth for editor metadata — update it when adding or removing editors.
+- **`EDITOR_CATALOG`** in `components/editorCatalog.ts` is the single source of truth for editor metadata — update it when adding or removing editors. Its array order is the display order everywhere.
+- **Nothing is persisted.** There is no Save anywhere; the playground is deliberately stateless.
+- **Templates are compiled in**, not fetched — see `utils/templateContent.ts` above.
+- **Deployment mirror**: `C:\dev\dep-streamlit` publishes this repo as a static Hugging Face Space. It syncs this tree into its `app/` and layers an overlay on top, so fixes belong here, not there. Its build fails if this repo adds `pages/_document.tsx` — that file is the overlay's injection point, which is why `pages/_app.tsx` carries the `<Head>` font links.

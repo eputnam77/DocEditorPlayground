@@ -8,8 +8,11 @@ export interface ValidationResult {
 }
 
 /**
- * Displays validation results with pass/fail status.
- * Non-obvious logic: results are rendered in a list with basic styling.
+ * Diagnostics results, marked up the way a reviewer marks up a draft.
+ *
+ * The summary line goes first so the outcome is readable at a glance - the
+ * panel is rendered right under the "Run diagnostics" button, and the whole
+ * point is immediate feedback that the run happened.
  */
 export default function ValidationStatus({
   results,
@@ -19,21 +22,50 @@ export default function ValidationStatus({
   onClear?(): void;
 }) {
   if (results.length === 0) return null;
+
+  const passed = results.filter((result) => result.passed).length;
+  const failed = results.length - passed;
+
   return (
-    <div className="max-h-[70vh] overflow-y-auto rounded-lg border border-slate-300 bg-slate-50 p-4 shadow-sm dark:border-slate-700 dark:bg-slate-900/60">
-      <div className="mb-3 flex items-center justify-between">
-        <span className="text-sm font-semibold text-slate-800 dark:text-slate-100">Diagnostics results</span>
+    <div className="dep-card dep-card--sunk" data-testid="validation-status">
+      <div className="mb-2 flex flex-wrap items-baseline justify-between gap-2">
+        <div className="flex flex-wrap items-baseline gap-2">
+          <span className="dep-eyebrow">Diagnostics</span>
+          <span className="dep-mono" style={{ color: "var(--pass)" }}>
+            {passed} pass
+          </span>
+          {failed > 0 && (
+            <span className="dep-mono" style={{ color: "var(--fail)" }}>
+              {failed} fail
+            </span>
+          )}
+        </div>
         {onClear && (
-          <button className="text-xs font-semibold text-sky-700 underline dark:text-sky-300" onClick={onClear} aria-label="Clear diagnostics results">
+          <button
+            type="button"
+            className="dep-btn dep-btn--quiet"
+            onClick={onClear}
+            aria-label="Clear diagnostics results"
+          >
             Clear
           </button>
         )}
       </div>
-      <ul className="space-y-2 text-sm">
-        {results.map((r) => (
-          <li key={r.id} className={r.passed ? "text-emerald-700 dark:text-emerald-300" : "text-rose-700 dark:text-rose-300"}>
-            <span className="font-medium">{r.label}:</span> {r.passed ? "Pass" : "Fail"}
-            {r.detail && <span className="text-xs"> ({r.detail})</span>}
+      <ul className="max-h-[22rem] overflow-y-auto">
+        {results.map((result) => (
+          <li
+            key={result.id}
+            className={`dep-check ${result.passed ? "dep-check--pass" : "dep-check--fail"}`}
+          >
+            <span className="dep-check__flag">
+              {result.passed ? "PASS" : "FAIL"}
+            </span>
+            <span>
+              <span className="dep-check__label">{result.label}</span>
+              {result.detail && (
+                <span className="dep-check__detail"> &mdash; {result.detail}</span>
+              )}
+            </span>
           </li>
         ))}
       </ul>

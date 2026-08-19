@@ -40,7 +40,7 @@ describe("integrateTemplates", () => {
     assert.deepStrictEqual(result, [{ title: "A", body: "b" }]);
   });
 
-  it("removes zero-width characters while normalising", () => {
+  it("removes zero-width characters while normalizing", () => {
     const input: any = [{ title: "Tit\u200Ble", body: "Body\u200C" }];
     const result = integrateTemplates(input);
     assert.deepStrictEqual(result, [{ title: "Title", body: "Body" }]);

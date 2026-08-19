@@ -8,7 +8,7 @@ describe("TEMPLATES", () => {
     assert.deepStrictEqual(labels, [
       "Software Release Notes",
       "Medical Research Article",
-      "Legal Contract Template",
+      "Legal Contract",
     ]);
   });
 

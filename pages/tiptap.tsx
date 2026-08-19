@@ -14,12 +14,22 @@ import Collaboration from "@tiptap/extension-collaboration";
 import CollaborationCursor from "@tiptap/extension-collaboration-cursor";
 import SlashCommand from "../extensions/slash-command";
 import Lint from "../extensions/lint";
+import Head from "next/head";
 import sanitizeHtml from "../utils/sanitize";
-import { TEMPLATES } from "../utils/templates";
+import { TEMPLATES, getTemplateHtml } from "../utils/templates";
 import { LIPSUM_HTML } from "../utils/lipsum";
-import DarkModeToggle from "../components/DarkModeToggle";
-import NavBar from "../components/NavBar";
+import { WorkspaceChrome } from "../components/EditorWorkspace";
+import TemplateLoader from "../components/TemplateLoader";
+import FormatToggleButton from "../components/FormatToggleButton";
+import EditorProfile from "../components/EditorProfile";
+import EditorOutputPanel from "../components/EditorOutputPanel";
+import ValidationStatus, {
+  type ValidationResult,
+} from "../components/ValidationStatus";
+import CommentTrack from "../components/CommentTrack";
+import TrackChanges from "../components/TrackChanges";
 import { EDITOR_BY_ID } from "../components/editorCatalog";
+import { runEditorDiagnostics } from "../utils/editorDiagnostics";
 
 // Custom TipTap extensions
 import { tiptapHeadingLock } from "../extensions/tiptapHeadingLock";
@@ -134,21 +144,25 @@ export function AiSuggestButton({
   }
 
   return (
-    <span className="ml-2 relative">
+    <span className="relative">
       <button
+        type="button"
         onClick={handleSuggest}
         disabled={loading}
-        className="px-3 py-2 bg-blue-600 text-white rounded hover:bg-blue-700 flex items-center gap-1"
-        title="AI Suggest (rewrite selection)"
+        className="dep-btn"
+        title="Rewrite the selected text with the AI Suggest endpoint"
       >
-        {loading ? (
-          <Loader2 className="animate-spin w-4 h-4" />
-        ) : (
-          <span>AI Suggest</span>
-        )}
+        {loading ? <Loader2 className="w-4 h-4 animate-spin" /> : <span>AI Suggest</span>}
       </button>
       {error && (
-        <div className="absolute left-0 mt-2 bg-red-50 text-red-800 px-2 py-1 text-xs rounded shadow z-50">
+        <div
+          className="absolute left-0 z-50 mt-2 whitespace-nowrap px-2 py-1 text-xs"
+          style={{
+            background: "var(--mark-soft)",
+            border: "1px solid var(--mark-line)",
+            color: "var(--mark)",
+          }}
+        >
           {error}
         </div>
       )}
@@ -197,7 +211,7 @@ export function useCollabResources(collabEnabled: boolean) {
         setCollabDoc((prev) => (prev === doc ? null : prev));
       };
     } catch (err) {
-      console.warn("Failed to initialise collaboration", err);
+      console.warn("Failed to initialize collaboration", err);
       safeDestroyDoc(docRef.current);
       docRef.current = null;
       providerRef.current = null;
@@ -268,31 +282,40 @@ function Sidebar(props: SidebarProps) {
   } = props;
   return (
     <aside
-      className={`fixed top-0 right-0 h-full w-80 bg-gray-100 border-l z-50 shadow-lg transform transition-transform duration-200 ${
-        show ? "translate-x-0" : "translate-x-full"
-      }`}
-      style={{ minWidth: "18rem" }}
+      className={`dep-extension-panel ${show ? "is-open" : ""}`}
+      aria-hidden={!show}
     >
-      <div className="flex justify-between items-center px-4 py-3 border-b bg-white">
-        <span className="font-bold text-lg">Tools & Extensions</span>
+      <div
+        className="flex items-center justify-between px-4 py-3"
+        style={{ borderBottom: "1px solid var(--ink-16)" }}
+      >
+        <span className="dep-eyebrow">TipTap extensions</span>
         <button
+          type="button"
           onClick={onClose}
-          className="hover:bg-gray-200 rounded p-1"
+          className="dep-btn dep-btn--quiet dep-btn--icon"
           aria-label="Close sidebar"
         >
-          <XIcon className="w-5 h-5" />
+          <XIcon className="w-4 h-4" />
         </button>
       </div>
 
-      <div className="px-4 py-2 space-y-5">
+      <div className="space-y-5 overflow-y-auto px-4 py-3" style={{ maxHeight: "calc(100vh - 4rem)" }}>
+        <p className="dep-muted">
+          Every switch below is a separate TipTap extension. Nothing here ships with
+          the editor - this is what &quot;headless&quot; buys you.
+        </p>
+
         {/* Templates */}
         <section>
-          <div className="font-semibold mb-1">Templates</div>
-          <ul className="space-y-1 text-sm">
+          <div className="dep-eyebrow mb-1.5">Templates</div>
+          <ul className="space-y-1">
             {TEMPLATES.map((tpl) => (
               <li key={tpl.filename}>
                 <button
-                  className="text-indigo-700 underline"
+                  type="button"
+                  className="dep-link text-sm"
+                  title={tpl.note}
                   onClick={() => onTemplateLoad(tpl.filename)}
                 >
                   {tpl.label}
@@ -304,11 +327,10 @@ function Sidebar(props: SidebarProps) {
 
         {/* Validation (Lint) */}
         <section>
-          <div className="font-semibold mb-1">Validation (Lint)</div>
+          <div className="dep-eyebrow mb-1.5">Validation (Lint)</div>
           <button
-            className={`px-2 py-1 rounded w-full ${
-              lintEnabled ? "bg-green-500 text-white" : "bg-gray-200"
-            }`}
+            className="dep-btn w-full"
+            aria-pressed={lintEnabled}
             onClick={onToggleLint}
           >
             {lintEnabled ? "Disable Lint" : "Enable Lint"}
@@ -317,27 +339,26 @@ function Sidebar(props: SidebarProps) {
 
         {/* AI Suggest */}
         <section>
-          <div className="font-semibold mb-1 flex items-center gap-1">
+          <div className="dep-eyebrow mb-1.5 flex items-center gap-1">
             AI Suggest
             {/* Optional info icon, if you have one */}
             {/* <InfoIcon className="w-4 h-4 text-blue-500" /> */}
           </div>
           <button
-            className={`px-2 py-1 rounded w-full ${
-              aiSuggestEnabled ? "bg-blue-500 text-white" : "bg-gray-200"
-            }`}
+            className="dep-btn w-full"
+            aria-pressed={aiSuggestEnabled}
             onClick={onToggleAiSuggest}
           >
             {aiSuggestEnabled ? "Disable AI Suggest" : "Enable AI Suggest"}
           </button>
           {aiSuggestEnabled && (
             <div className="mt-2 space-y-2">
-              <div className="text-xs text-gray-500 mb-1">
+              <div className="dep-muted mb-1">
                 Select text in the editor and press "AI Suggest" in the toolbar
                 to get suggestions.
               </div>
               {suggestions.length === 0 ? (
-                <div className="text-xs text-gray-400">
+                <div className="dep-muted">
                   No AI suggestions yet.
                 </div>
               ) : (
@@ -345,22 +366,22 @@ function Sidebar(props: SidebarProps) {
                   {suggestions.map((s) => (
                     <div
                       key={s.id}
-                      className="border rounded bg-white px-2 py-1 text-sm"
+                      className="dep-card px-3 py-2 text-sm"
                     >
-                      <div className="mb-1 text-xs text-gray-600">
+                      <div className="dep-muted mb-1">
                         For: <em>{s.original.slice(0, 40)}...</em>
                       </div>
                       <div className="mb-2">{s.suggestion}</div>
                       <div className="flex gap-2">
                         <button
                           onClick={() => acceptSuggestion(s.id)}
-                          className="px-2 py-1 rounded bg-green-500 text-white text-xs"
+                          className="dep-btn dep-btn--mark"
                         >
                           Accept
                         </button>
                         <button
                           onClick={() => rejectSuggestion(s.id)}
-                          className="px-2 py-1 rounded bg-red-500 text-white text-xs"
+                          className="dep-btn"
                         >
                           Reject
                         </button>
@@ -368,8 +389,9 @@ function Sidebar(props: SidebarProps) {
                     </div>
                   ))}
                   <button
+                    type="button"
                     onClick={clearSuggestions}
-                    className="mt-2 text-xs underline text-gray-500"
+                    className="dep-btn dep-btn--quiet mt-2"
                   >
                     Clear all suggestions
                   </button>
@@ -381,11 +403,10 @@ function Sidebar(props: SidebarProps) {
 
         {/* Heading Lock */}
         <section>
-          <div className="font-semibold mb-1">Heading Lock</div>
+          <div className="dep-eyebrow mb-1.5">Heading Lock</div>
           <button
-            className={`px-2 py-1 rounded w-full ${
-              headingLockEnabled ? "bg-green-500 text-white" : "bg-gray-200"
-            }`}
+            className="dep-btn w-full"
+            aria-pressed={headingLockEnabled}
             onClick={onToggleHeadingLock}
           >
             {headingLockEnabled ? "Disable" : "Enable"} Heading Lock
@@ -394,11 +415,10 @@ function Sidebar(props: SidebarProps) {
 
         {/* Indentation */}
         <section>
-          <div className="font-semibold mb-1">Indentation</div>
+          <div className="dep-eyebrow mb-1.5">Indentation</div>
           <button
-            className={`px-2 py-1 rounded w-full ${
-              indentationEnabled ? "bg-green-500 text-white" : "bg-gray-200"
-            }`}
+            className="dep-btn w-full"
+            aria-pressed={indentationEnabled}
             onClick={onToggleIndentation}
           >
             {indentationEnabled ? "Disable" : "Enable"} Indentation
@@ -407,11 +427,10 @@ function Sidebar(props: SidebarProps) {
 
         {/* Section Node */}
         <section>
-          <div className="font-semibold mb-1">Section Node</div>
+          <div className="dep-eyebrow mb-1.5">Section Node</div>
           <button
-            className={`px-2 py-1 rounded w-full ${
-              sectionNodeEnabled ? "bg-green-500 text-white" : "bg-gray-200"
-            }`}
+            className="dep-btn w-full"
+            aria-pressed={sectionNodeEnabled}
             onClick={onToggleSectionNode}
           >
             {sectionNodeEnabled ? "Disable" : "Enable"} Section Node
@@ -420,11 +439,10 @@ function Sidebar(props: SidebarProps) {
 
         {/* Mark Review */}
         <section>
-          <div className="font-semibold mb-1">Mark Review</div>
+          <div className="dep-eyebrow mb-1.5">Mark Review</div>
           <button
-            className={`px-2 py-1 rounded w-full ${
-              markReviewEnabled ? "bg-green-500 text-white" : "bg-gray-200"
-            }`}
+            className="dep-btn w-full"
+            aria-pressed={markReviewEnabled}
             onClick={onToggleMarkReview}
           >
             {markReviewEnabled ? "Disable" : "Enable"} Mark Review
@@ -433,18 +451,17 @@ function Sidebar(props: SidebarProps) {
 
         {/* Watermark */}
         <section>
-          <div className="font-semibold mb-1">Watermark</div>
+          <div className="dep-eyebrow mb-1.5">Watermark</div>
           <button
-            className={`px-2 py-1 rounded w-full ${
-              watermarkEnabled ? "bg-green-500 text-white" : "bg-gray-200"
-            }`}
+            className="dep-btn w-full"
+            aria-pressed={watermarkEnabled}
             onClick={onToggleWatermark}
           >
             {watermarkEnabled ? "Disable" : "Enable"} Watermark
           </button>
           {watermarkEnabled && (
             <input
-              className="mt-2 w-full border rounded px-2 py-1 text-sm"
+              className="dep-input mt-2 w-full"
               value={watermarkText}
               onChange={(e) => onWatermarkText(e.target.value)}
               placeholder="Watermark text"
@@ -454,11 +471,10 @@ function Sidebar(props: SidebarProps) {
 
         {/* Collaboration */}
         <section>
-          <div className="font-semibold mb-1">Collaboration</div>
+          <div className="dep-eyebrow mb-1.5">Collaboration</div>
           <button
-            className={`px-2 py-1 rounded w-full ${
-              collabEnabled ? "bg-green-500 text-white" : "bg-gray-200"
-            }`}
+            className="dep-btn w-full"
+            aria-pressed={collabEnabled}
             onClick={onToggleCollab}
           >
             {collabEnabled ? "Disconnect" : "Connect"}
@@ -467,8 +483,8 @@ function Sidebar(props: SidebarProps) {
 
         {/* History */}
         <section>
-          <div className="font-semibold mb-1">History</div>
-          <ul className="text-xs text-gray-700 space-y-1">
+          <div className="dep-eyebrow mb-1.5">History</div>
+          <ul className="dep-mono space-y-1" style={{ color: "var(--ink-60)" }}>
             {history.map((h: any) => (
               <li key={h.id}>{h.label}</li>
             ))}
@@ -503,6 +519,7 @@ export default function TipTapEditorPage() {
     id: number;
   }
   const [suggestions, setSuggestions] = useState<Suggestion[]>([]);
+  const [validationResults, setValidationResults] = useState<ValidationResult[]>([]);
 
   // Version History (dummy)
   const DUMMY_HISTORY = [
@@ -667,18 +684,42 @@ export default function TipTapEditorPage() {
     );
   }
 
-  async function handleTemplateLoad(filename: string) {
+  function handleTemplateLoad(filename: string) {
     if (!editor) return;
-    try {
-      const res = await fetch(`/templates/${filename}`);
-      if (!res.ok) throw new Error("fetch failed");
-      const html = await res.text();
-      const sanitized = sanitizeHtml(html);
-      editor.commands.setContent(sanitized);
-      setContent(sanitized);
-    } catch {
-      alert("Failed to load template: " + filename);
-    }
+    // Compiled into the bundle - see utils/templateContent.ts.
+    const sanitized = sanitizeHtml(getTemplateHtml(filename));
+    editor.commands.setContent(sanitized);
+    setContent(sanitized);
+    setSidebarOpen(false);
+  }
+
+  function runDiagnostics() {
+    if (!editor) return;
+    const editable = document.querySelector(".tiptap-content") as HTMLElement | null;
+    setValidationResults(
+      runEditorDiagnostics({
+        editorName: "TipTap",
+        capabilities: {
+          heading: true,
+          bulletList: true,
+          numberedList: true,
+        },
+        getContent: () => ({
+          text: editor.state.doc.textContent,
+          html: editor.getHTML(),
+          json: editor.getJSON(),
+        }),
+        getDirection: () =>
+          editable ? window.getComputedStyle(editable).direction : null,
+        getSelectionFormatState: () => ({
+          bold: editor.isActive("bold"),
+          italic: editor.isActive("italic"),
+          heading: editor.isActive("heading"),
+          bulletList: editor.isActive("bulletList"),
+          numberedList: editor.isActive("orderedList"),
+        }),
+      }),
+    );
   }
 
   function handleToggleLint() {
@@ -751,196 +792,328 @@ export default function TipTapEditorPage() {
 
   if (!editor)
     return (
-      <div className="flex items-center justify-center h-full">
-        Loading TipTap…
+      <div className="dep-shell items-center justify-center">
+        <p className="dep-muted p-10">Loading TipTap…</p>
       </div>
     );
 
   return (
-    <div className="workspace-shell flex min-h-screen flex-col">
-      <header className="workspace-top-bar border-b px-4 py-4 sm:px-8">
-        <div className="mx-auto flex w-full max-w-[1440px] items-center justify-between gap-4">
-          <div>
-            <p className="workspace-brand">Document Editor Playground</p>
-            <p className="workspace-brand-subtitle">
-              TipTap advanced authoring workspace
-            </p>
-            <p className="mt-1 text-sm text-slate-700 dark:text-slate-200">
-              {EDITOR_BY_ID.tiptap.toolDescription} Repository:{" "}
-              <a
-                href={EDITOR_BY_ID.tiptap.githubRepoUrl}
-                target="_blank"
-                rel="noreferrer"
-                className="font-semibold text-sky-700 underline dark:text-sky-300"
+    <>
+      <Head>
+        <title>TipTap · Document Editor Playground</title>
+      </Head>
+      <div className="dep-shell">
+        <WorkspaceChrome subtitle={EDITOR_BY_ID.tiptap.tagline}>
+          <main className="dep-wrap flex flex-1 flex-col gap-4 py-5">
+            <section className="dep-card">
+              <div className="mb-3">
+                <div className="flex flex-wrap items-baseline gap-3">
+                  <span className="dep-num">02 / 6</span>
+                  <h1 className="dep-title">TipTap</h1>
+                  <span className="dep-tag dep-tag--mark">
+                    {EDITOR_BY_ID.tiptap.nativeFormat}
+                  </span>
+                </div>
+                <p className="dep-lede mt-1">
+                  Headless by design: every button in the toolbar below is written by
+                  hand in this page&apos;s source. TipTap ships the document model and
+                  the commands, and nothing else.
+                </p>
+                <p className="dep-muted mt-2">
+                  {EDITOR_BY_ID.tiptap.toolDescription}{" "}
+                  <a
+                    href={EDITOR_BY_ID.tiptap.githubRepoUrl}
+                    target="_blank"
+                    rel="noreferrer"
+                    className="dep-link"
+                  >
+                    Source on GitHub
+                  </a>
+                </p>
+              </div>
+
+              {/* ---- Document controls ---------------------------------- */}
+              <div
+                className="flex flex-wrap items-center gap-2"
+                data-testid="workspace-controls"
               >
-                {EDITOR_BY_ID.tiptap.githubRepoUrl}
-              </a>
-            </p>
+                <TemplateLoader
+                  templates={TEMPLATES}
+                  onLoad={handleTemplateLoad}
+                  onClear={() => {
+                    editor.commands.clearContent();
+                    setContent("");
+                  }}
+                  onError={(error) =>
+                    alert(`Could not load template: ${String(error)}`)
+                  }
+                />
+                <button
+                  type="button"
+                  className="dep-btn dep-btn--mark"
+                  onClick={runDiagnostics}
+                >
+                  Run diagnostics
+                </button>
+                <AiSuggestButton
+                  editor={editor}
+                  aiSuggestEnabled={aiSuggestEnabled}
+                  onNewSuggestion={handleNewSuggestion}
+                />
+                <button
+                  type="button"
+                  onClick={() => setSidebarOpen(true)}
+                  className="dep-btn"
+                  aria-label="Open extensions panel"
+                >
+                  <MenuIcon className="h-4 w-4" />
+                  Extensions
+                </button>
+              </div>
+
+              {validationResults.length > 0 && (
+                <div className="mt-3">
+                  <ValidationStatus
+                    results={validationResults}
+                    onClear={() => setValidationResults([])}
+                  />
+                </div>
+              )}
+
+              <div className="dep-callout mt-3">
+                <strong>Look for:</strong> hover any toolbar button and it names itself
+                with its shortcut. Type <code>/</code> in the document for the
+                slash-command menu, and open <em>Extensions</em> to switch on heading
+                locks, watermarks, linting, or live collaboration &mdash; each one is a
+                separate TipTap package.
+              </div>
+
+              {/* ---- Formatting toolbar -------------------------------- */}
+              <div className="dep-toolbar mt-3">
+                <span className="dep-toolbar__label">Block</span>
+                <select
+                  value={getCurrentBlock(editor)}
+                  onChange={(e) => setBlock(editor, e.target.value)}
+                  className="dep-select"
+                  aria-label="Block style"
+                  title="Paragraph or heading level for the current block"
+                >
+                  <option value="p">Paragraph</option>
+                  <option value="h1">Heading 1</option>
+                  <option value="h2">Heading 2</option>
+                  <option value="h3">Heading 3</option>
+                </select>
+
+                <span aria-hidden="true" className="dep-toolbar__sep" />
+                <span className="dep-toolbar__label">Marks</span>
+                <FormatToggleButton
+                  label="Bold"
+                  shortcut="Ctrl+B"
+                  active={editor.isActive("bold")}
+                  onMouseDown={(event) => {
+                    event.preventDefault();
+                    editor.chain().focus().toggleBold().run();
+                  }}
+                >
+                  <Bold className="h-4 w-4" />
+                </FormatToggleButton>
+                <FormatToggleButton
+                  label="Italic"
+                  shortcut="Ctrl+I"
+                  active={editor.isActive("italic")}
+                  onMouseDown={(event) => {
+                    event.preventDefault();
+                    editor.chain().focus().toggleItalic().run();
+                  }}
+                >
+                  <Italic className="h-4 w-4" />
+                </FormatToggleButton>
+                <FormatToggleButton
+                  label="Underline"
+                  shortcut="Ctrl+U"
+                  active={editor.isActive("underline")}
+                  onMouseDown={(event) => {
+                    event.preventDefault();
+                    editor.chain().focus().toggleUnderline?.().run();
+                  }}
+                >
+                  <UnderlineIcon className="h-4 w-4" />
+                </FormatToggleButton>
+                <FormatToggleButton
+                  label="Strikethrough"
+                  active={editor.isActive("strike")}
+                  onMouseDown={(event) => {
+                    event.preventDefault();
+                    editor.chain().focus().toggleStrike().run();
+                  }}
+                >
+                  <Strikethrough className="h-4 w-4" />
+                </FormatToggleButton>
+                <FormatToggleButton
+                  label="Inline code"
+                  active={editor.isActive("code")}
+                  onMouseDown={(event) => {
+                    event.preventDefault();
+                    editor.chain().focus().toggleCode().run();
+                  }}
+                >
+                  <Code className="h-4 w-4" />
+                </FormatToggleButton>
+
+                <span aria-hidden="true" className="dep-toolbar__sep" />
+                <span className="dep-toolbar__label">Lists</span>
+                <FormatToggleButton
+                  label="Bullet list"
+                  active={editor.isActive("bulletList")}
+                  onMouseDown={(event) => {
+                    event.preventDefault();
+                    editor.chain().focus().toggleBulletList().run();
+                  }}
+                >
+                  <List className="h-4 w-4" />
+                </FormatToggleButton>
+                <FormatToggleButton
+                  label="Numbered list"
+                  active={editor.isActive("orderedList")}
+                  onMouseDown={(event) => {
+                    event.preventDefault();
+                    editor.chain().focus().toggleOrderedList().run();
+                  }}
+                >
+                  <ListOrdered className="h-4 w-4" />
+                </FormatToggleButton>
+                <FormatToggleButton
+                  label="Block quote"
+                  active={editor.isActive("blockquote")}
+                  onMouseDown={(event) => {
+                    event.preventDefault();
+                    editor.chain().focus().toggleBlockquote().run();
+                  }}
+                >
+                  <Quote className="h-4 w-4" />
+                </FormatToggleButton>
+
+                <span aria-hidden="true" className="dep-toolbar__sep" />
+                <span className="dep-toolbar__label">Insert</span>
+                <FormatToggleButton
+                  label="Insert table"
+                  onMouseDown={(event) => {
+                    event.preventDefault();
+                    insertTable();
+                  }}
+                >
+                  <TableIcon className="h-4 w-4" />
+                </FormatToggleButton>
+                <FormatToggleButton
+                  label="Insert image"
+                  onMouseDown={(event) => {
+                    event.preventDefault();
+                    insertImage();
+                  }}
+                >
+                  <ImageIcon className="h-4 w-4" />
+                </FormatToggleButton>
+
+                <span aria-hidden="true" className="dep-toolbar__sep" />
+                <FormatToggleButton
+                  label="Undo"
+                  shortcut="Ctrl+Z"
+                  onMouseDown={(event) => {
+                    event.preventDefault();
+                    editor.chain().focus().undo().run();
+                  }}
+                >
+                  <Undo2 className="h-4 w-4" />
+                </FormatToggleButton>
+                <FormatToggleButton
+                  label="Redo"
+                  shortcut="Ctrl+Shift+Z"
+                  onMouseDown={(event) => {
+                    event.preventDefault();
+                    editor.chain().focus().redo().run();
+                  }}
+                >
+                  <Redo2 className="h-4 w-4" />
+                </FormatToggleButton>
+              </div>
+
+              {/* ---- The document -------------------------------------- */}
+              <div
+                className="dep-doc dep-sheet mt-3 max-h-[62vh] overflow-auto"
+                data-testid="workspace-editor"
+              >
+                <EditorContent editor={editor} />
+              </div>
+            </section>
+
+            <section className="grid gap-4 lg:grid-cols-[1.4fr_1fr]">
+              <div className="dep-card space-y-3">
+                <EditorOutputPanel
+                  editorName="TipTap"
+                  nativeFormat={EDITOR_BY_ID.tiptap.nativeFormat}
+                  available={["html", "json"]}
+                  getters={{
+                    html: () => editor.getHTML(),
+                    json: () => JSON.stringify(editor.getJSON()),
+                  }}
+                />
+                <TrackChanges content={content} />
+              </div>
+              <aside className="dep-card space-y-5">
+                <EditorProfile editorId="tiptap" />
+                <hr className="dep-rule" />
+                <CommentTrack />
+              </aside>
+            </section>
+          </main>
+        </WorkspaceChrome>
+
+        {/* Lint (Validation) Overlay */}
+        {lintEnabled && (
+          <div
+            className="fixed bottom-6 left-1/2 z-40 -translate-x-1/2 px-5 py-2"
+            style={{
+              background: "var(--mark-soft)",
+              border: "1px solid var(--mark-line)",
+              color: "var(--mark)",
+            }}
+          >
+            <span className="text-sm font-semibold">
+              Linting enabled &mdash; issues are highlighted inline.
+            </span>
           </div>
-          <DarkModeToggle />
-        </div>
-      </header>
+        )}
 
-      <div className="border-b px-4 py-3 sm:px-8">
-        <div className="mx-auto w-full max-w-[1440px]">
-          <NavBar />
-        </div>
-      </div>
-
-      {/* Header Toolbar */}
-      <header className="flex items-center gap-2 border-b bg-slate-100 px-6 py-3 dark:bg-slate-900/50">
-        <button
-          onClick={() => setSidebarOpen(true)}
-          className="mr-2 rounded bg-gray-200 p-2"
-          aria-label="Open sidebar"
-        >
-          <MenuIcon className="w-5 h-5" />
-        </button>
-        <span className="text-xl font-bold">TipTap Editor</span>
-        <select
-          value={getCurrentBlock(editor)}
-          onChange={(e) => setBlock(editor, e.target.value)}
-          className="rounded border px-2 py-1 ml-4"
-          aria-label="Block style"
-        >
-          <option value="p">Paragraph</option>
-          <option value="h1">Heading 1</option>
-          <option value="h2">Heading 2</option>
-          <option value="h3">Heading 3</option>
-        </select>
-        {toolbarButton(
-          <Bold className="w-4 h-4" />,
-          () => editor.chain().focus().toggleBold().run(),
-          editor.isActive("bold"),
-          "Bold",
-        )}
-        {toolbarButton(
-          <Italic className="w-4 h-4" />,
-          () => editor.chain().focus().toggleItalic().run(),
-          editor.isActive("italic"),
-          "Italic",
-        )}
-        {toolbarButton(
-          <UnderlineIcon className="w-4 h-4" />,
-          () => editor.chain().focus().toggleUnderline?.().run(),
-          editor.isActive("underline"),
-          "Underline",
-        )}
-        {toolbarButton(
-          <Strikethrough className="w-4 h-4" />,
-          () => editor.chain().focus().toggleStrike().run(),
-          editor.isActive("strike"),
-          "Strikethrough",
-        )}
-        {toolbarButton(
-          <Code className="w-4 h-4" />,
-          () => editor.chain().focus().toggleCode().run(),
-          editor.isActive("code"),
-          "Inline Code",
-        )}
-        {toolbarButton(
-          <Quote className="w-4 h-4" />,
-          () => editor.chain().focus().toggleBlockquote().run(),
-          editor.isActive("blockquote"),
-          "Blockquote",
-        )}
-        {toolbarButton(
-          <List className="w-4 h-4" />,
-          () => editor.chain().focus().toggleBulletList().run(),
-          editor.isActive("bulletList"),
-          "Bullet List",
-        )}
-        {toolbarButton(
-          <ListOrdered className="w-4 h-4" />,
-          () => editor.chain().focus().toggleOrderedList().run(),
-          editor.isActive("orderedList"),
-          "Numbered List",
-        )}
-        {toolbarButton(
-          <Undo2 className="w-4 h-4" />,
-          () => editor.chain().focus().undo().run(),
-          false,
-          "Undo",
-        )}
-        {toolbarButton(
-          <Redo2 className="w-4 h-4" />,
-          () => editor.chain().focus().redo().run(),
-          false,
-          "Redo",
-        )}
-        <button
-          onClick={insertTable}
-          className="ml-2 p-2 rounded bg-gray-200"
-          title="Insert Table"
-        >
-          <TableIcon className="w-4 h-4" />
-        </button>
-        <button
-          onClick={insertImage}
-          className="ml-1 p-2 rounded bg-gray-200"
-          title="Insert Image"
-        >
-          <ImageIcon className="w-4 h-4" />
-        </button>
-        <button
-          onClick={() => alert(editor.getHTML())}
-          className="ml-4 px-4 py-2 bg-indigo-600 text-white rounded hover:bg-indigo-700"
-        >
-          Save
-        </button>
-        <AiSuggestButton
-          editor={editor}
+        {/* Sidebar for templates, validation, collab, history */}
+        <Sidebar
+          show={sidebarOpen}
+          onClose={() => setSidebarOpen(false)}
+          onTemplateLoad={handleTemplateLoad}
+          onToggleLint={handleToggleLint}
+          lintEnabled={lintEnabled}
+          onToggleCollab={handleToggleCollab}
+          collabEnabled={collabEnabled}
+          onToggleAiSuggest={handleToggleAiSuggest}
           aiSuggestEnabled={aiSuggestEnabled}
-          onNewSuggestion={handleNewSuggestion}
+          onToggleHeadingLock={handleToggleHeadingLock}
+          headingLockEnabled={headingLockEnabled}
+          onToggleIndentation={handleToggleIndentation}
+          indentationEnabled={indentationEnabled}
+          onToggleSectionNode={handleToggleSectionNode}
+          sectionNodeEnabled={sectionNodeEnabled}
+          onToggleMarkReview={handleToggleMarkReview}
+          markReviewEnabled={markReviewEnabled}
+          onToggleWatermark={handleToggleWatermark}
+          watermarkEnabled={watermarkEnabled}
+          watermarkText={watermarkText}
+          onWatermarkText={setWatermarkText}
+          suggestions={suggestions}
+          acceptSuggestion={acceptSuggestion}
+          rejectSuggestion={rejectSuggestion}
+          clearSuggestions={clearSuggestions}
+          history={DUMMY_HISTORY}
         />
-        <div className="flex-1" />
-      </header>
-
-      {/* Lint (Validation) Overlay */}
-      {lintEnabled && (
-        <div className="fixed bottom-6 left-1/2 transform -translate-x-1/2 bg-red-50 border border-red-300 px-6 py-2 rounded z-40 shadow">
-          <span className="text-red-600 font-semibold">
-            Linting enabled — Issues will be highlighted inline.
-          </span>
-        </div>
-      )}
-
-      {/* Main Editor */}
-      <main className="flex flex-1 items-start justify-center overflow-auto bg-white dark:bg-slate-950">
-        <div className="w-full max-w-[860px] p-8">
-          <EditorContent editor={editor} />
-        </div>
-      </main>
-
-      {/* Sidebar for templates, validation, collab, history */}
-      <Sidebar
-        show={sidebarOpen}
-        onClose={() => setSidebarOpen(false)}
-        onTemplateLoad={handleTemplateLoad}
-        onToggleLint={handleToggleLint}
-        lintEnabled={lintEnabled}
-        onToggleCollab={handleToggleCollab}
-        collabEnabled={collabEnabled}
-        onToggleAiSuggest={handleToggleAiSuggest}
-        aiSuggestEnabled={aiSuggestEnabled}
-        onToggleHeadingLock={handleToggleHeadingLock}
-        headingLockEnabled={headingLockEnabled}
-        onToggleIndentation={handleToggleIndentation}
-        indentationEnabled={indentationEnabled}
-        onToggleSectionNode={handleToggleSectionNode}
-        sectionNodeEnabled={sectionNodeEnabled}
-        onToggleMarkReview={handleToggleMarkReview}
-        markReviewEnabled={markReviewEnabled}
-        onToggleWatermark={handleToggleWatermark}
-        watermarkEnabled={watermarkEnabled}
-        watermarkText={watermarkText}
-        onWatermarkText={setWatermarkText}
-        suggestions={suggestions}
-        acceptSuggestion={acceptSuggestion}
-        rejectSuggestion={rejectSuggestion}
-        clearSuggestions={clearSuggestions}
-        history={DUMMY_HISTORY}
-      />
-    </div>
+      </div>
+    </>
   );
 }

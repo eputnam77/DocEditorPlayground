@@ -22,19 +22,19 @@ export default function CommentTrack() {
 
   return (
     <section className="space-y-2" data-testid="comment-track">
-      <label className="block text-sm font-semibold text-slate-700 dark:text-slate-100" htmlFor="comment-input">
+      <label className="dep-eyebrow block" htmlFor="comment-input">
         Comments
       </label>
       <div className="flex items-center gap-2">
         <input
           id="comment-input"
-          className="flex-1 rounded-md border border-slate-300 bg-white px-2 py-1 text-sm text-slate-900 placeholder:text-slate-500 dark:border-slate-600 dark:bg-slate-900 dark:text-slate-100"
+          className="dep-input flex-1"
           value={comment}
           onChange={(e) => setComment(e.target.value)}
           placeholder="Add a comment for this draft"
         />
         <button
-          className="rounded-md bg-sky-600 px-3 py-1 text-sm font-semibold text-white hover:bg-sky-700"
+          className="dep-btn dep-btn--mark"
           onClick={add}
         >
           Add comment
@@ -42,7 +42,7 @@ export default function CommentTrack() {
       </div>
       {comments.length > 0 && (
         <ul
-          className="list-inside list-disc space-y-1 text-sm text-slate-700 dark:text-slate-200"
+          className="dep-doc space-y-1 pl-5 text-sm"
           data-testid="comment-list"
         >
           {comments.map((c, i) => (

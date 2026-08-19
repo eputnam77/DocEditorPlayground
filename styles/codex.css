@@ -1,4 +1,10 @@
-/* Editor.js overrides */
+/* Editor.js overrides
+ *
+ * Editor.js styles its own chrome (block handles, inline toolbar, popovers) but
+ * not the content, so heading and list typography comes from the shared
+ * .dep-doc rules in globals.css. Its chrome is reset back to the UI font here
+ * so it does not inherit the document serif.
+ */
 
 #codex-editor,
 #codex-editor .ce-block__content,
@@ -9,10 +15,47 @@
   text-align: left;
 }
 
+/* Editor.js positions the add-block and drag handles in a gutter to the LEFT of
+ * .ce-toolbar__content, which by default is a centered column. Widening that
+ * column to the full width put the handles at a negative offset, where the
+ * scroll container clipped them. Full width is worth keeping, so the gutter is
+ * reserved as padding on the holder instead. */
+#codex-editor {
+  padding-left: 3.25rem;
+}
+
+#codex-editor .ce-block__content,
+#codex-editor .ce-toolbar__content {
+  max-width: none;
+}
+
+/* Keep the handles inside the reserved gutter and always visible, rather than
+ * only appearing on hover at the edge of the viewport. */
+#codex-editor .ce-toolbar__actions {
+  right: 100%;
+  padding-right: 0.4rem;
+  opacity: 1;
+}
+
+#codex-editor .ce-toolbar__plus,
+#codex-editor .ce-toolbar__settings-btn {
+  color: var(--ink-60);
+  background: var(--paper-sunk);
+  border: 1px solid var(--ink-16);
+  border-radius: 2px;
+}
+
+#codex-editor .ce-toolbar__plus:hover,
+#codex-editor .ce-toolbar__settings-btn:hover {
+  color: var(--mark);
+  border-color: var(--mark-line);
+  background: var(--paper-raised);
+}
+
 #codex-editor ul,
 #codex-editor ol {
   margin: 0.25rem 0;
-  padding-left: 1.5rem;
+  padding-left: 1.6rem;
 }
 
 #codex-editor ul {
@@ -21,4 +64,8 @@
 
 #codex-editor ol {
   list-style-type: decimal;
+}
+
+#codex-editor li {
+  display: list-item;
 }

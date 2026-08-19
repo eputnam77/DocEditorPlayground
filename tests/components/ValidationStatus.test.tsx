@@ -11,6 +11,8 @@ describe("ValidationStatus", () => {
         onClear={() => {}}
       />,
     );
-    expect(screen.getByText(/A:/).textContent).toContain("A:");
+    expect(screen.getByText("A")).toBeTruthy();
+    expect(screen.getByText("PASS")).toBeTruthy();
+    expect(screen.getByText("1 pass")).toBeTruthy();
   });
 });

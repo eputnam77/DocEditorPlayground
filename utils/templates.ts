@@ -1,5 +1,12 @@
-export const TEMPLATES = [
-  { label: "Software Release Notes", filename: "software-release-notes.html" },
-  { label: "Medical Research Article", filename: "medical-research-article.html" },
-  { label: "Legal Contract Template", filename: "legal-contract-template.html" },
-];
+/**
+ * Template metadata for the template picker.
+ *
+ * The bodies live in `templateContent.ts`, which is compiled into the bundle -
+ * see the comment there for why they are no longer fetched at runtime.
+ */
+export {
+  TEMPLATES,
+  TEMPLATE_BY_FILENAME,
+  getTemplateHtml,
+  type TemplateDefinition,
+} from "./templateContent";

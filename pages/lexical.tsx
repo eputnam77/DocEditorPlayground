@@ -42,7 +42,9 @@ import {
   Redo2,
   Undo2,
 } from "lucide-react";
-import EditorIntegrationInfo from "../components/EditorIntegrationInfo";
+import Head from "next/head";
+import EditorProfile from "../components/EditorProfile";
+import EditorOutputPanel from "../components/EditorOutputPanel";
 import TemplateLoader from "../components/TemplateLoader";
 import sanitizeHtml from "../utils/sanitize";
 import ValidationStatus, {
@@ -50,7 +52,7 @@ import ValidationStatus, {
 } from "../components/ValidationStatus";
 import CommentTrack from "../components/CommentTrack";
 import TrackChanges from "../components/TrackChanges";
-import { TEMPLATES } from "../utils/templates";
+import { TEMPLATES, getTemplateHtml } from "../utils/templates";
 import { LIPSUM_PARAGRAPHS } from "../utils/lipsum";
 import EditorWorkspace from "../components/EditorWorkspace";
 import FormatToggleButton from "../components/FormatToggleButton";
@@ -85,6 +87,54 @@ function findNearestListType(node: any): "bullet" | "number" | null {
   return null;
 }
 
+/**
+ * Lexical's class map. Node type -> CSS class; the classes themselves are
+ * defined in styles/lexical.css.
+ */
+const LEXICAL_THEME = {
+  paragraph: "lexical-paragraph",
+  quote: "lexical-quote",
+  heading: {
+    h1: "lexical-h1",
+    h2: "lexical-h2",
+    h3: "lexical-h3",
+    h4: "lexical-h4",
+    h5: "lexical-h5",
+    h6: "lexical-h6",
+  },
+  list: {
+    ul: "lexical-ul",
+    ol: "lexical-ol",
+    listitem: "lexical-li",
+    nested: { listitem: "lexical-li-nested" },
+  },
+  text: {
+    bold: "lexical-bold",
+    italic: "lexical-italic",
+    underline: "lexical-underline",
+    strikethrough: "lexical-strikethrough",
+    code: "lexical-code",
+  },
+};
+
+/**
+ * The top-level block containing `node`, or null.
+ *
+ * getTopLevelElementOrThrow throws when the selection is anchored on the root
+ * itself, which happens for a beat after root.clear() during a template load.
+ * Every caller here wants "no block" rather than an exception.
+ */
+function topLevelBlockOf(node: any): any | null {
+  try {
+    if (!node || node.getKey?.() === "root") {
+      return null;
+    }
+    return node.getTopLevelElementOrThrow();
+  } catch {
+    return null;
+  }
+}
+
 function Toolbar({
   onStateChange,
 }: {
@@ -103,12 +153,12 @@ function Toolbar({
       }
 
       const anchorNode = selection.anchor.getNode();
-      const topLevel = anchorNode.getTopLevelElementOrThrow();
+      const topLevel = topLevelBlockOf(anchorNode);
       const listType = findNearestListType(anchorNode);
       const nextState: LexicalFormatState = {
         bold: selection.hasFormat("bold"),
         italic: selection.hasFormat("italic"),
-        heading: topLevel.getType() === "heading",
+        heading: topLevel?.getType() === "heading",
         bulletList: listType === "bullet",
         numberedList: listType === "number",
       };
@@ -137,9 +187,11 @@ function Toolbar({
   }, [editor]);
 
   return (
-    <div className="mb-3 flex flex-wrap gap-2">
+    <div className="dep-toolbar mb-3">
+      <span className="dep-toolbar__label">Marks</span>
       <FormatToggleButton
         label="Bold"
+        shortcut="Ctrl+B"
         active={state.bold}
         onMouseDown={(event) => {
           event.preventDefault();
@@ -150,6 +202,7 @@ function Toolbar({
       </FormatToggleButton>
       <FormatToggleButton
         label="Italic"
+        shortcut="Ctrl+I"
         active={state.italic}
         onMouseDown={(event) => {
           event.preventDefault();
@@ -158,8 +211,10 @@ function Toolbar({
       >
         <Italic size={16} />
       </FormatToggleButton>
+      <span aria-hidden="true" className="dep-toolbar__sep" />
+      <span className="dep-toolbar__label">Blocks</span>
       <FormatToggleButton
-        label="Heading"
+        label="Heading 2"
         active={state.heading}
         onMouseDown={(event) => {
           event.preventDefault();
@@ -169,8 +224,8 @@ function Toolbar({
               return;
             }
             const anchorNode = selection.anchor.getNode();
-            const topLevel = anchorNode.getTopLevelElementOrThrow();
-            if (topLevel.getType() === "heading") {
+            const topLevel = topLevelBlockOf(anchorNode);
+            if (topLevel?.getType() === "heading") {
               $setBlocksType(selection, () => $createParagraphNode());
               return;
             }
@@ -206,8 +261,10 @@ function Toolbar({
       >
         <ListOrdered size={16} />
       </FormatToggleButton>
+      <span aria-hidden="true" className="dep-toolbar__sep" />
       <FormatToggleButton
         label="Undo"
+        shortcut="Ctrl+Z"
         onMouseDown={(event) => {
           event.preventDefault();
           editor.dispatchCommand(UNDO_COMMAND, undefined);
@@ -217,6 +274,7 @@ function Toolbar({
       </FormatToggleButton>
       <FormatToggleButton
         label="Redo"
+        shortcut="Ctrl+Shift+Z"
         onMouseDown={(event) => {
           event.preventDefault();
           editor.dispatchCommand(REDO_COMMAND, undefined);
@@ -255,7 +313,11 @@ function LexicalPage() {
   const initialConfig = useMemo(
     () => ({
       namespace: "DocEditorPlaygroundLexical",
-      theme: {},
+      // Lexical renders semantic elements but styles nothing: with an empty
+      // theme, an h2 inherited paragraph styling from Tailwind's preflight and
+      // "make this a heading" appeared to do nothing at all. Every node type
+      // therefore has to be mapped to a class explicitly.
+      theme: LEXICAL_THEME,
       onError(error: Error) {
         throw error;
       },
@@ -272,32 +334,24 @@ function LexicalPage() {
     [],
   );
 
-  async function loadTemplate(filename: string) {
-    try {
-      const response = await fetch(`/templates/${filename}`);
-      if (!response.ok) {
-        throw new Error("fetch failed");
-      }
-      const html = sanitizeHtml(await response.text());
-      const editor = editorRef.current;
-      if (!editor) {
-        return;
-      }
-      editor.update(() => {
-        const parser = new DOMParser();
-        const dom = parser.parseFromString(html, "text/html");
-        const nodes = $generateNodesFromDOM(editor, dom);
-        const root = $getRoot();
-        root.clear();
-        if (nodes.length > 0) {
-          root.append(...nodes);
-        } else {
-          root.append($createParagraphNode());
-        }
-      });
-    } catch {
-      alert(`Failed to load template: ${filename}`);
+  function loadTemplate(filename: string) {
+    const html = sanitizeHtml(getTemplateHtml(filename));
+    const editor = editorRef.current;
+    if (!editor) {
+      return;
     }
+    editor.update(() => {
+      const parser = new DOMParser();
+      const dom = parser.parseFromString(html, "text/html");
+      const nodes = $generateNodesFromDOM(editor, dom);
+      const root = $getRoot();
+      root.clear();
+      if (nodes.length > 0) {
+        root.append(...nodes);
+      } else {
+        root.append($createParagraphNode());
+      }
+    });
   }
 
   function runDiagnostics() {
@@ -329,11 +383,24 @@ function LexicalPage() {
   }
 
   return (
-    <EditorWorkspace
-      title="Lexical editor"
-      description="Official Lexical React setup with ListPlugin, heading nodes, and selection-aware toolbar state."
+    <>
+      <Head>
+        <title>Lexical · Document Editor Playground</title>
+      </Head>
+      <EditorWorkspace
+      editorId="lexical"
+      title="Lexical"
+      description="Meta's editor core, deliberately small. Rich text, history, and lists are three separate plugins on this page - remove one and that capability simply stops existing."
       toolDescription={EDITOR_BY_ID.lexical.toolDescription}
       toolRepoUrl={EDITOR_BY_ID.lexical.githubRepoUrl}
+      surfaceNote={
+        <>
+          <strong>Look for:</strong> heading and list formatting now render visibly
+          because this page maps every Lexical node type to a CSS class. Lexical emits
+          semantic <code>&lt;h2&gt;</code> and <code>&lt;ul&gt;</code> elements but
+          styles nothing itself - the theme object is the app&apos;s job.
+        </>
+      }
       controls={
         <>
           <TemplateLoader
@@ -350,36 +417,46 @@ function LexicalPage() {
                 root.append($createParagraphNode());
               });
             }}
-            onError={(error) => alert(String(error))}
+            onError={(error) => alert(`Could not load template: ${String(error)}`)}
           />
           <button
             type="button"
-            className="rounded-md bg-sky-600 px-3 py-2 text-sm font-semibold text-white hover:bg-sky-700"
+            className="dep-btn dep-btn--mark"
             onClick={runDiagnostics}
           >
             Run diagnostics
           </button>
         </>
       }
+      diagnostics={
+        <ValidationStatus
+          results={validationResults}
+          onClear={() => setValidationResults([])}
+        />
+      }
       statusPanel={
         <div className="space-y-3">
+          <EditorOutputPanel
+            editorName="Lexical"
+            nativeFormat={EDITOR_BY_ID.lexical.nativeFormat}
+            available={["json", "html"]}
+            getters={{
+              json: () => JSON.stringify(contentJson),
+              html: () => contentHtml,
+            }}
+          />
           <TrackChanges content={contentText} />
-          {validationResults.length > 0 && (
-            <ValidationStatus
-              results={validationResults}
-              onClear={() => setValidationResults([])}
-            />
-          )}
         </div>
       }
       sidePanel={
-        <div className="space-y-4">
+        <div className="space-y-5">
+          <EditorProfile editorId="lexical" />
+          <hr className="dep-rule" />
           <CommentTrack />
-          <EditorIntegrationInfo editorName="Lexical" />
         </div>
       }
     >
-      <div className="h-full p-3">
+      <div className="dep-doc relative h-full p-3">
         <LexicalComposer initialConfig={initialConfig}>
           <Toolbar onStateChange={setFormatState} />
           <RichTextPlugin
@@ -387,7 +464,7 @@ function LexicalPage() {
               <ContentEditable
                 data-testid="lexical-editor"
                 dir="ltr"
-                className="h-[58vh] w-full rounded-md border border-slate-300 bg-white p-3 text-left text-slate-900 outline-none dark:border-slate-600 dark:bg-slate-900 dark:text-slate-100"
+                className="dep-sheet h-[58vh] w-full overflow-auto p-4 outline-none"
                 style={{
                   direction: "ltr",
                   unicodeBidi: "plaintext",
@@ -396,7 +473,10 @@ function LexicalPage() {
               />
             }
             placeholder={
-              <p className="pointer-events-none absolute m-3 text-sm text-slate-400">
+              <p
+                className="pointer-events-none absolute p-4"
+                style={{ color: "var(--ink-42)" }}
+              >
                 Start writing...
               </p>
             }
@@ -420,7 +500,8 @@ function LexicalPage() {
           />
         </LexicalComposer>
       </div>
-    </EditorWorkspace>
+      </EditorWorkspace>
+    </>
   );
 }
 

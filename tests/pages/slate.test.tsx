@@ -6,7 +6,7 @@ import SlatePage from "../../pages/slate";
 describe("SlatePage", () => {
   it("renders heading", () => {
     render(<SlatePage />);
-    expect(screen.getByText("Slate editor")).toBeTruthy();
+    expect(screen.getByRole("heading", { level: 1, name: "Slate" })).toBeTruthy();
     expect(screen.getByText("Comments")).toBeTruthy();
   });
 

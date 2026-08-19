@@ -1,4 +1,9 @@
-/* CKEditor overrides */
+/* CKEditor overrides
+ *
+ * CKEditor ships its whole UI, including its colors, so it is themed through
+ * its own custom properties rather than by restyling its DOM. Document
+ * typography comes from the shared .dep-doc rules in globals.css.
+ */
 
 .ckeditor-editor-shell,
 .ckeditor-editor-shell .ck-editor__editable,
@@ -8,12 +13,25 @@
   text-align: left;
 }
 
+/* Let the editable fill the sheet instead of CKEditor's default narrow box. */
+.ckeditor-editor-shell .ck.ck-editor__editable {
+  min-height: 24rem;
+  border: 0;
+  box-shadow: none;
+}
+
+.ckeditor-editor-shell .ck.ck-toolbar {
+  border-left: 0;
+  border-right: 0;
+  border-top: 0;
+}
+
 .ckeditor-editor-shell .ck-content ul,
 .ckeditor-editor-shell .ck-content ol,
 [data-testid="ckeditor-editable"] ul,
 [data-testid="ckeditor-editable"] ol {
-  margin: 0.25rem 0;
-  padding-left: 1.5rem;
+  margin: 0 0 0.9em;
+  padding-left: 1.6em;
 }
 
 .ckeditor-editor-shell .ck-content ul,
@@ -24,4 +42,44 @@
 .ckeditor-editor-shell .ck-content ol,
 [data-testid="ckeditor-editable"] ol {
   list-style-type: decimal;
+}
+
+/* Dark mode: CKEditor has no dark build, but its UI is driven entirely by these
+ * custom properties, so remapping them onto the app's tokens is enough. Without
+ * this the editor stayed a white slab in an otherwise dark page. */
+.dark .ckeditor-editor-shell {
+  --ck-color-base-background: var(--paper-raised);
+  --ck-color-base-foreground: var(--paper-sunk);
+  --ck-color-base-border: var(--ink-16);
+  --ck-color-base-text: var(--ink);
+  --ck-color-base-active: var(--mark);
+  --ck-color-base-active-focus: var(--mark);
+  --ck-color-focus-border: var(--mark-line);
+  --ck-color-text: var(--ink);
+  --ck-color-shadow-drop: rgba(0, 0, 0, 0.5);
+  --ck-color-shadow-inner: rgba(0, 0, 0, 0.4);
+  --ck-color-button-default-background: transparent;
+  --ck-color-button-default-hover-background: var(--ink-08);
+  --ck-color-button-default-active-background: var(--ink-08);
+  --ck-color-button-on-background: var(--mark-soft);
+  --ck-color-button-on-hover-background: var(--mark-soft);
+  --ck-color-button-on-color: var(--mark);
+  --ck-color-toolbar-background: var(--paper-sunk);
+  --ck-color-toolbar-border: var(--ink-16);
+  --ck-color-dropdown-panel-background: var(--paper-card);
+  --ck-color-dropdown-panel-border: var(--ink-16);
+  --ck-color-panel-background: var(--paper-card);
+  --ck-color-panel-border: var(--ink-16);
+  --ck-color-list-background: var(--paper-card);
+  --ck-color-list-button-hover-background: var(--ink-08);
+  --ck-color-list-button-on-background: var(--mark-soft);
+  --ck-color-list-button-on-text: var(--mark);
+  --ck-color-input-background: var(--paper-raised);
+  --ck-color-input-border: var(--ink-16);
+  --ck-color-input-text: var(--ink);
+  --ck-color-labeled-field-label-background: var(--paper-raised);
+}
+
+.dark .ckeditor-editor-shell .ck.ck-icon {
+  color: var(--ink-80);
 }

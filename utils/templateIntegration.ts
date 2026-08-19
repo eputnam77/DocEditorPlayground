@@ -8,7 +8,7 @@ export interface Template {
 const INVISIBLE_TEMPLATE_CHARS = /[\u200B-\u200D\u2060-\u206F\uFEFF]/g;
 
 /**
- * Filter and normalise an array of templates.
+ * Filter and normalize an array of templates.
  *
  * The function validates each template using `validateTemplate` and returns
  * only those that pass validation. Invalid items are ignored. A TypeError is

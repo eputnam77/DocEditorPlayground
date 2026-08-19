@@ -1,113 +1,102 @@
-/* Placeholder overrides for TipTap */
+/* TipTap overrides
+ *
+ * Document typography comes from the shared .dep-doc rules in globals.css - the
+ * editable sits inside a .dep-doc wrapper - so this file only carries the
+ * surface chrome and the extension-specific decorations.
+ */
+
+/* Toast UI's stylesheet is imported globally from pages/_app.tsx and contains a
+ * bare `.ProseMirror { color: #222 }`. TipTap's editable is also a .ProseMirror
+ * node, so that color leaked across editors and left the TipTap document
+ * unreadable in dark mode. Two classes outrank one, which settles it wherever
+ * the two stylesheets land in the cascade. */
+.tiptap-content.ProseMirror {
+  color: var(--ink);
+  caret-color: var(--mark);
+}
+
 .tiptap-content {
-  min-height: 200px;
+  min-height: 24rem;
+  font-family: var(--serif);
+  font-size: 1.02rem;
+  line-height: 1.7;
   direction: ltr;
   text-align: left;
-  border: 1px solid #d1d5db; /* Tailwind gray-300 */
-  border-radius: 0.5rem;
-  padding: 1rem;
-  background: #fff;
-  font-size: 1rem;
+  padding: clamp(1.5rem, 4vw, 3rem);
+  background: var(--paper-raised);
   outline: none;
-  transition: border-color 0.2s;
-}
-.tiptap-content:focus-within {
-  border-color: #6366f1; /* Tailwind indigo-500 */
 }
 
-.tiptap-content h1 {
-  font-size: 2rem;
-  font-weight: 700;
-  margin: 1.2em 0 0.5em 0;
-}
-.tiptap-content h2 {
-  font-size: 1.5rem;
-  font-weight: 600;
-  margin: 1.1em 0 0.5em 0;
-}
-.tiptap-content h3 {
-  font-size: 1.25rem;
-  font-weight: 600;
-  margin: 1em 0 0.5em 0;
-}
-.tiptap-content h4 {
-  font-size: 1.1rem;
-  font-weight: 600;
-  margin: 0.9em 0 0.5em 0;
-}
-.tiptap-content h5 {
-  font-size: 1rem;
-  font-weight: 600;
-  margin: 0.8em 0 0.5em 0;
-}
-.tiptap-content h6 {
-  font-size: 0.95rem;
-  font-weight: 600;
-  margin: 0.7em 0 0.5em 0;
+/* Table handles come from the table extension, not from .dep-doc. */
+.tiptap-content table {
+  position: relative;
 }
 
-.tiptap-content blockquote {
-  border-left: 4px solid #a5b4fc; /* Tailwind indigo-300 */
-  background: #f3f4f6; /* Tailwind gray-100 */
-  color: #374151; /* Tailwind gray-700 */
-  margin: 1em 0;
-  padding: 0.5em 1em;
-  font-style: italic;
+.tiptap-content .selectedCell::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  background: var(--mark-soft);
+  pointer-events: none;
 }
 
-.tiptap-content code {
-  background: #f3f4f6;
-  color: #d97706; /* Tailwind amber-600 */
-  font-family: 'Fira Mono', 'Consolas', 'Monaco', monospace;
-  padding: 0.2em 0.4em;
-  border-radius: 0.3em;
-  font-size: 0.95em;
+.tiptap-content .column-resize-handle {
+  position: absolute;
+  right: -2px;
+  top: 0;
+  bottom: 0;
+  width: 3px;
+  background: var(--mark);
 }
 
-.tiptap-content pre {
-  background: #1e293b; /* Tailwind slate-800 */
-  color: #f1f5f9; /* Tailwind slate-100 */
-  padding: 1em;
-  border-radius: 0.5em;
-  overflow-x: auto;
-  font-family: 'Fira Mono', 'Consolas', 'Monaco', monospace;
-  font-size: 0.95em;
-  margin: 1em 0;
-}
-
-.tiptap-content ul,
-.tiptap-content ol {
-  margin: 1em 0 1em 2em;
-  padding-left: 1.5em;
-}
-.tiptap-content ul {
-  list-style-type: disc;
-}
-.tiptap-content ol {
-  list-style-type: decimal;
-}
-
-.tiptap-content li {
-  margin: 0.25em 0;
-}
-
-.tiptap-content strong {
-  font-weight: 700;
-}
-
-.tiptap-content em {
-  font-style: italic;
-}
-
-.tiptap-content u {
-  text-decoration: underline;
-}
-
-.tiptap-content s {
-  text-decoration: line-through;
-}
-
+/* Lint extension: an inline flag on suspect prose. */
 .lint-highlight {
-  background-color: #fef3c7; /* Tailwind amber-100 */
-  border-bottom: 2px solid #f59e0b; /* Tailwind amber-500 */
+  background-color: var(--mark-soft);
+  border-bottom: 2px solid var(--mark);
+}
+
+/* Watermark extension. */
+.tiptap-watermark {
+  position: relative;
+}
+
+.tiptap-watermark::after {
+  content: attr(data-watermark);
+  position: absolute;
+  inset: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-family: var(--sans);
+  font-size: clamp(3rem, 12vw, 8rem);
+  font-weight: 700;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  color: var(--ink);
+  opacity: 0.05;
+  pointer-events: none;
+  user-select: none;
+}
+
+/* Collaboration cursors. */
+.collaboration-cursor__caret {
+  position: relative;
+  border-left: 1px solid var(--mark);
+  border-right: 1px solid var(--mark);
+  margin-inline: -1px;
+  pointer-events: none;
+}
+
+.collaboration-cursor__label {
+  position: absolute;
+  top: -1.4em;
+  left: -1px;
+  padding: 0.1rem 0.3rem;
+  border-radius: 2px;
+  background: var(--mark);
+  color: #fff;
+  font-family: var(--sans);
+  font-size: 0.65rem;
+  font-weight: 600;
+  white-space: nowrap;
 }

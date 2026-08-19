@@ -37,7 +37,7 @@ export default function TrackChanges({ content }: TrackChangesProps) {
   if (added === 0 && removed === 0) return null;
 
   return (
-    <div className="text-sm text-slate-700 dark:text-slate-200" data-testid="track-changes">
+    <div className="dep-mono" data-testid="track-changes" style={{ color: "var(--ink-60)" }}>
       {added > 0 && <span data-testid="added">{added} characters added</span>}
       {removed > 0 && (
         <span data-testid="removed" className="ml-3">

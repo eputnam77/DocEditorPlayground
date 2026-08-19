@@ -1,6 +1,8 @@
 import React, { useRef, useState } from "react";
 import dynamic from "next/dynamic";
-import EditorIntegrationInfo from "../components/EditorIntegrationInfo";
+import Head from "next/head";
+import EditorProfile from "../components/EditorProfile";
+import EditorOutputPanel from "../components/EditorOutputPanel";
 import TemplateLoader from "../components/TemplateLoader";
 import sanitizeHtml from "../utils/sanitize";
 import ValidationStatus, {
@@ -8,7 +10,7 @@ import ValidationStatus, {
 } from "../components/ValidationStatus";
 import CommentTrack from "../components/CommentTrack";
 import TrackChanges from "../components/TrackChanges";
-import { TEMPLATES } from "../utils/templates";
+import { TEMPLATES, getTemplateHtml } from "../utils/templates";
 import { LIPSUM_HTML } from "../utils/lipsum";
 import EditorWorkspace from "../components/EditorWorkspace";
 import { EDITOR_BY_ID } from "../components/editorCatalog";
@@ -40,18 +42,12 @@ function CkeditorPage() {
     };
   }, []);
 
-  async function loadTemplate(filename: string) {
-    try {
-      const response = await fetch(`/templates/${filename}`);
-      if (!response.ok) {
-        throw new Error("fetch failed");
-      }
-      const html = sanitizeHtml(await response.text());
-      editorRef.current?.setData(html);
-      setContent(html);
-    } catch {
-      alert(`Failed to load template: ${filename}`);
-    }
+  function loadTemplate(filename: string) {
+    // Templates are compiled into the bundle, so this cannot fail on a network
+    // hop the way the previous fetch("/templates/...") could.
+    const html = sanitizeHtml(getTemplateHtml(filename));
+    editorRef.current?.setData(html);
+    setContent(html);
   }
 
   function runDiagnostics() {
@@ -84,101 +80,125 @@ function CkeditorPage() {
   }
 
   return (
-    <EditorWorkspace
-      title="CKEditor 5"
-      description="Official Classic build configuration with icon toolbar, active command states, and paragraph/list/heading support."
-      toolDescription={EDITOR_BY_ID.ckeditor.toolDescription}
-      toolRepoUrl={EDITOR_BY_ID.ckeditor.githubRepoUrl}
-      controls={
-        <>
-          <TemplateLoader
-            templates={TEMPLATES}
-            onLoad={loadTemplate}
-            onClear={() => {
-              editorRef.current?.setData("");
-              setContent("");
-            }}
-            onError={(error) => alert(String(error))}
+    <>
+      <Head>
+        <title>CKEditor 5 · Document Editor Playground</title>
+      </Head>
+      <EditorWorkspace
+        editorId="ckeditor"
+        title="CKEditor 5"
+        description="The batteries-included option: the toolbar, dropdowns, and balloon UI below all ship with the editor. Nothing on this page draws CKEditor's controls - it draws its own."
+        toolDescription={EDITOR_BY_ID.ckeditor.toolDescription}
+        toolRepoUrl={EDITOR_BY_ID.ckeditor.githubRepoUrl}
+        surfaceNote={
+          <>
+            <strong>Look for:</strong> the gray toolbar below is CKEditor&apos;s own.
+            Select a heading from its dropdown and the paragraph style changes
+            immediately - CKEditor maintains its own document model, so it never
+            produces invalid markup. Its output is HTML and only HTML.
+          </>
+        }
+        controls={
+          <>
+            <TemplateLoader
+              templates={TEMPLATES}
+              onLoad={loadTemplate}
+              onClear={() => {
+                editorRef.current?.setData("");
+                setContent("");
+              }}
+              onError={(error) => alert(`Could not load template: ${String(error)}`)}
+            />
+            <button
+              type="button"
+              className="dep-btn dep-btn--mark"
+              onClick={runDiagnostics}
+            >
+              Run diagnostics
+            </button>
+          </>
+        }
+        diagnostics={
+          <ValidationStatus
+            results={validationResults}
+            onClear={() => setValidationResults([])}
           />
-          <button
-            type="button"
-            className="rounded-md bg-sky-600 px-3 py-2 text-sm font-semibold text-white hover:bg-sky-700"
-            onClick={runDiagnostics}
+        }
+        statusPanel={
+          <div className="space-y-3">
+            <EditorOutputPanel
+              editorName="CKEditor 5"
+              nativeFormat={EDITOR_BY_ID.ckeditor.nativeFormat}
+              available={["html"]}
+              getters={{
+                html: () => editorRef.current?.getData?.() ?? content,
+              }}
+            />
+            <TrackChanges content={content} />
+          </div>
+        }
+        sidePanel={
+          <div className="space-y-5">
+            <EditorProfile editorId="ckeditor" />
+            <hr className="dep-rule" />
+            <CommentTrack />
+          </div>
+        }
+      >
+        <div className="dep-doc h-full p-3">
+          <div
+            dir="ltr"
+            className="ckeditor-editor-shell dep-sheet h-[58vh] overflow-auto p-2"
           >
-            Run diagnostics
-          </button>
-        </>
-      }
-      statusPanel={
-        <div className="space-y-3">
-          <TrackChanges content={content} />
-          {validationResults.length > 0 && (
-            <ValidationStatus
-              results={validationResults}
-              onClear={() => setValidationResults([])}
-            />
-          )}
+            {editorConstructor && (
+              <ClientCKEditor
+                editor={editorConstructor}
+                data={content}
+                onReady={(editor: any) => {
+                  editorRef.current = editor;
+                  (window as unknown as Record<string, unknown>).ckeditorEditor = editor;
+                  const editable =
+                    editor?.ui?.getEditableElement?.() ??
+                    editor?.ui?.view?.editable?.element ??
+                    null;
+                  if (editable) {
+                    editable.setAttribute("dir", "ltr");
+                    editable.setAttribute("data-testid", "ckeditor-editable");
+                    editable.style.direction = "ltr";
+                    editable.style.unicodeBidi = "plaintext";
+                    editable.style.textAlign = "left";
+                  }
+                }}
+                onChange={(_: unknown, editor: any) => {
+                  setContent(editor.getData());
+                }}
+                config={{
+                  toolbar: {
+                    items: [
+                      "heading",
+                      "|",
+                      "bold",
+                      "italic",
+                      "link",
+                      "bulletedList",
+                      "numberedList",
+                      "|",
+                      "blockQuote",
+                      "insertTable",
+                      "|",
+                      "undo",
+                      "redo",
+                    ],
+                    shouldNotGroupWhenFull: true,
+                  },
+                  placeholder: "Start writing...",
+                }}
+              />
+            )}
+          </div>
         </div>
-      }
-      sidePanel={
-        <div className="space-y-4">
-          <CommentTrack />
-          <EditorIntegrationInfo editorName="CKEditor 5" />
-        </div>
-      }
-    >
-      <div className="h-full p-3">
-        <p className="mb-2 text-xs text-slate-600 dark:text-slate-300">
-          Use CKEditor&apos;s built-in toolbar for heading, bold/italic, and list formatting with automatic active indicators.
-        </p>
-        <div
-          dir="ltr"
-          className="ckeditor-editor-shell h-[58vh] overflow-auto rounded-md border border-slate-300 bg-white p-2 text-left dark:border-slate-600 dark:bg-slate-900"
-        >
-          {editorConstructor && (
-            <ClientCKEditor
-              editor={editorConstructor}
-              data={content}
-              onReady={(editor: any) => {
-                editorRef.current = editor;
-                (window as unknown as Record<string, unknown>).ckeditorEditor = editor;
-                const editable =
-                  editor?.ui?.getEditableElement?.() ??
-                  editor?.ui?.view?.editable?.element ??
-                  null;
-                if (editable) {
-                  editable.setAttribute("dir", "ltr");
-                  editable.setAttribute("data-testid", "ckeditor-editable");
-                  editable.style.direction = "ltr";
-                  editable.style.unicodeBidi = "plaintext";
-                  editable.style.textAlign = "left";
-                }
-              }}
-              onChange={(_, editor: any) => {
-                setContent(editor.getData());
-              }}
-              config={{
-                toolbar: {
-                  items: [
-                    "heading",
-                    "|",
-                    "bold",
-                    "italic",
-                    "bulletedList",
-                    "numberedList",
-                    "|",
-                    "undo",
-                    "redo",
-                  ],
-                  shouldNotGroupWhenFull: true,
-                },
-                placeholder: "Start writing...",
-              }}
-            />
-          )}
-        </div>
-      </div>
-    </EditorWorkspace>
+      </EditorWorkspace>
+    </>
   );
 }
 
