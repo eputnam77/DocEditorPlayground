@@ -12,6 +12,7 @@ import { useLexicalComposerContext } from "@lexical/react/LexicalComposerContext
 import { LexicalErrorBoundary } from "@lexical/react/LexicalErrorBoundary";
 import {
   $createParagraphNode,
+  $createTextNode,
   $getRoot,
   $getSelection,
   $isRangeSelection,
@@ -50,6 +51,7 @@ import ValidationStatus, {
 import CommentTrack from "../components/CommentTrack";
 import TrackChanges from "../components/TrackChanges";
 import { TEMPLATES } from "../utils/templates";
+import { LIPSUM_PARAGRAPHS } from "../utils/lipsum";
 import EditorWorkspace from "../components/EditorWorkspace";
 import FormatToggleButton from "../components/FormatToggleButton";
 import { EDITOR_BY_ID } from "../components/editorCatalog";
@@ -258,6 +260,14 @@ function LexicalPage() {
         throw error;
       },
       nodes: [HeadingNode, QuoteNode, ListNode, ListItemNode],
+      editorState: () => {
+        const root = $getRoot();
+        LIPSUM_PARAGRAPHS.forEach((text) => {
+          const paragraph = $createParagraphNode();
+          paragraph.append($createTextNode(text));
+          root.append(paragraph);
+        });
+      },
     }),
     [],
   );

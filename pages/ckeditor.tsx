@@ -9,6 +9,7 @@ import ValidationStatus, {
 import CommentTrack from "../components/CommentTrack";
 import TrackChanges from "../components/TrackChanges";
 import { TEMPLATES } from "../utils/templates";
+import { LIPSUM_HTML } from "../utils/lipsum";
 import EditorWorkspace from "../components/EditorWorkspace";
 import { EDITOR_BY_ID } from "../components/editorCatalog";
 import { runEditorDiagnostics } from "../utils/editorDiagnostics";
@@ -24,7 +25,7 @@ function htmlToText(html: string): string {
 function CkeditorPage() {
   const editorRef = useRef<any>(null);
   const [editorConstructor, setEditorConstructor] = useState<any>(null);
-  const [content, setContent] = useState("");
+  const [content, setContent] = useState(LIPSUM_HTML);
   const [validationResults, setValidationResults] = useState<ValidationResult[]>([]);
 
   React.useEffect(() => {

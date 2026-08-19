@@ -16,6 +16,7 @@ import ValidationStatus, {
 import CommentTrack from "../components/CommentTrack";
 import TrackChanges from "../components/TrackChanges";
 import { TEMPLATES } from "../utils/templates";
+import { LIPSUM_PARAGRAPHS } from "../utils/lipsum";
 import EditorWorkspace from "../components/EditorWorkspace";
 import FormatToggleButton from "../components/FormatToggleButton";
 import { EDITOR_BY_ID } from "../components/editorCatalog";
@@ -61,11 +62,15 @@ function outputToText(data: OutputData): string {
     .trim();
 }
 
+const INITIAL_BLOCKS: OutputData = {
+  blocks: LIPSUM_PARAGRAPHS.map((text) => ({ type: "paragraph", data: { text } })),
+};
+
 function CodexPage() {
   const holderRef = useRef<HTMLDivElement>(null);
   const editorRef = useRef<any>(null);
-  const savedDataRef = useRef<OutputData>({ blocks: [] });
-  const [savedData, setSavedData] = useState<OutputData>({ blocks: [] });
+  const savedDataRef = useRef<OutputData>(INITIAL_BLOCKS);
+  const [savedData, setSavedData] = useState<OutputData>(INITIAL_BLOCKS);
   const [content, setContent] = useState("");
   const [validationResults, setValidationResults] = useState<ValidationResult[]>([]);
   const [active, setActive] = useState({
@@ -178,9 +183,7 @@ function CodexPage() {
         holder: holderRef.current,
         autofocus: true,
         placeholder: "Start writing...",
-        data: {
-          blocks: [{ type: "paragraph", data: { text: "" } }],
-        },
+        data: INITIAL_BLOCKS,
         tools: {
           paragraph: {
             class: Paragraph as any,

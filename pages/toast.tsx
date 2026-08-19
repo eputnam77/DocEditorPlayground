@@ -9,6 +9,7 @@ import ValidationStatus, {
 import CommentTrack from "../components/CommentTrack";
 import TrackChanges from "../components/TrackChanges";
 import { TEMPLATES } from "../utils/templates";
+import { LIPSUM_MARKDOWN } from "../utils/lipsum";
 import EditorWorkspace from "../components/EditorWorkspace";
 import { EDITOR_BY_ID } from "../components/editorCatalog";
 import { runEditorDiagnostics } from "../utils/editorDiagnostics";
@@ -58,7 +59,7 @@ function ToastPage() {
         height: "58vh",
         initialEditType: "wysiwyg",
         previewStyle: "vertical",
-        initialValue: "",
+        initialValue: LIPSUM_MARKDOWN,
         usageStatistics: false,
         toolbarItems: [
           ["heading"],

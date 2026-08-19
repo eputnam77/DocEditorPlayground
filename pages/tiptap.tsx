@@ -16,6 +16,7 @@ import SlashCommand from "../extensions/slash-command";
 import Lint from "../extensions/lint";
 import sanitizeHtml from "../utils/sanitize";
 import { TEMPLATES } from "../utils/templates";
+import { LIPSUM_HTML } from "../utils/lipsum";
 import DarkModeToggle from "../components/DarkModeToggle";
 import NavBar from "../components/NavBar";
 import { EDITOR_BY_ID } from "../components/editorCatalog";
@@ -613,7 +614,7 @@ export default function TipTapEditorPage() {
   ]);
 
   // TipTap Editor
-  const [content, setContent] = useState("<p>Hello world!</p>");
+  const [content, setContent] = useState(LIPSUM_HTML);
   const editor = useEditor(
     {
       extensions,

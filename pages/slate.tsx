@@ -14,6 +14,7 @@ import ValidationStatus, {
 import CommentTrack from "../components/CommentTrack";
 import TrackChanges from "../components/TrackChanges";
 import { TEMPLATES } from "../utils/templates";
+import { LIPSUM_PARAGRAPHS } from "../utils/lipsum";
 import EditorWorkspace from "../components/EditorWorkspace";
 import FormatToggleButton from "../components/FormatToggleButton";
 import { EDITOR_BY_ID } from "../components/editorCatalog";
@@ -27,12 +28,10 @@ type CustomElement = {
 
 const LIST_TYPES: CustomElement["type"][] = ["bulleted-list", "numbered-list"];
 
-const INITIAL_VALUE: CustomElement[] = [
-  {
-    type: "paragraph",
-    children: [{ text: "" }],
-  },
-];
+const INITIAL_VALUE: CustomElement[] = LIPSUM_PARAGRAPHS.map((text) => ({
+  type: "paragraph",
+  children: [{ text }],
+}));
 
 function isMarkActive(editor: any, format: "bold" | "italic"): boolean {
   try {
@@ -227,7 +226,7 @@ function Toolbar() {
 
 function SlatePage() {
   const [value, setValue] = useState<CustomElement[]>(INITIAL_VALUE);
-  const [content, setContent] = useState("");
+  const [content, setContent] = useState(LIPSUM_PARAGRAPHS.join(" "));
   const [validationResults, setValidationResults] = useState<ValidationResult[]>([]);
 
   const editor = useMemo(() => withHistory(withReact(createEditor())), []);

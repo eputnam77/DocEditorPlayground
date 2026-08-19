@@ -6,7 +6,6 @@ describe("TEMPLATES", () => {
   it("includes known templates", () => {
     const labels = TEMPLATES.map((tpl) => tpl.label);
     assert.deepStrictEqual(labels, [
-      "FAA Advisory Circular",
       "Software Release Notes",
       "Medical Research Article",
       "Legal Contract Template",
