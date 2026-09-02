@@ -75,8 +75,8 @@
     "lexical": "^0.40.0",
     "lucide-react": "^0.263.0",
     "mark-review": "github:eputnam77/MarkReview",
-    "next": "^15.4.10",
-    "postcss": "^8.4.34",
+    "next": "^16.3.4",
+    "postcss": "^8.5.23",
     "react": "^18.2.0",
     "react-dom": "^18.2.0",
     "slate": "^0.94.0",
@@ -101,7 +101,7 @@
     "jsdom": "^24.0.0",
     "prettier": "^3.2.4",
     "typescript": "^5.4.2",
-    "vitest": "^4.0.14"
+    "vitest": "^4.1.0"
   },
   "license": "GPL-3.0-only"
 }
